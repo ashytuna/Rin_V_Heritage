@@ -1575,6 +1575,8 @@ class Component extends DCLogic {
 
   DEMO_EMAIL = 'minhanh@email.com';
   DEMO_PASS = 'Heritage2024';
+  TEST_EMAIL = 'test@gmail.com';
+  TEST_PASS = '123456';
 
   venues = [
     { id: 1, name: 'Bảo tàng Lịch sử Quốc gia', city: 'Hà Nội', count: 48, seed: 'baotanglichsu', dist: 'Cách 1,2 km', x: '34%', y: '34%', wheelchair: true, floor: 'Tầng trệt' },
@@ -1788,8 +1790,8 @@ class Component extends DCLogic {
     const err = { email: null, pass: null };
     if (this.state.isOffline) { this.showToast('Không có kết nối mạng. Vui lòng kiểm tra và thử lại.', 'error'); return; }
     if (!this.validEmail(liEmail)) { err.email = 'Định dạng email không đúng'; this.setState({ liErr: err }); return; }
-    if (liEmail.toLowerCase() !== this.DEMO_EMAIL) { err.email = 'Email này chưa có tài khoản.'; err.emailAction = 'Đăng ký'; this.setState({ liErr: err }); return; }
-    if (liPass !== this.DEMO_PASS) {
+    if (liEmail.toLowerCase() !== this.DEMO_EMAIL && liEmail.toLowerCase() !== this.TEST_EMAIL) { err.email = 'Email này chưa có tài khoản.'; err.emailAction = 'Đăng ký'; this.setState({ liErr: err }); return; }
+    if (liPass !== this.DEMO_PASS && liPass !== this.TEST_PASS) {
       const fc = this.state.failedLogin + 1;
       if (fc >= 5) { this.lockLogin(); err.pass = 'Sai quá 5 lần — đã tạm khoá'; this.setState({ liErr: err, failedLogin: fc }); return; }
       err.pass = 'Mật khẩu không đúng. Thử lại hoặc Quên mật khẩu? (còn ' + (5 - fc) + ' lần)';
@@ -1808,7 +1810,7 @@ class Component extends DCLogic {
     const rg = this.state.rg; const err = {};
     if (!rg.name.trim()) err.name = true;
     if (!this.validEmail(rg.email)) err.email = 'Định dạng email không đúng';
-    else if (rg.email.toLowerCase() === this.DEMO_EMAIL) { err.email = 'Email này đã có tài khoản.'; err.emailAction = 'Đăng nhập'; }
+    else if (rg.email.toLowerCase() === this.DEMO_EMAIL || rg.email.toLowerCase() === this.TEST_EMAIL) { err.email = 'Email này đã có tài khoản.'; err.emailAction = 'Đăng nhập'; }
     const birth = parseInt(rg.birth, 10);
     const age = birth > 1900 ? (2026 - birth) : null;
     if (!age || age < 0 || age > 120) err.birth = 'Năm sinh không hợp lệ';
@@ -2347,7 +2349,7 @@ class Component extends DCLogic {
       cpConfirmBorder: (st._cpConfirm && st._cpConfirm !== st._cpNew) ? 'var(--error)' : 'var(--border)',
       cpErr: (st._cpConfirm && st._cpConfirm !== st._cpNew) ? 'Mật khẩu xác nhận không khớp' : null,
       cpDisabled: cpInvalid, cpOpacity: cpInvalid ? '0.5' : '1',
-      submitCp: () => { if (st._cpOld !== this.DEMO_PASS) { this.showToast('Mật khẩu hiện tại không đúng', 'error'); return; } this.setState({ _cpOld: '', _cpNew: '', _cpConfirm: '' }); this.showToast('Đã đổi mật khẩu thành công ✦'); this.back(); },
+      submitCp: () => { if (st._cpOld !== this.DEMO_PASS && st._cpOld !== this.TEST_PASS) { this.showToast('Mật khẩu hiện tại không đúng', 'error'); return; } this.setState({ _cpOld: '', _cpNew: '', _cpConfirm: '' }); this.showToast('Đã đổi mật khẩu thành công ✦'); this.back(); },
       // CHANGE EMAIL
       isChangeEmail: st.screen === 'changeemail',
       ceNew: st._ceNew, onCeNew: (e) => this.setState({ _ceNew: e.target.value }),
