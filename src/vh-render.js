@@ -1,0 +1,664 @@
+window.VH_RENDER = {
+  renderVals() {
+    return Object.assign({}, this.globalVals(), this.authVals(),
+      (this.mainVals ? this.mainVals() : {}),
+      (this.placeVals ? this.placeVals() : {}),
+      (this.arVals ? this.arVals() : {}),
+      (this.libVals ? this.libVals() : {}),
+      (this.profileVals ? this.profileVals() : {}),
+      (this.settingsVals ? this.settingsVals() : {}),
+      (this.errorVals ? this.errorVals() : {}));
+  },
+
+  globalVals() {
+    const st = this.state;
+    const mainTabs = ['home', 'explore', 'library', 'profile'];
+    const navDef = [
+      { key: 'home', icon: 'ti-home', label: this.t('home') },
+      { key: 'explore', icon: 'ti-map-2', label: this.t('explore') },
+      { key: 'scan', isScan: true },
+      { key: 'library', icon: 'ti-bookmark', label: this.t('library') },
+      { key: 'profile', icon: 'ti-user', label: this.t('profile') },
+    ];
+    const navItems = navDef.map(n => {
+      const active = st.screen === n.key;
+      return { ...n, normal: !n.isScan, go: () => this.goTab(n.key), color: active ? 'var(--cta)' : 'var(--text-tertiary)', underline: active ? 'var(--cta)' : 'transparent', labelDisp: (active || st.a11y.visualLow) ? 'block' : 'none' };
+    });
+    const langs = this.langDefs.map(l => ({ ...l, active: st.language === l.code, border: st.language === l.code ? 'var(--cta)' : 'var(--border)', pickScreen: () => this.setState({ language: l.code }), pickSheet: () => { this.setState({ language: l.code, sheet: null }); this.showToast('Đã đổi ngôn ngữ'); }, pickInline: () => this.setState({ language: l.code }) }));
+    const cur = this.artifacts.find(a => a.id === st.curArtId) || this.artifacts[0];
+    const md = st.modalData || {};
+    const shareTargets = [
+      { name: 'Zalo', icon: 'ti-brand-zalo', bg: '#0068FF' }, { name: 'Messenger', icon: 'ti-brand-messenger', bg: '#0084FF' },
+      { name: 'Facebook', icon: 'ti-brand-facebook', bg: '#1877F2' }, { name: 'Instagram', icon: 'ti-brand-instagram', bg: '#E1306C' },
+      { name: 'TikTok', icon: 'ti-brand-tiktok', bg: '#111' }, { name: 'Lưu máy', icon: 'ti-download', bg: 'var(--primary)' },
+    ].map(s => ({ ...s, tap: () => { this.setState({ sheet: null }); this.showToast('Đang lan tỏa di sản...'); } }));
+
+    const mainTabsSet = mainTabs.includes(st.screen);
+    return {
+      theme: st.theme, vlow: st.a11y.visualLow ? '1' : '0', vblind: st.a11y.visualBlind ? '1' : '0', vmotor: st.a11y.motor ? '1' : '0',
+      navAnim: st.navDir === 'back' ? 'vhPopIn' : 'vhPushIn',
+      screen: st.screen,
+      isSplash: st.screen === 'splash', isWalk: st.screen === 'walkthrough',
+      isAuthChoice: st.screen === 'authchoice', isLogin: st.screen === 'login', isRegister: st.screen === 'register',
+      isForgot: st.screen === 'forgot', isParental: st.screen === 'parental', isLangScreen: st.screen === 'language', isPermissions: st.screen === 'permissions',
+      offlineBanner: st.isOffline && st.hasPacks && mainTabsSet, t_offlineBanner: this.t('offlineBanner'),
+      toggleOffline: () => { this.setState({ isOffline: false }); this.showToast('Đã bật lại kết nối mạng'); },
+      showNav: mainTabsSet, navItems, langs,
+      showAvatar: false,
+      toast: st.toast, toastBg: st.toastType === 'error' ? 'var(--error)' : 'var(--primary)', toastIcon: st.toastType === 'error' ? 'ti-alert-triangle' : 'ti-circle-check-filled',
+      // overlays
+      anyOverlay: (!!st.sheet || !!st.modal),
+      dismissOverlay: () => this.setState({ sheet: null, modal: null }),
+      sheetLang: st.sheet === 'lang', sheetShare: st.sheet === 'share', sheetContext: st.sheet === 'context',
+      sheetGuestbook: st.sheet === 'guestbook', gbSheetH: (st._gbSheetH || 60) + '%',
+      gbSheetRef: (el) => { this._gbSheetEl = el; },
+      gbToggleH: () => this.setState({ _gbSheetH: (st._gbSheetH || 60) >= 85 ? 60 : 90 }),
+      gbDragStart: (e) => { const sy = e.touches ? e.touches[0].clientY : e.clientY; const sh = st._gbSheetH || 60; const move = (ev) => { const y = ev.touches ? ev.touches[0].clientY : ev.clientY; const vh = (this._gbSheetEl ? this._gbSheetEl.parentElement.clientHeight : 700); let nh = sh + (sy - y) / vh * 100; nh = Math.max(35, Math.min(92, nh)); this.setState({ _gbSheetH: nh }); }; const up = () => { document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up); document.removeEventListener('touchmove', move); document.removeEventListener('touchend', up); const cur = this.state._gbSheetH || 60; if (cur < 45) this.setState({ sheet: null }); else this.setState({ _gbSheetH: cur > 75 ? 90 : 60 }); }; document.addEventListener('mousemove', move); document.addEventListener('mouseup', up); document.addEventListener('touchmove', move, { passive: true }); document.addEventListener('touchend', up); },
+      guestbookList: this.guestbook.map(g => ({ ...g, initial: (g.author || 'B')[0] })),
+      gbCount: this.guestbook.length,
+      gbCustomLocked: !(st.tiers && st.tiers.premium), gbCustomOpen: !!(st.tiers && st.tiers.premium),
+      gbUnlock: () => this.premiumGate(),
+      gbText: st._gbText || '', onGbText: (e) => this.setState({ _gbText: e.target.value }),
+      postGuestbook: () => this.postGuestbook(),
+      gbTemplates: ['Tự hào về di sản Việt Nam 🇻🇳', 'Cảm ơn vì đã gìn giữ lịch sử', 'Một trải nghiệm khó quên!', 'Đẹp và ý nghĩa quá!'].map(t => ({ t, use: () => this.postGuestbookTemplate(t) })),
+      shareTargets, shareSubtitle: cur.name,
+      ctxSave: () => { this.toggleSave(st.curArtId); this.setState({ sheet: null }); },
+      ctxShare: () => this.setState({ sheet: 'share' }),
+      ctxOpen: () => { this.setState({ sheet: null }); this.openArtifact(st.curArtId); },
+      // social modal
+      modalSocial: st.modal === 'social', socialName: md.name, socialIcon: md.icon, socialColor: md.color,
+      socialContinue: () => { this.setState({ modal: null, user: { name: 'Minh Anh', email: 'minhanh@gmail.com', isLoggedIn: true, age: 31 } }); this.showToast('Chào mừng trở lại ✦'); this.nav('permissions', 'fwd'); },
+      socialCancel: () => { this.setState({ modal: null }); this.showToast('Đã huỷ đăng nhập', 'error'); },
+      // generic modal
+      modalGeneric: st.modal === 'generic',
+      mTitle: md.title, mBody: md.body, mPrimary: md.primary, mSecondary: md.secondary,
+      mIcon: md.icon || 'ti-info-circle', mIconBg: md.iconBg || 'rgba(237,137,39,.14)', mIconColor: md.iconColor || 'var(--cta)',
+      mPrimaryTap: () => { const f = md.onPrimary; this.setState({ modal: null }); if (f) f(); },
+      mSecondaryTap: () => { const f = md.onSecondary; this.setState({ modal: null }); if (f) f(); },
+      // delete-pack modal (3 options)
+      modalDelPack: st.modal === 'delpack', delPackName: md.name, delPackSize: md.size,
+      stopProp: (e) => { if (e && e.stopPropagation) e.stopPropagation(); },
+      delPackCache: () => { this.setState({ modal: null }); this.showToast('Đã xoá cache · giữ lại hiện vật sưu tầm ✦'); },
+      delPackAll: () => { const id = md.id; this.setState({ modal: null, packs: (st.packs || []).filter(p => p.id !== id) }); this.showToast('Đã xoá toàn bộ gói ' + (md.name || '')); },
+      // create collection modal
+      modalCreateCollection: st.modal === 'createcollection',
+      ccName: st._ccName || '', onCcName: (e) => this.setState({ _ccName: e.target.value }),
+      ccEmoji: st._ccEmoji || '📁',
+      ccEmojis: ['📁', '🏛️', '🗿', '🏮', '⚔️', '🎨', '👑', '🪕'].map(ch => ({ ch, border: (st._ccEmoji === ch) ? 'var(--cta)' : 'var(--border)', pick: () => this.setState({ _ccEmoji: ch }) })),
+      ccDisabled: !(st._ccName || '').trim(), ccOpacity: (st._ccName || '').trim() ? '1' : '0.5',
+      doCreateCollection: () => this.createCollection(),
+      // badge detail modal
+      modalBadge: st.modal === 'badge',
+      ...this.badgeModalVals(md),
+      toggleSave: (id) => this.toggleSave(id),
+    };
+  },
+
+  authVals() {
+    const st = this.state;
+    const ws = this.walkSlides[Math.min(st.walkStep, 3)];
+    const social = [
+      { name: 'Google', icon: 'ti-brand-google', color: '#EA4335' },
+      { name: 'Apple', icon: 'ti-brand-apple', color: 'var(--text-primary)' },
+      { name: 'Zalo', icon: 'ti-brand-zalo', color: '#0068FF' },
+      { name: 'Facebook', icon: 'ti-brand-facebook', color: '#1877F2' },
+    ].map(s => ({ ...s, tap: () => this.socialLogin(s.name, s.icon, s.color) }));
+
+    const rg = st.rg; const rerr = rg.err || {};
+    const strength = this.passStrength(rg.pass);
+    const strengthColors = ['var(--error)', 'var(--warning)', 'var(--info)', 'var(--success)'];
+    const strengthLabels = ['Yếu — cần ít nhất 8 ký tự, 1 chữ hoa, 1 số', 'Trung bình', 'Khá', 'Mạnh'];
+    const strengthBars = [0, 1, 2].map(i => i < strength ? strengthColors[strength] : 'var(--bg-tertiary)');
+    const locked = Date.now() < st.lockedUntil;
+
+    const perms = [
+      { key: 'notification', icon: 'ti-bell', title: 'Thông báo', req: '(bắt buộc)', sub: 'Nhận tin di tích mới & nhắc nhở hành trình' },
+      { key: 'camera', icon: 'ti-camera', title: 'Camera', req: '(tuỳ chọn)', sub: 'Quét và xem hiện vật bằng AR' },
+      { key: 'location', icon: 'ti-map-pin', title: 'Vị trí', req: '(tuỳ chọn)', sub: 'Gợi ý di tích gần bạn' },
+    ].map(p => {
+      const g = st.permissions[p.key] === 1;
+      return { ...p, cardBorder: g ? 'var(--success)' : 'var(--border)', btnLabel: g ? 'Đã cấp' : 'Cấp quyền', btnBg: g ? 'var(--success)' : 'var(--cta)', btnColor: '#fff', btnIcon: 'ti-check', btnIconDisp: g ? 'inline' : 'none', grant: () => { const np = Object.assign({}, st.permissions, { [p.key]: 1 }); this.setState({ permissions: np }); this.showToast('Đã cấp quyền ' + p.title); } };
+    });
+    const permOk = st.permissions.notification === 1;
+
+    return {
+      walkStep: st.walkStep, walkIcon: ws.icon, walkTitle: ws.title,
+      walkDots: this.walkSlides.map((s, i) => ({ w: i === st.walkStep ? '22px' : '7px', c: i === st.walkStep ? 'var(--cta)' : 'var(--border-2)' })),
+      walkBtn: st.walkStep === 3 ? 'Bắt đầu' : 'Tiếp theo',
+      nextWalk: () => this.nextWalk(), skipWalk: () => this.skipWalk(),
+      goLogin: () => this.nav('login', 'fwd'), goRegister: () => this.nav('register', 'fwd'),
+      guestEnter: () => { this.setState({ user: { name: 'Khách', email: '', isLoggedIn: false, age: null } }); this.nav('language', 'fwd'); },
+      back: () => this.back(),
+      // login
+      liEmail: st.liEmail, liPass: st.liPass, liPassType: st.liPassShow ? 'text' : 'password', liPassEye: st.liPassShow ? 'ti-eye-off' : 'ti-eye',
+      liEmailBorder: st.liErr.email ? 'var(--error)' : 'var(--border)', liPassBorder: st.liErr.pass ? 'var(--error)' : 'var(--border)',
+      liEmailErr: st.liErr.email, liEmailErrAction: st.liErr.emailAction, liPassErr: st.liErr.pass,
+      liEmailErrTap: () => { this.setState({ rg: Object.assign({}, st.rg, { email: st.liEmail }) }); this.nav('register', 'fwd'); },
+      onLiEmail: (e) => this.setState({ liEmail: e.target.value, liErr: Object.assign({}, st.liErr, { email: null, emailAction: null }) }),
+      onLiEmailBlur: () => { if (st.liEmail && !this.validEmail(st.liEmail)) this.setState({ liErr: Object.assign({}, st.liErr, { email: 'Định dạng email không đúng' }) }); },
+      onLiPass: (e) => this.setState({ liPass: e.target.value, liErr: Object.assign({}, st.liErr, { pass: null }) }),
+      toggleLiPass: () => this.setState({ liPassShow: !st.liPassShow }),
+      doLogin: () => this.doLogin(), loginLocked: locked, lockCountdown: st.lockCountdown,
+      loginDisabled: locked, loginBtnBg: locked ? 'var(--text-tertiary)' : 'var(--cta)', loginBtnOpacity: locked ? '0.6' : '1',
+      loginBtnLabel: locked ? 'Đã khoá (' + st.lockCountdown + 's)' : 'Đăng nhập',
+      socialBtns: social,
+      goForgot: () => { this.setState({ fpEmail: st.liEmail, fpStep: 'email', fpErr: null, fpOtp: '', fpOtpErr: null, fpNewPass: '' }); this.nav('forgot', 'fwd'); },
+      // register
+      rgName: rg.name, rgEmail: rg.email, rgBirth: rg.birth, rgPass: rg.pass, rgConfirm: rg.confirm,
+      rgPassType: rg.show ? 'text' : 'password', rgPassEye: rg.show ? 'ti-eye-off' : 'ti-eye',
+      rgNameBorder: rerr.name ? 'var(--error)' : 'var(--border)', rgEmailBorder: rerr.email ? 'var(--error)' : 'var(--border)',
+      rgBirthBorder: rerr.birth ? 'var(--error)' : 'var(--border)', rgPassBorder: rerr.pass ? 'var(--error)' : 'var(--border)', rgConfirmBorder: rerr.confirm ? 'var(--error)' : 'var(--border)',
+      rgEmailErr: rerr.email, rgEmailErrAction: rerr.emailAction, rgBirthErr: rerr.birth, rgConfirmErr: rerr.confirm,
+      rgPassShow: rg.pass.length > 0, strengthBars, strengthColor: strengthColors[strength], strengthLabel: strengthLabels[strength],
+      onRgName: (e) => this.upRg('name', e.target.value), onRgEmail: (e) => this.upRg('email', e.target.value, ['email']),
+      onRgEmailBlur: () => { if (rg.email && !this.validEmail(rg.email)) this.setState({ rg: Object.assign({}, rg, { err: Object.assign({}, rerr, { email: 'Định dạng email không đúng' }) }) }); },
+      onRgBirth: (e) => this.upRg('birth', e.target.value, ['birth']), onRgPass: (e) => this.upRg('pass', e.target.value, ['pass']), onRgConfirm: (e) => this.upRg('confirm', e.target.value, ['confirm']),
+      toggleRgPass: () => this.setState({ rg: Object.assign({}, rg, { show: !rg.show }) }),
+      toggleTerms: () => this.setState({ rg: Object.assign({}, rg, { terms: !rg.terms, err: Object.assign({}, rerr, { terms: null }) }) }),
+      termsBorder: rg.terms ? 'var(--cta)' : (rerr.terms ? 'var(--error)' : 'var(--border-2)'), termsBg: rg.terms ? 'var(--cta)' : 'transparent', termsCheckDisp: rg.terms ? 'block' : 'none',
+      termsShakeAnim: rerr.terms ? 'animation:vhShake .5s;' : '',
+      doRegister: () => this.doRegister(),
+      // forgot (multi-step OTP)
+      fpStepEmail: st.fpStep === 'email', fpStepOtp: st.fpStep === 'otp', fpStepReset: st.fpStep === 'reset', fpStepDone: st.fpStep === 'done',
+      fpEmail: st.fpEmail, fpErr: st.fpErr, fpBorder: st.fpErr ? 'var(--error)' : 'var(--border)',
+      onFp: (e) => this.setState({ fpEmail: e.target.value, fpErr: null }),
+      sendOtp: () => { if (!this.validEmail(st.fpEmail)) { this.setState({ fpErr: 'Định dạng email không đúng' }); return; } this.setState({ fpStep: 'otp', fpOtp: '', fpOtpErr: null, _otpTries: 0, otpArr: ['', '', '', '', '', ''] }); this.startResend(); this.showToast('Đã gửi mã OTP — demo: 123456'); setTimeout(() => { if (this._otpRefs && this._otpRefs[0]) this._otpRefs[0].focus(); }, 120); },
+      fpOtp: st.fpOtp, fpOtpErr: st.fpOtpErr, fpOtpBorder: st.fpOtpErr ? 'var(--error)' : 'var(--border-2)', fpOtpShake: st.fpOtpErr ? 'animation:vhShake .5s;' : '',
+      otpBoxes: (st.otpArr || ['', '', '', '', '', '']).map((v, i) => ({
+        val: v, ref: (el) => { this._otpRefs = this._otpRefs || []; this._otpRefs[i] = el; },
+        border: st.fpOtpErr ? 'var(--error)' : (v ? 'var(--cta)' : 'var(--border-2)'),
+        focus: (e) => { try { e.target.select(); } catch (x) {} },
+        input: (e) => this.otpInput(i, e.target.value),
+        keydown: (e) => this.otpKey(i, e),
+      })),
+      verifyOtp: () => this.verifyOtp(),
+      resendLabel: st.fpResendCd > 0 ? ('Gửi lại sau ' + st.fpResendCd + 's') : 'Gửi lại mã', resendColor: st.fpResendCd > 0 ? 'var(--text-tertiary)' : 'var(--cta)',
+      resendOtp: () => { if (st.fpResendCd > 0) return; this.startResend(); this.setState({ _otpTries: 0, fpOtpErr: null, otpArr: ['', '', '', '', '', ''] }); this.showToast('Đã gửi lại mã OTP — demo: 123456'); setTimeout(() => { if (this._otpRefs && this._otpRefs[0]) this._otpRefs[0].focus(); }, 120); },
+      fpNewPass: st.fpNewPass, onNewPass: (e) => this.setState({ fpNewPass: e.target.value }),
+      fpNewBars: [0, 1, 2].map(i => i < this.passStrength(st.fpNewPass) ? ['var(--error)', 'var(--warning)', 'var(--info)', 'var(--success)'][this.passStrength(st.fpNewPass)] : 'var(--bg-tertiary)'),
+      submitNewPass: () => { if (this.passStrength(st.fpNewPass) < 2 || st.fpNewPass.length < 8) { this.showToast('Mật khẩu cần từ mức Khá trở lên', 'error'); return; } this.setState({ fpStep: 'done' }); },
+      backToLogin: () => { this.setState({ fpStep: 'email' }); this.nav('login', 'back'); },
+      // parental
+      parentEmail: st.parentEmail, onParent: (e) => this.setState({ parentEmail: e.target.value }),
+      sendParental: () => { if (!this.validEmail(st.parentEmail)) { this.showToast('Nhập email phụ huynh hợp lệ', 'error'); return; } this.showToast('Đã gửi link xin phép đến phụ huynh ✦'); this.nav('authchoice', 'back'); },
+      // language + permissions
+      langContinue: () => this.nav('permissions', 'fwd'),
+      perms, permDisabled: !permOk, permOpacity: permOk ? '1' : '0.55',
+      finishPerms: () => { if (!permOk) { this.showToast('Cần cấp quyền Camera và Âm thanh', 'error'); return; } this.goTab('home'); this.showToast('Chào mừng đến với V-Heritage ✦'); },
+    };
+  },
+
+  errorVals() {
+    const st = this.state;
+    return {
+      isError: st.screen === 'error', isMaintenance: st.screen === 'maintenance', isLocked: st.screen === 'locked', isOfflineScreen: st.screen === 'offline',
+      errRetry: () => this.back(),
+      offlineRetry: () => { this.setState({ isOffline: false }); this.goTab('home'); this.showToast('Đã kết nối lại'); },
+      offlineGoLib: () => this.goTab('library'),
+      lockedSupport: () => this.nav('help', 'fwd'),
+      reportSend: () => { this.showToast('Đã gửi báo cáo — cảm ơn bạn'); this.back(); },
+      isReport: st.screen === 'report', reportText: st._reportText || '', onReportText: (e) => this.setState({ _reportText: e.target.value }),
+    };
+  },
+
+
+  arVals() {
+    const st = this.state;
+    const ss = st.scanState;
+    return {
+      isScan: st.screen === 'scan',
+      isQR: st.screen === 'qrscanner', qrScanning: st.qrState === 'scanning', qrFlashDisp: st.qrState === 'flash' ? 'block' : 'none', exitQR: () => this.exitQR(),
+      scanning: ss === 'scanning', scanFailed: ss === 'failed', flashDisp: ss === 'flash' ? 'block' : 'none',
+      scanHint: ss === 'scanning' ? (st.scanFailReason === 'lowlight' ? 'Ánh sáng yếu — di chuyển đến chỗ sáng hơn' : st.scanFailReason === 'covered' ? 'Camera có thể bị che — kiểm tra ống kính' : 'Hướng camera vào hiện vật') : '',
+      vfColor: ss === 'failed' ? 'var(--error)' : 'var(--cta)', vfAnim: ss === 'failed' ? 'animation:vhShake .5s;' : '',
+      exitScan: () => this.exitScan(), retryScan: () => this.retryScan(),
+      simLowLight: () => this.scanFail('lowlight'), simCovered: () => this.scanFail('covered'), simNoMatch: () => this.scanFail('nomatch'),
+      scanBrowseQR: () => this.startQR(), scanBrowseList: () => { this.exitScan(); this.nav('search', 'fwd'); },
+      openAIWrong: () => this.nav('aiwrong', 'fwd'),
+      isAIWrong: st.screen === 'aiwrong',
+      aiWrongList: this.artifacts.slice(0, 5).map(a => ({ ...a, img: this.vimg(a.seed, 100, 100), pick: () => { this.showToast('Cảm ơn — đã ghi nhận để cải thiện AI'); this.setState({ curArtId: a.id }); this.nav('artifact', 'back'); } })),
+    };
+  },
+
+  mainVals() {
+    const st = this.state;
+    const mainTabs = ['home', 'explore', 'library', 'profile'];
+    const artifactsView = this.artifacts.map(a => ({ ...a, img: this.vimg(a.seed, 320, 240), open: () => this.openArtifact(a.id) }));
+    const venuesTop = this.venues.slice(0, 2).map(v => ({ ...v, img: this.vimg(v.seed, 220, 200), open: () => this.openVenue(v.id) }));
+    const articlesView = this.articles.map(a => ({ ...a, img: this.vimg(a.seed, 360, 200), open: () => { this.setState({ _curArticle: a.id }); this.nav('articledetail', 'fwd'); } }));
+    const topDestinations = this.destinations.map((d, i) => ({ ...d, rank: i + 1, rankColor: i < 3 ? 'var(--cta)' : 'var(--text-tertiary)', img: this.vimg(d.seed, 130, 130), open: () => this.openVenue(d.venueId || 1) }));
+    return {
+      isHome: st.screen === 'home',
+      isStub: st.screen === 'stub', stubName: st._stubName || '',
+      t_greet: this.homeGreeting(), t_homeTitle: this.t('homeSubtitle'),
+      t_secDiscover: this.t('secDiscover'), t_secFeatured: this.t('secFeatured'),
+      t_flag: this.langDefs.find(l => l.code === st.language).flag,
+      themeIcon: st.theme === 'light' ? 'ti-moon' : 'ti-sun',
+      toggleTheme: () => this.setState({ theme: st.theme === 'light' ? 'dark' : 'light' }),
+      openLangSheet: () => this.setState({ sheet: 'lang' }),
+      openSearch: () => this.nav('search', 'fwd'),
+      heroImg: this.vimg('congchieng', 600, 420), heroOpen: () => this.openArtifact(7),
+      goExplore: () => this.goTab('explore'),
+      artifactsView, venuesTop, articlesView, topDestinations,
+      goArticles: () => this.nav('articles', 'fwd'),
+      isArticles: st.screen === 'articles',
+      articlesList: this.articles.map(a => ({ ...a, img: this.vimg(a.seed, 400, 200), open: () => { this.setState({ _curArticle: a.id }); this.nav('articledetail', 'fwd'); } })),
+      isArticleDetail: st.screen === 'articledetail',
+      adImg: this.vimg((this.articles.find(a => a.id === st._curArticle) || this.articles[0]).seed, 600, 420),
+      adTag: (this.articles.find(a => a.id === st._curArticle) || this.articles[0]).tag,
+      adTitle: (this.articles.find(a => a.id === st._curArticle) || this.articles[0]).title,
+      adAuthor: (this.articles.find(a => a.id === st._curArticle) || this.articles[0]).author,
+      adRead: (this.articles.find(a => a.id === st._curArticle) || this.articles[0]).read,
+      adBody: (this.articles.find(a => a.id === st._curArticle) || this.articles[0]).body,
+    };
+  },
+  libVals() {
+    const st = this.state;
+    const savedArts = this.artifacts.filter(a => st.saved.includes(a.id));
+    const tabs = [{ k: 'art', l: 'Hiện vật' }, { k: 'collections', l: 'Bộ sưu tập' }, { k: 'photo', l: 'Ảnh AR' }, { k: 'badge', l: 'Huy hiệu' }];
+    const cols = st.collections || [];
+    const badgeCards = this.achievements.map(a => {
+      const pct = Math.round(100 * (a.progress || 0) / (a.target || 1));
+      return { ...a, locked: !a.earned, border: a.earned ? 'var(--cta)' : 'var(--border)', bg: a.earned ? 'var(--cta)' : 'var(--bg-tertiary)', iconColor: a.earned ? '#fff' : 'var(--text-tertiary)', filter: a.earned ? 'none' : 'grayscale(1)', pct: pct + '%', progressText: (a.progress || 0) + '/' + (a.target || 0), show: () => this.setState({ modal: 'badge', modalData: { id: a.id } }) };
+    });
+    return {
+      isLibrary: st.screen === 'library',
+      libTab: st.libTab, libTabs: tabs.map(t => ({ ...t, pick: () => this.setState({ libTab: t.k }), border: st.libTab === t.k ? 'var(--cta)' : 'var(--border)', bg: st.libTab === t.k ? 'var(--cta)' : 'transparent', color: st.libTab === t.k ? '#fff' : 'var(--text-secondary)' })),
+      libArtTab: st.libTab === 'art', libPhotoTab: st.libTab === 'photo', libCollectionsTab: st.libTab === 'collections', libBadgeTab: st.libTab === 'badge',
+      libEmpty: st.libTab === 'art' && savedArts.length === 0,
+      libHasItems: st.libTab === 'art' && savedArts.length > 0,
+      collectionsEmpty: cols.length === 0,
+      collectionsView: cols.map(c => { const first = this.artifacts.find(a => (c.items || []).includes(a.id)); return { ...c, count: (c.items || []).length, hasImg: !!first, img: first ? this.vimg(first.seed, 240, 180) : '', emoji: first ? '' : (c.emoji || '📁'), open: () => { this.setState({ _curCollection: c.id }); this.nav('collectiondetail', 'fwd'); } }; }),
+      badgeCards,
+      openCreateCollection: () => this.setState({ modal: 'createcollection', _ccName: '', _ccEmoji: '📁' }),
+      isCollectionDetail: st.screen === 'collectiondetail',
+      colDetailName: (cols.find(c => c.id === st._curCollection) || {}).name || 'Bộ sưu tập',
+      colDetailCount: ((cols.find(c => c.id === st._curCollection) || {}).items || []).length,
+      colDetailEmpty: ((cols.find(c => c.id === st._curCollection) || {}).items || []).length === 0,
+      colDetailItems: this.artifacts.filter(a => ((cols.find(c => c.id === st._curCollection) || {}).items || []).includes(a.id)).map(a => ({ ...a, img: this.vimg(a.seed, 300, 260), open: () => this.openArtifact(a.id) })),
+      colDetailMenu: () => this.setState({ modal: 'generic', modalData: { icon: 'ti-trash', iconBg: 'rgba(221,14,14,.12)', iconColor: 'var(--error)', title: 'Xoá bộ sưu tập?', body: 'Hiện vật vẫn ở trong Thư viện của bạn.', primary: 'Xoá bộ sưu tập', secondary: 'Huỷ', onPrimary: () => { this.setState({ collections: (st.collections || []).filter(c => c.id !== st._curCollection) }); this.showToast('Đã xoá bộ sưu tập'); this.back(); } } }),
+      savedView: savedArts.map(a => ({ ...a, img: this.vimg(a.seed, 300, 260), open: () => this.openArtifact(a.id) })),
+      libSubtitle: savedArts.length + ' hiện vật · 23 đã quét',
+      goExploreLib: () => this.goTab('explore'),
+      photoGrid: this.artifacts.slice(0, 4).map(a => ({ ...a, img: this.vimg(a.seed, 240, 280), open: () => { this.setState({ curArtId: a.id }); this.nav('photo', 'fwd'); } })),
+      openDownloadMgr: () => this.nav('downloads', 'fwd'),
+      isDownloads: st.screen === 'downloads',
+      autoCleanLabel: st.autoClean === 0 ? 'Tắt' : st.autoClean + ' ngày',
+      openAutoClean: () => this.setState({ sheet: 'autoclean' }),
+      sheetAutoClean: st.sheet === 'autoclean',
+      autoCleanOptions: [0, 7, 14, 30, 60, 90].map(d => ({ label: d === 0 ? 'Tắt tự động dọn' : 'Sau ' + d + ' ngày không dùng', sel: st.autoClean === d, pick: () => { this.setState({ autoClean: d, sheet: null }); this.showToast(d === 0 ? 'Đã tắt tự động dọn' : 'Tự động dọn gói không dùng sau ' + d + ' ngày'); } })),
+      dataPacks: (st.packs || []).map(d => ({ ...d, sizeText: String(d.size).replace('.', ',') + ' GB', star: d.fav ? 'ti-star-filled' : 'ti-star', starColor: d.fav ? 'var(--cta)' : 'var(--text-tertiary)', toggleFav: (e) => { if (e && e.stopPropagation) e.stopPropagation(); this.setState({ packs: st.packs.map(p => p.id === d.id ? { ...p, fav: !p.fav } : p) }); }, del: () => this.setState({ modal: 'delpack', modalData: { name: d.name, size: String(d.size).replace('.', ',') + ' GB', id: d.id } }) })),
+      storagePct: Math.min(100, Math.round((st.packs || []).reduce((s, p) => s + p.size, 0) / 8 * 100)) + '%',
+      storageText: 'Đã dùng ' + String((st.packs || []).reduce((s, p) => s + p.size, 0).toFixed(1)).replace('.', ',') + ' / 8 GB',
+    };
+  },
+
+  profileVals() {
+    const st = this.state;
+    const T = st.tiers || {}; const hasPremium = !!T.premium; const hasAcademic = !!T.academic;
+    const isPremium = hasPremium;
+    const cpStrength = this.passStrength(st._cpNew);
+    const cpStrengthColor = ['var(--error)', 'var(--warning)', 'var(--info)', 'var(--success)'][cpStrength];
+    const cpInvalid = !st._cpOld || cpStrength < 2 || st._cpNew.length < 8 || st._cpNew !== st._cpConfirm;
+    const ceInvalid = !this.validEmail(st._ceNew);
+    const daInvalid = !st._daConfirm || !st._daPass;
+    const tierName = (hasPremium && hasAcademic) ? 'Nhà nghiên cứu · Học giả' : hasAcademic ? 'Học giả' : hasPremium ? 'Nhà nghiên cứu' : 'Khách tham quan';
+    const perks = [
+      { icon: 'ti-headphones', text: 'Audio thuyết minh HD giọng nghệ sĩ' },
+      { icon: 'ti-history', text: 'Du hành thời gian — timeline đầy đủ' },
+      { icon: 'ti-wand', text: 'Bộ lọc AR 3D độc quyền' },
+      { icon: 'ti-message-2', text: 'Lời nhắn AR Guestbook tuỳ chỉnh' },
+    ];
+    // comparison table
+    const compareRows = [
+      { f: 'Audio thuyết minh cơ bản', free: 1, prem: 1, acad: 1 },
+      { f: 'AR Scan không giới hạn', free: 1, prem: 1, acad: 1 },
+      { f: '3D Viewer + Guestbook', free: 1, prem: 1, acad: 1 },
+      { f: 'Audio HD giọng nghệ sĩ', free: 0, prem: 1, acad: 1 },
+      { f: 'AR Filter 3D động', free: 0, prem: 1, acad: 1 },
+      { f: 'Time-travel timeline đầy đủ', free: 0, prem: 1, acad: 1 },
+      { f: 'References & citations', free: 0, prem: 0, acad: 1 },
+      { f: 'Export PDF nghiên cứu', free: 0, prem: 0, acad: 1 },
+    ].map(r => ({ ...r, freeIcon: r.free ? 'ti-check' : 'ti-minus', freeColor: r.free ? 'var(--success)' : 'var(--text-tertiary)', premIcon: r.prem ? 'ti-check' : 'ti-minus', premColor: r.prem ? 'var(--success)' : 'var(--text-tertiary)', acadIcon: r.acad ? 'ti-check' : 'ti-minus', acadColor: r.acad ? 'var(--success)' : 'var(--text-tertiary)' }));
+
+    const plans = [
+      { k: 'premium', name: 'Nhà nghiên cứu', price: '79.000đ', per: '/tháng' },
+      { k: 'academic', name: 'Học giả', price: '149.000đ', per: '/tháng' },
+    ].map(p => ({ ...p, sel: st.paymentTier === p.k, border: st.paymentTier === p.k ? 'var(--cta)' : 'var(--border)', pick: () => this.setState({ paymentTier: p.k }) }));
+
+    const payMethods = [
+      { k: 'momo', name: 'Ví MoMo', icon: 'ti-wallet', color: '#A50064' },
+      { k: 'zalopay', name: 'ZaloPay', icon: 'ti-brand-zalo', color: '#0068FF' },
+      { k: 'card', name: 'Thẻ tín dụng / ghi nợ', icon: 'ti-credit-card', color: 'var(--primary)' },
+      { k: 'bank', name: 'Chuyển khoản ngân hàng', icon: 'ti-building-bank', color: 'var(--primary)' },
+    ].map(m => ({ ...m, sel: st.paymentMethod === m.k, border: st.paymentMethod === m.k ? 'var(--cta)' : 'var(--border)', pick: () => this.setState({ paymentMethod: m.k }) }));
+
+    const seed = st.notifList || this.NOTIF_SEED;
+    const notifs = seed.map(n => ({ ...n, bg: n.read ? 'var(--bg-card)' : 'var(--bg-tertiary)', dotDisp: n.read ? 'none' : 'block', offset: '0px', tap: () => { this.markRead(n.id); const f = this.notifAction[n.id]; if (f) f(); }, del: (e) => { if (e && e.stopPropagation) e.stopPropagation(); this.delNotif(n.id); } }));
+    const nf = st._notifFilter || 'all';
+    const SOCIAL = ['n2', 'n3'];
+    const notifsFiltered = notifs.filter(n => nf === 'all' ? true : nf === 'unread' ? !n.read : nf === 'social' ? SOCIAL.includes(n.id) : !SOCIAL.includes(n.id));
+
+    return {
+      isProfile: st.screen === 'profile',
+      profIsPremium: hasPremium, profNotPremium: !hasPremium,
+      tierChipLabel: tierName, tierChipBg: (hasPremium || hasAcademic) ? 'var(--cta)' : 'var(--primary)', tierChipColor: (hasPremium || hasAcademic) ? '#fff' : 'var(--cream)', tierChipIcon: (hasPremium || hasAcademic) ? 'ti-crown' : 'ti-user',
+      profName: st.user.name || 'Khách tham quan', profInitial: (st.user.name || 'K')[0],
+      profEmailShort: st.user.email || 'minhanh@email.com',
+      openManageTier: () => this.nav('managetier', 'fwd'),
+      isManageTier: st.screen === 'managetier',
+      mtActiveCards: [
+        hasPremium ? { key: 'premium', name: 'Nhà nghiên cứu', icon: 'ti-crown', until: '25/07/2026', manage: () => this.showToast('Gia hạn tự động đang BẬT'), refund: () => this.nav('refund', 'fwd') } : null,
+        hasAcademic ? { key: 'academic', name: 'Học giả', icon: 'ti-school', until: '25/07/2026', manage: () => this.showToast('Gia hạn tự động đang BẬT'), refund: () => this.nav('refund', 'fwd') } : null,
+      ].filter(Boolean),
+      mtAvailLabel: (hasPremium && hasAcademic) ? 'Bạn đã có tất cả các gói' : 'Có thể kích hoạt thêm',
+      mtAvailCards: [
+        !hasPremium ? { key: 'premium', name: 'Nhà nghiên cứu', icon: 'ti-crown', price: '79.000đ', cta: 'Thêm gói Nhà nghiên cứu', perks: ['Audio HD giọng nghệ sĩ', 'Du hành thời gian đầy đủ', 'Bộ lọc AR 3D', 'AR Guestbook viết tự do'], add: () => { this.setState({ paymentTier: 'premium' }); this.nav('paywall', 'fwd'); } } : null,
+        !hasAcademic ? { key: 'academic', name: 'Học giả', icon: 'ti-school', price: '149.000đ', cta: 'Thêm gói Học giả', perks: ['Thông tin học thuật chi tiết', 'Export PDF tài liệu', 'Kho ảnh chất lượng cao', 'Lịch sử tham quan vĩnh viễn'], add: () => { this.setState({ paymentTier: 'academic' }); this.nav('paywall', 'fwd'); } } : null,
+      ].filter(Boolean),
+      profileStats: [{ value: String(st.saved.length), label: 'Đã sưu tầm' }, { value: '23', label: 'Đã quét' }, { value: '2', label: 'Huy hiệu' }],
+      isRefund: st.screen === 'refund',
+      refundTiers: [hasPremium ? { k: 'premium', label: 'Nhà nghiên cứu' } : null, hasAcademic ? { k: 'academic', label: 'Học giả' } : null].filter(Boolean).map(t => ({ ...t, border: st._refundTier === t.k ? 'var(--error)' : 'var(--border)', bg: st._refundTier === t.k ? 'var(--error)' : 'var(--bg-card)', color: st._refundTier === t.k ? '#fff' : 'var(--text-secondary)', pick: () => this.setState({ _refundTier: t.k }) })),
+      refundReasons: [{ k: 'mistake', label: 'Đăng ký nhầm' }, { k: 'unused', label: 'Không dùng đến' }, { k: 'expensive', label: 'Giá quá cao' }, { k: 'other', label: 'Lý do khác' }].map(r => ({ ...r, border: st._refundReason === r.k ? 'var(--cta)' : 'var(--border)', dot: st._refundReason === r.k ? 'var(--cta)' : 'var(--border-2)', fill: st._refundReason === r.k ? 'var(--cta)' : 'transparent', pick: () => this.setState({ _refundReason: r.k }) })),
+      refundDisabled: !st._refundTier || !st._refundReason, refundOpacity: (st._refundTier && st._refundReason) ? '1' : '0.5',
+      submitRefund: () => { this.setState({ _refundTier: null, _refundReason: null }); this.showToast('Đã gửi yêu cầu hoàn tiền — chúng tôi sẽ phản hồi trong 24 giờ ✦'); this.back(); },
+      achievements: this.achievements.map(a => ({ ...a, op: a.earned ? '1' : '0.4', bg: a.earned ? 'var(--cta)' : 'var(--bg-tertiary)', iconColor: a.earned ? '#fff' : 'var(--text-tertiary)', show: () => this.showToast(a.earned ? 'Đã đạt: ' + a.name : 'Chưa mở khoá: ' + a.name) })),
+      openPaywall: () => { this.setState({ paymentTier: 'premium' }); this.nav('paywall', 'fwd'); },
+      openManagePremium: () => this.nav('managepremium', 'fwd'),
+      openNotifs: () => this.nav('notifications', 'fwd'),
+      openEditProfile: () => this.nav('editprofile', 'fwd'),
+      themeIconP: st.theme === 'light' ? 'ti-moon' : 'ti-sun',
+      toggleThemeP: () => this.setState({ theme: st.theme === 'light' ? 'dark' : 'light' }),
+      profSettings: [
+        { icon: 'ti-settings', label: 'Cài đặt', tap: () => this.nav('settings', 'fwd') },
+        { icon: 'ti-accessible', label: 'Trợ năng', tap: () => this.nav('accessibility', 'fwd') },
+        { icon: 'ti-shield-lock', label: 'Tài khoản & Bảo mật', tap: () => this.nav('accountsecurity', 'fwd') },
+        { icon: 'ti-help-circle', label: 'Trợ giúp & FAQ', tap: () => this.nav('help', 'fwd') },
+        { icon: 'ti-info-circle', label: 'Về V-Heritage', tap: () => this.nav('about', 'fwd') },
+        { icon: 'ti-logout', label: 'Đăng xuất', tap: () => this.logout() },
+      ].map((s, i, arr) => ({ ...s, radius: i === 0 ? '12px 12px 0 0' : i === arr.length - 1 ? '0 0 12px 12px' : '0' })),
+      // PAYWALL
+      isPaywall: st.screen === 'paywall', compareRows, plans, paywallBuy: () => this.nav('paymentmethod', 'fwd'),
+      // PAYMENT METHOD
+      isPaymentMethod: st.screen === 'paymentmethod', payMethods, payMethodNext: () => { if (!st.paymentMethod) { this.showToast('Chọn phương thức thanh toán', 'error'); return; } if (st.tiers && st.tiers[st.paymentTier]) { this.setState({ modal: 'generic', modalData: { icon: 'ti-crown', title: 'Bạn đã có gói này', body: 'Gói này của bạn còn hiệu lực đến 25/07/2026.', primary: 'Quản lý gói', onPrimary: () => this.nav('managepremium', 'fwd'), secondary: 'Đóng' } }); return; } this.nav('paymentconfirm', 'fwd'); },
+      // CONFIRM
+      isPaymentConfirm: st.screen === 'paymentconfirm',
+      confirmTier: st.paymentTier === 'academic' ? 'Học giả' : 'Nhà nghiên cứu',
+      confirmPrice: st.paymentTier === 'academic' ? '149.000đ' : '79.000đ',
+      confirmMethod: (payMethods.find(m => m.k === st.paymentMethod) || {}).name || 'MoMo',
+      doPay: () => this.processPayment(),
+      simPayFail: () => { this.setState({ failedPayment: (st.failedPayment || 0) + 1 }); this.nav('paymentfailed', 'fwd'); },
+      // SUCCESS
+      isPaymentSuccess: st.screen === 'paymentsuccess', confetti: this._confetti || [],
+      // FAILED
+      isPaymentFailed: st.screen === 'paymentfailed', payFailOver: (st.failedPayment || 0) > 3, payFailNormal: (st.failedPayment || 0) <= 3,
+      retryPay: () => this.replace('paymentmethod'),
+      payContact: () => this.nav('contactsupport', 'fwd'),
+      payLater: () => { this.setState({ history: [] }); this.replace('home'); },
+      // MANAGE PREMIUM
+      isManagePremium: st.screen === 'managepremium',
+      manageTier: tierName, openRefund: () => this.nav('refund', 'fwd'),
+      cancelSub: () => this.setState({ modal: 'generic', modalData: { icon: 'ti-alert-triangle', iconBg: 'rgba(221,14,14,.12)', iconColor: 'var(--error)', title: 'Huỷ gói thành viên?', body: 'Bạn sẽ mất quyền truy cập các tính năng nâng cao khi hết kỳ hiện tại.', primary: 'Giữ gói', secondary: 'Vẫn huỷ', onSecondary: () => { this.setState({ tier: 'free' }); this.showToast('Đã huỷ gói — về Khách tham quan'); this.back(); } } }),
+      // REFUND
+      isRefund: st.screen === 'refund', refundReason: st._refundReason || '',
+      onRefundReason: (e) => this.setState({ _refundReason: e.target.value }),
+      submitRefund: () => { this.showToast('Đã gửi yêu cầu hoàn tiền — phản hồi trong 3 ngày'); this.back(); },
+      // EDIT PROFILE
+      isEditProfile: st.screen === 'editprofile',
+      editName: st._editName != null ? st._editName : (st.user.name || ''),
+      onEditName: (e) => this.setState({ _editName: e.target.value }),
+      saveProfile: () => { this.setState({ user: Object.assign({}, st.user, { name: this.state._editName != null ? this.state._editName : st.user.name }) }); this.showToast('Đã lưu hồ sơ ✦'); this.back(); },
+      // NOTIFICATIONS
+      isNotifications: st.screen === 'notifications', notifs: notifsFiltered, notifsEmpty: notifsFiltered.length === 0,
+      notifFilters: [{ k: 'all', label: 'Tất cả' }, { k: 'unread', label: 'Chưa đọc' }, { k: 'system', label: 'Hệ thống' }, { k: 'social', label: 'Tương tác' }].map(f => ({ ...f, border: (st._notifFilter || 'all') === f.k ? 'var(--cta)' : 'var(--border)', bg: (st._notifFilter || 'all') === f.k ? 'var(--cta)' : 'var(--bg-card)', color: (st._notifFilter || 'all') === f.k ? '#fff' : 'var(--text-secondary)', pick: () => this.setState({ _notifFilter: f.k }) })),
+      markAllRead: () => this.markAllRead(), clearReadNotifs: () => this.clearReadNotifs(),
+      // ACCOUNT SECURITY
+      isAccountSecurity: st.screen === 'accountsecurity',
+      accEmail: st.user.email || 'minhanh@email.com',
+      twoFASub: st.twoFA ? 'Đang bật — bảo vệ qua email' : 'Đang tắt',
+      twoFATrack: st.twoFA ? 'var(--success)' : 'var(--border-2)', twoFAKnob: st.twoFA ? '22px' : '3px',
+      toggle2FA: () => { this.setState({ twoFA: !st.twoFA }); this.showToast(!st.twoFA ? 'Đã bật xác thực 2 bước ✦' : 'Đã tắt xác thực 2 bước'); },
+      deviceCount: 3, devicesHl: st._accSecTab === 'devices' ? 'rgba(237,137,39,.1)' : 'transparent',
+      goChangeEmail: () => this.nav('changeemail', 'fwd'),
+      goChangePass: () => this.nav('changepassword', 'fwd'),
+      goDevices: () => this.nav('devicemanagement', 'fwd'),
+      goDataExport: () => this.setState({ modal: 'generic', modalData: { icon: 'ti-download', title: 'Tải xuống dữ liệu của bạn', body: 'Chúng tôi sẽ tổng hợp toàn bộ dữ liệu tài khoản và gửi link tải về email trong vòng 24 giờ.', primary: 'Yêu cầu tải xuống', secondary: 'Huỷ', onPrimary: () => this.showToast('Đã gửi yêu cầu — kiểm tra email của bạn ✦') } }),
+      goDeleteAccount: () => this.nav('deleteaccount', 'fwd'),
+      goPrivacyPolicy: () => this.nav('privacypolicy', 'fwd'),
+      // CHANGE PASSWORD
+      isChangePass: st.screen === 'changepassword',
+      cpOld: st._cpOld, cpNew: st._cpNew, cpConfirm: st._cpConfirm,
+      onCpOld: (e) => this.setState({ _cpOld: e.target.value }), onCpNew: (e) => this.setState({ _cpNew: e.target.value }), onCpConfirm: (e) => this.setState({ _cpConfirm: e.target.value }),
+      cpBars: [0, 1, 2].map(i => i < cpStrength ? cpStrengthColor : 'var(--bg-tertiary)'),
+      cpConfirmBorder: (st._cpConfirm && st._cpConfirm !== st._cpNew) ? 'var(--error)' : 'var(--border)',
+      cpErr: (st._cpConfirm && st._cpConfirm !== st._cpNew) ? 'Mật khẩu xác nhận không khớp' : null,
+      cpDisabled: cpInvalid, cpOpacity: cpInvalid ? '0.5' : '1',
+      submitCp: () => { if (st._cpOld !== this.DEMO_PASS && st._cpOld !== this.TEST_PASS) { this.showToast('Mật khẩu hiện tại không đúng', 'error'); return; } this.setState({ _cpOld: '', _cpNew: '', _cpConfirm: '' }); this.showToast('Đã đổi mật khẩu thành công ✦'); this.back(); },
+      // CHANGE EMAIL
+      isChangeEmail: st.screen === 'changeemail',
+      ceNew: st._ceNew, onCeNew: (e) => this.setState({ _ceNew: e.target.value }),
+      ceBorder: (st._ceNew && !this.validEmail(st._ceNew)) ? 'var(--error)' : 'var(--border)',
+      ceErr: (st._ceNew && !this.validEmail(st._ceNew)) ? 'Định dạng email không đúng' : null,
+      ceDisabled: ceInvalid, ceOpacity: ceInvalid ? '0.5' : '1',
+      submitCe: () => { this.setState({ _ceNew: '' }); this.showToast('Đã gửi link xác minh đến email mới ✦'); this.back(); },
+      // DEVICE MANAGEMENT
+      isDevices: st.screen === 'devicemanagement',
+      deviceList: this.devices.filter(d => !st._revoked.includes(d.id)).map(d => ({ ...d, border: d.current ? 'var(--success)' : 'var(--border)', curDisp: d.current ? 'inline' : 'none', revokeDisp: d.current ? 'none' : 'flex', revoke: () => { this.setState({ _revoked: st._revoked.concat(d.id) }); this.showToast('Đã đăng xuất ' + d.name); } })),
+      // DELETE ACCOUNT
+      isDeleteAccount: st.screen === 'deleteaccount',
+      daPass: st._daPass, onDaPass: (e) => this.setState({ _daPass: e.target.value }),
+      toggleDaConfirm: () => this.setState({ _daConfirm: !st._daConfirm }),
+      daCheckBorder: st._daConfirm ? 'var(--error)' : 'var(--border-2)', daCheckBg: st._daConfirm ? 'var(--error)' : 'transparent', daCheckDisp: st._daConfirm ? 'block' : 'none',
+      daDisabled: daInvalid, daOpacity: daInvalid ? '0.5' : '1',
+      submitDelete: () => { this.setState({ _daConfirm: false, _daPass: '', user: { name: '', email: '', isLoggedIn: false, age: null }, history: [] }); this.showToast('Tài khoản đã được xoá'); this.replace('authchoice'); },
+      // PRIVACY POLICY
+      isPrivacyPolicy: st.screen === 'privacypolicy',
+      // EVENT DETAIL
+      isEventDetail: st.screen === 'eventdetail',
+      eventImg: this.vimg('phocohoian', 600, 420),
+      remindEvent: () => this.showToast('Đã đặt lịch nhắc — sẽ báo bạn trước 1 ngày ✦'),
+      openEventVenue: () => { this.setState({ curVenueId: 2 }); this.nav('place', 'fwd'); },
+    };
+  },
+  settingsVals() {
+    const st = this.state; const a = st.a11y;
+    const lowSw = this.sw(a.visualLow), blindSw = this.sw(a.visualBlind), motorSw = this.sw(a.motor), offSw = this.sw(st.isOffline);
+    const faqs = [
+      { q: 'AR Scan hoạt động thế nào?', a: 'Hướng camera vào hiện vật có gắn nhãn V-Heritage, AI sẽ nhận diện và hiển thị thông tin cùng mô hình 3D ngay trên màn hình.' },
+      { q: 'Tôi có cần Internet để dùng app không?', a: 'Không bắt buộc. Bạn có thể tải gói dữ liệu của từng địa điểm để dùng offline khi tham quan.' },
+      { q: 'Gói miễn phí có những gì?', a: 'Audio thuyết minh, 3D viewer, AR Guestbook, sưu tầm hiện vật, AR Scan không giới hạn — đủ dùng cho mọi chuyến tham quan.' },
+      { q: 'Premium khác gì bản miễn phí?', a: 'Premium thêm audio HD giọng nghệ sĩ, du hành thời gian đầy đủ, bộ lọc AR 3D và lời nhắn Guestbook tuỳ chỉnh.' },
+      { q: 'Làm sao để bật chế độ trợ năng?', a: 'Vào Hồ sơ → Trợ năng và bật các hồ sơ phù hợp: mắt yếu, khiếm thị hoặc vận động khó khăn.' },
+      { q: 'Tôi quên mật khẩu thì sao?', a: 'Tại màn đăng nhập, chạm "Quên mật khẩu?" và làm theo hướng dẫn gửi qua email.' },
+      { q: 'Làm sao để tạo bộ sưu tập?', a: 'Vào Thư viện → chạm nút "+" để tạo bộ sưu tập mới và đặt tên. Mỗi hiện vật có thể thêm vào nhiều bộ qua nút bookmark.' },
+      { q: 'Mất kết nối có dùng được không?', a: 'Được, nếu bạn đã tải gói dữ liệu của địa điểm. AR Scan và nội dung đã tải vẫn hoạt động bình thường khi offline.' },
+    ];
+    const hq = (st._helpQuery || '').toLowerCase().trim();
+    const helpFiltered = hq ? faqs.filter(f => f.q.toLowerCase().includes(hq) || f.a.toLowerCase().includes(hq)) : faqs;
+    const csInvalid = !st._csName.trim() || !this.validEmail(st._csEmail) || !st._csIssue || !st._csDesc.trim();
+    const settingsItems = [
+      { icon: 'ti-language', label: 'Ngôn ngữ', value: this.langDefs.find(l => l.code === st.language).name, tap: () => this.setState({ sheet: 'lang' }) },
+      { icon: st.theme === 'light' ? 'ti-moon' : 'ti-sun', label: 'Giao diện', value: st.theme === 'light' ? 'Sáng' : 'Tối', tap: () => this.setState({ theme: st.theme === 'light' ? 'dark' : 'light' }) },
+      { icon: 'ti-accessible', label: 'Trợ năng', value: '', tap: () => this.nav('accessibility', 'fwd') },
+      { icon: 'ti-bell', label: 'Thông báo', value: '', tap: () => this.nav('notifications', 'fwd') },
+      { icon: 'ti-database', label: 'Quản lý bộ nhớ', value: '7,2 GB', tap: () => this.nav('downloads', 'fwd') },
+      { icon: 'ti-shield-lock', label: 'Tài khoản & Bảo mật', value: '', tap: () => this.nav('accountsecurity', 'fwd') },
+      { icon: 'ti-help-circle', label: 'Trợ giúp & FAQ', value: '', tap: () => this.nav('help', 'fwd') },
+    ].map((s, i, arr) => ({ ...s, radius: i === 0 ? '12px 12px 0 0' : i === arr.length - 1 ? '0 0 12px 12px' : '0' }));
+
+    return {
+      // SETTINGS
+      isSettings: st.screen === 'settings', settingsItems,
+      offlineSwitchOn: st.isOffline, offTrack: offSw.track, offKnob: offSw.knob,
+      toggleOfflineSetting: () => { const willOffline = !st.isOffline; this.setState({ isOffline: willOffline }); if (willOffline && !st.hasPacks) this.nav('offline', 'fwd'); else this.showToast(willOffline ? 'Đã chuyển sang offline' : 'Đã bật lại kết nối'); },
+      // ACCESSIBILITY
+      isAccessibility: st.screen === 'accessibility',
+      acLowOn: a.visualLow, acLowTrack: lowSw.track, acLowKnob: lowSw.knob, toggleLow: () => this.toggleA11y('visualLow'),
+      acBlindOn: a.visualBlind, acBlindTrack: blindSw.track, acBlindKnob: blindSw.knob, toggleBlind: () => this.toggleA11y('visualBlind'),
+      acMotorOn: a.motor, acMotorTrack: motorSw.track, acMotorKnob: motorSw.knob, toggleMotor: () => this.toggleA11y('motor'),
+      acAnyOn: a.visualLow || a.visualBlind || a.motor,
+      acPreviewFs: a.visualLow ? '17px' : '14px', acPreviewPad: a.visualLow ? '16px' : '12px',
+      acSoundTrack: this.sw(st.soundAlert).track, acSoundKnob: this.sw(st.soundAlert).knob, toggleSoundAlert: () => { this.setState({ soundAlert: !st.soundAlert }); this.showToast(!st.soundAlert ? 'Đã bật cảnh báo âm thanh' : 'Đã tắt cảnh báo âm thanh'); },
+      acDistTrack: this.sw(st.distAlert).track, acDistKnob: this.sw(st.distAlert).knob, toggleDistAlert: () => { this.setState({ distAlert: !st.distAlert }); this.showToast(!st.distAlert ? 'Đã bật cảnh báo khoảng cách' : 'Đã tắt cảnh báo khoảng cách'); },
+      // PRIVACY
+      isPrivacy: st.screen === 'privacy',
+      privacySections: [
+        { icon: 'ti-database', title: 'Dữ liệu chúng tôi thu thập', body: 'Email, lịch sử tham quan và hiện vật bạn lưu. Vị trí chỉ khi bạn cho phép, dùng để gợi ý di tích gần bạn.' },
+        { icon: 'ti-lock', title: 'Cách chúng tôi bảo vệ', body: 'Dữ liệu được mã hoá khi truyền và lưu trữ. Chúng tôi không bán thông tin cá nhân cho bên thứ ba.' },
+        { icon: 'ti-share', title: 'Chia sẻ với đối tác', body: 'Chỉ chia sẻ dữ liệu ẩn danh, gộp với các bảo tàng đối tác để cải thiện trải nghiệm trưng bày.' },
+        { icon: 'ti-user-check', title: 'Quyền của bạn', body: 'Bạn có thể yêu cầu xuất hoặc xoá toàn bộ dữ liệu bất cứ lúc nào trong phần Cài đặt tài khoản.' },
+      ],
+      // HELP
+      isHelp: st.screen === 'help',
+      helpQuery: st._helpQuery, onHelpQuery: (e) => this.setState({ _helpQuery: e.target.value }),
+      faqs: helpFiltered.map((f) => ({ ...f, open: st._faqOpen === f.q, chevron: st._faqOpen === f.q ? 'ti-chevron-up' : 'ti-chevron-down', toggle: () => this.setState({ _faqOpen: st._faqOpen === f.q ? null : f.q }) })),
+      faqsEmpty: helpFiltered.length === 0,
+      contactSupport2: () => this.nav('contactsupport', 'fwd'),
+      // CONTACT SUPPORT
+      isContactSupport: st.screen === 'contactsupport',
+      csName: st._csName, csEmail: st._csEmail, csDesc: st._csDesc,
+      onCsName: (e) => this.setState({ _csName: e.target.value }), onCsEmail: (e) => this.setState({ _csEmail: e.target.value }), onCsDesc: (e) => this.setState({ _csDesc: e.target.value }),
+      csIssues: [
+        { k: 'bug', label: 'Lỗi kỹ thuật' }, { k: 'account', label: 'Tài khoản' }, { k: 'payment', label: 'Thanh toán' }, { k: 'content', label: 'Nội dung' }, { k: 'other', label: 'Khác' },
+      ].map(it => ({ ...it, pick: () => this.setState({ _csIssue: it.k }), border: st._csIssue === it.k ? 'var(--cta)' : 'var(--border)', bg: st._csIssue === it.k ? 'var(--cta)' : 'var(--bg-card)', color: st._csIssue === it.k ? '#fff' : 'var(--text-secondary)' })),
+      csAttached: st._csAttached, csAttachIcon: st._csAttached ? 'ti-circle-check-filled' : 'ti-paperclip', csAttachLabel: st._csAttached ? 'Đã đính kèm ảnh chụp màn hình' : 'Đính kèm ảnh chụp màn hình',
+      csAttach: () => this.setState({ _csAttached: !st._csAttached }),
+      csDisabled: csInvalid, csOpacity: csInvalid ? '0.5' : '1',
+      submitContact: () => { this.setState({ _csName: '', _csEmail: '', _csIssue: null, _csDesc: '', _csAttached: false }); this.showToast('Đã gửi yêu cầu — chúng tôi sẽ phản hồi trong 24 giờ ✦'); this.back(); },
+      // ABOUT
+      isAbout: st.screen === 'about', aboutVersion: 'V-Heritage v8.0.0',
+      triggerError: () => this.nav('error', 'fwd'),
+      triggerMaintenance: () => this.nav('maintenance', 'fwd'),
+      triggerLocked: () => this.nav('locked', 'fwd'),
+      gbPostedCount: st.guestbookPosted,
+    };
+  },
+
+  placeVals() {
+    const st = this.state;
+    const cur = this.artifacts.find(a => a.id === st.curArtId) || this.artifacts[0];
+    const ven = this.venues.find(v => v.id === st.curVenueId) || this.venues[0];
+    const venArtifacts = this.artifacts.filter(a => a.venue === ven.id);
+    const isPremium = !!(st.tiers && st.tiers.premium);
+    const isSaved = st.saved.includes(cur.id);
+
+    // Explore
+    const mapPins = this.venues.map(v => ({ ...v, select: () => this.setState({ curVenueId: v.id }), color: st.curVenueId === v.id ? 'var(--cta)' : 'var(--primary)', z: st.curVenueId === v.id ? 6 : 3, dim: (st.a11y.motor && !v.wheelchair) ? '0.35' : '1' }));
+    const venuesView = this.venues.filter(v => !st.a11y.motor || v.wheelchair).map(v => ({ ...v, img: this.vimg(v.seed, 200, 200), open: () => this.openVenue(v.id), activeBorder: st.curVenueId === v.id ? 'var(--cta)' : 'var(--border)' }));
+
+    // Search
+    const q = st.searchQuery.trim().toLowerCase();
+    let searchItems = [];
+    if (q) {
+      this.artifacts.forEach(a => { if (a.name.toLowerCase().includes(q)) searchItems.push({ kind: 'art', id: a.id, name: a.name, sub: a.era + ' · ' + a.material, img: this.vimg(a.seed, 120, 120), icon: 'ti-artboard', tap: () => this.openArtifact(a.id) }); });
+      this.venues.forEach(v => { if (v.name.toLowerCase().includes(q)) searchItems.push({ kind: 'venue', id: v.id, name: v.name, sub: v.city + ' · ' + v.count + ' hiện vật', img: this.vimg(v.seed, 120, 120), icon: 'ti-map-pin', tap: () => this.openVenue(v.id) }); });
+    }
+    if (st.searchFilter === 'art') searchItems = searchItems.filter(i => i.kind === 'art');
+    if (st.searchFilter === 'venue') searchItems = searchItems.filter(i => i.kind === 'venue');
+    const searchChips = [{ k: 'all', l: 'Tất cả' }, { k: 'art', l: 'Hiện vật' }, { k: 'venue', l: 'Địa điểm' }].map(c => ({ ...c, pick: () => this.setState({ searchFilter: c.k }), bg: st.searchFilter === c.k ? 'var(--cta)' : 'transparent', color: st.searchFilter === c.k ? '#fff' : 'var(--text-secondary)', border: st.searchFilter === c.k ? 'var(--cta)' : 'var(--border)' }));
+
+    // audio
+    const audioPct = st.audioProgress + '%';
+
+    return {
+      // EXPLORE
+      isExplore: st.screen === 'explore',
+      showMap: !st.isOffline && !st._noLocation,
+      mapHidden: st.isOffline || st._noLocation,
+      mapHiddenIcon: st.isOffline ? 'ti-wifi-off' : 'ti-map-pin-off',
+      mapHiddenTitle: st.isOffline ? 'Bản đồ không khả dụng offline' : 'Chưa xác định được vị trí',
+      mapHiddenBody: st.isOffline ? 'Bạn vẫn có thể xem danh sách địa điểm đã tải bên dưới.' : 'Bật vị trí để xem di tích gần bạn, hoặc chọn một thành phố để khám phá.',
+      showChooseCity: st._noLocation && !st.isOffline,
+      chooseCity: () => this.setState({ sheet: 'city' }),
+      sheetCity: st.sheet === 'city',
+      cityList: ['Hà Nội', 'TP.HCM', 'Huế', 'Đà Nẵng', 'Quảng Nam', 'Ninh Bình'].map(c => ({ name: c, pick: () => { this.setState({ _noLocation: false, _fallbackLoc: true, sheet: null }); this.showToast('Đang khám phá di sản tại ' + c + ' ✦'); } })),
+      mapPins, venuesView, exploreCount: venuesView.length,
+      usingFallbackLoc: st._fallbackLoc,
+      openSearchFromExplore: () => this.nav('search', 'fwd'),
+      // SEARCH
+      isSearch: st.screen === 'search',
+      searchQuery: st.searchQuery, onSearchInput: (e) => this.setState({ searchQuery: e.target.value }),
+      searchChips, searchItems, searchHasQuery: !!q, searchEmpty: q && searchItems.length === 0,
+      clearSearch: () => this.setState({ searchQuery: '' }),
+      // LOCPERM
+      isLocPerm: st.screen === 'locperm',
+      allowLoc: () => { this.setState({ _fallbackLoc: false, permissions: Object.assign({}, st.permissions, { location: 1 }) }); this.nav('explore', 'fwd'); },
+      demoLoc: () => { this.setState({ _fallbackLoc: true }); this.showToast('Đang dùng vị trí mặc định: Hà Nội'); this.nav('explore', 'fwd'); },
+      // PLACE DETAIL
+      isPlace: st.screen === 'place',
+      curVen: { ...ven, img: this.vimg(ven.seed, 600, 400) },
+      venArtifacts: venArtifacts.map(a => ({ ...a, img: this.vimg(a.seed, 200, 200), open: () => this.openArtifact(a.id) })),
+      venArtCount: venArtifacts.length,
+      showWheelchairToggle: st.a11y.motor,
+      wcTrackBg: st.wheelchair ? 'var(--cta)' : 'var(--bg-tertiary)', wcKnobX: st.wheelchair ? '19px' : '0px',
+      toggleWheelchair: () => { this.setState({ wheelchair: !st.wheelchair }); this.showToast(st.wheelchair ? 'Đã tắt lộ trình xe lăn' : 'Hiện lối tiếp cận thân thiện xe lăn ♿'); },
+      venAccessNote: ven.wheelchair ? ('Có lối tiếp cận — ' + ven.floor) : ('Khó tiếp cận — ' + ven.floor),
+      venAccessColor: ven.wheelchair ? 'var(--success)' : 'var(--warning)',
+      venAccessIcon: ven.wheelchair ? 'ti-wheelchair' : 'ti-stairs',
+      readArticle: () => this.nav('article', 'fwd'),
+      // VENUE ARTICLE
+      isArticle: st.screen === 'article',
+      articleTitle: ven.name, articleImg: this.vimg(ven.seed, 600, 360), articleImg2: this.vimg((venArtifacts[0] || cur).seed, 600, 360),
+      // ARTIFACT DETAIL
+      isArtifact: st.screen === 'artifact',
+      curArt: { ...cur, img: this.vimg(cur.seed, 600, 440) },
+      fromScan: st._fromScan,
+      audioPct, audioTime: this.fmtTime(st.audioProgress), audioIcon: st.isPlaying ? 'ti-player-pause-filled' : 'ti-player-play-filled',
+      toggleAudio: () => this.toggleAudio(),
+      audioHDTap: () => { if (isPremium) this.showToast('Đang phát bản HD giọng nghệ sĩ...'); else this.premiumGate(); },
+      isPremium,
+      openAudioPlayer: () => { this.nav('audioplayer', 'fwd'); if (!st.isPlaying) this.toggleAudio(); },
+      isAudioPlayer: st.screen === 'audioplayer',
+      apImg: this.vimg(cur.seed, 500, 500), apName: cur.name, apSub: (cur.era || '') + ' · Thuyết minh',
+      apSpin: st.isPlaying ? 'running' : 'paused',
+      apSpeedLabel: (st.audioSpeed || 1) + 'x',
+      apSpeed: () => { const seq = [1, 1.25, 1.5, 0.75]; const i = seq.indexOf(st.audioSpeed || 1); this.setState({ audioSpeed: seq[(i + 1) % seq.length] }); },
+      apBack15: () => this.setState({ audioProgress: Math.max(0, st.audioProgress - 6.75) }),
+      apFwd15: () => this.setState({ audioProgress: Math.min(100, st.audioProgress + 6.75) }),
+      apHD: () => { if (isPremium) this.showToast('Đang phát bản HD giọng nghệ sĩ ✦'); else this.premiumGate(); },
+      apHDColor: isPremium ? 'var(--cta)' : 'rgba(255,255,255,.5)',
+      apSeek: (e) => { const r = e.currentTarget.getBoundingClientRect(); const pct = Math.max(0, Math.min(100, (e.clientX - r.left) / r.width * 100)); this.setState({ audioProgress: pct }); },
+      apLyricsRef: (el) => { this._apLyricsEl = el; },
+      apLyrics: this.audioLyrics.map((l, i) => { const arr = this.audioLyrics; const next = arr[i + 1]; const cp = st.audioProgress; const active = cp >= l.p && (!next || cp < next.p); return { ...l, active, color: active ? '#fff' : 'rgba(255,255,255,.4)', size: active ? '18px' : '15px', seek: () => this.setState({ audioProgress: l.p }) }; }),
+      open3D: () => { this.nav('threed', 'fwd'); this.start3D(); this.showToast('Kéo để xoay · chạm điểm sáng để xem chi tiết'); },
+      openTimeTravel: () => this.nav('timetravel', 'fwd'),
+      openGuestbook2: () => this.setState({ sheet: 'guestbook', _gbSheetH: 60 }),
+      gbCount: this.guestbook.length,
+      saveBg: isSaved ? 'var(--cta)' : 'var(--bg-secondary)', saveColor: isSaved ? '#fff' : 'var(--text-primary)', saveIcon: isSaved ? 'ti-bookmark-filled' : 'ti-bookmark-plus', saveLabel: isSaved ? 'Đã lưu' : 'Thêm vào bộ sưu tập',
+      toggleSaveCur: () => this.toggleSave(cur.id),
+      openShareArt: () => this.setState({ sheet: 'share' }),
+      openPhoto: () => this.nav('photo', 'fwd'),
+      showVoiceDesc: st.a11y.visualBlind,
+      openAudioDesc: () => this.nav('audiodesc', 'fwd'),
+      // 3D VIEWER
+      isThreeD: st.screen === 'threed',
+      threeDRot: 'rotateY(' + st.threeDRot + 'deg) scale(' + st.threeDZoom + ')',
+      threeDImg: this.vimg(cur.seed, 500, 500),
+      rot3DLeft: () => this.setState({ threeDRot: (st.threeDRot - 30 + 360) % 360 }),
+      rot3DRight: () => this.setState({ threeDRot: (st.threeDRot + 30) % 360 }),
+      zoom3DIn: () => this.setState({ threeDZoom: Math.min(1.8, st.threeDZoom + 0.2) }),
+      zoom3DOut: () => this.setState({ threeDZoom: Math.max(0.6, st.threeDZoom - 0.2) }),
+      reset3D: () => this.setState({ threeDRot: 0, threeDZoom: 1 }),
+      show3DHint: () => this.showToast('Kéo để xoay · chạm điểm sáng để xem chi tiết'),
+      threeDPlaying: st.threeDPlaying, threeDPlayIcon: st.threeDPlaying ? 'ti-player-pause' : 'ti-player-play',
+      toggle3DPlay: () => this.toggle3DPlay(),
+      drag3DStart: (e) => this.drag3DStart(e),
+      exit3D: () => { this.stop3D(); this.back(); },
+      // TIME TRAVEL
+      isTimeTravel: st.screen === 'timetravel',
+      timeIdx: st.timeIdx, timeEras: ['Nguyên bản', 'Hiện tại', 'Phục dựng'],
+      timeLabel: ['Nguyên bản (thế kỷ XI)', 'Hiện trạng ngày nay', 'Phục dựng 3D đầy đủ'][st.timeIdx],
+      setTime0: () => this.setState({ timeIdx: 0 }), setTime1: () => this.setState({ timeIdx: 1 }),
+      setTime2: () => { if (!isPremium) { this.premiumGate(); return; } this.setState({ timeIdx: 2 }); },
+      timeImg: this.vimg(cur.seed, 600, 400),
+      timeLocked2Disp: isPremium ? 'none' : 'block',
+      // PHOTO DETAIL
+      isPhoto: st.screen === 'photo',
+      photoImg: this.vimg(cur.seed, 600, 700),
+      sharePhoto: () => this.setState({ sheet: 'share' }),
+      // AUDIO DESC
+      isAudioDesc: st.screen === 'audiodesc',
+      descShape: cur.shape, descName: cur.name, descImg: this.vimg(cur.seed, 400, 300),
+    };
+  }
+};
