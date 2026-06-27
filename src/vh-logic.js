@@ -33,6 +33,7 @@ window.VH_LOGIC = {
     };
     document.addEventListener('error', this._imgErr, true);
     this._onClick = (e) => {
+      if (this._lpFired || document._vhDragged) return;
       const el = e.target.closest && e.target.closest('[data-ripple]');
       if (!el || el.disabled) return;
       const r = el.getBoundingClientRect();
@@ -250,7 +251,7 @@ window.VH_LOGIC = {
       user: {name: 'Minh Anh', email: liEmail, isLoggedIn: true, age: 31}
     });
     this.showToast('Chào mừng trở lại ✦', 'success');
-    this.nav('language', 'fwd');
+    this.goTab('home');
   },
   lockLogin() {
     this.setState({lockedUntil: Date.now() + 60000, lockCountdown: 60});

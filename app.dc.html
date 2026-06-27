@@ -4178,19 +4178,29 @@ Object.assign(Component.prototype, VH_DATA, VH_LOGIC, VH_RENDER);
   const SKIP = new Set(['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'A']);
   let drag = null;
   let moved = false;
+  function nearestVScroll(el) {
+    let node = el;
+    while (node) {
+      if (node.scrollHeight > node.clientHeight + 1) return node;
+      const par = node.parentElement;
+      node = par ? par.closest('.vh-scroll') : null;
+    }
+    return el;
+  }
   document.addEventListener('mousedown', function (e) {
     if (SKIP.has(e.target.tagName)) return;
     const el = e.target.closest('.vh-scroll');
     if (!el) return;
-    drag = { el, x: e.clientX, y: e.clientY, sl: el.scrollLeft, st: el.scrollTop };
+    const elV = nearestVScroll(el);
+    drag = { el, elV, x: e.clientX, y: e.clientY, sl: el.scrollLeft, st: elV.scrollTop };
     moved = false;
   });
   document.addEventListener('mousemove', function (e) {
     if (!drag) return;
     const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
     drag.el.scrollLeft = drag.sl - dx;
-    drag.el.scrollTop = drag.st - dy;
-    if (drag.el.scrollLeft !== drag.sl || drag.el.scrollTop !== drag.st) moved = true;
+    drag.elV.scrollTop = drag.st - dy;
+    if (drag.el.scrollLeft !== drag.sl || drag.elV.scrollTop !== drag.st) { moved = true; document._vhDragged = true; }
   });
   document.addEventListener('mouseup', function () {
     if (moved) {
@@ -4202,8 +4212,9 @@ Object.assign(Component.prototype, VH_DATA, VH_LOGIC, VH_RENDER);
     }
     drag = null;
     moved = false;
+    setTimeout(function () { document._vhDragged = false; }, 100);
   });
-  document.addEventListener('mouseleave', function () { drag = null; moved = false; });
+  document.addEventListener('mouseleave', function () { drag = null; moved = false; document._vhDragged = false; });
 })();
 </script>
 </body>
