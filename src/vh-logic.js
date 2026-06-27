@@ -546,13 +546,24 @@ window.VH_LOGIC = {
   },
 
   // ---- artifact / venue ----
-  // ghi nhận hiện vật đã mở xem + di tích đang tham quan dở (cho card "Tiếp tục tham quan")
+  // tra cứu venue ở cả danh sách chính lẫn điểm đến Top 10
+  findVenue(id) {
+    return this.venues.concat(this.destVenues || []).find(v => v.id === id);
+  },
+  // hiện vật hiển thị của một nơi (điểm đến Top 10 không có hiện vật riêng → mẫu)
+  venueArtifacts(venId) {
+    let arr = this.artifacts.filter(a => a.venue === venId);
+    if (arr.length === 0) {
+      const start = (venId * 3) % this.artifacts.length;
+      arr = [0, 1, 2].map(k => this.artifacts[(start + k) % this.artifacts.length]);
+    }
+    return arr;
+  },
+  // chỉ ghi nhận hiện vật đã mở xem (cho tiến độ card "Tiếp tục tham quan")
   recordVisit(id) {
-    const art = this.artifacts.find(a => a.id === id);
-    if (!art) return;
     const visited = this.state._visited || [];
-    const nv = visited.includes(id) ? visited : visited.concat([id]);
-    this.setState({_visited: nv, _visitVenue: art.venue});
+    if (visited.includes(id)) return;
+    this.setState({_visited: visited.concat([id])});
   },
   openArtifact(id, fromScan) {
     if (this._lpFired) return;
@@ -561,18 +572,21 @@ window.VH_LOGIC = {
     this.recordVisit(id);
     this.nav('artifact', 'fwd');
   },
-  // Mở thẳng Màn 1 (mô hình 3D) cho card "Đang chờ khám phá"
+  // Mở thẳng Màn 1 (mô hình 3D) cho card "Đang chờ khám phá" → nơi đang tham quan = venue của hiện vật
   openArtifactModel(id) {
     if (this._lpFired) return;
-    this.setState({curArtId: id, isPlaying: false, audioProgress: 0, _fromScan: false});
+    const art = this.artifacts.find(a => a.id === id);
+    this.setState({curArtId: id, isPlaying: false, audioProgress: 0, _fromScan: false, _visitVenue: art ? art.venue : this.state._visitVenue});
     clearInterval(this._audioT);
     this.recordVisit(id);
     this.nav('threed', 'fwd');
   },
   // Sau khi quét/QR nhận diện: hiện Màn 1, thay scanner trong history (back về nguồn vào)
   revealArtifact(id) {
+    const art = this.artifacts.find(a => a.id === id);
     this.setState({
       curArtId: id, isPlaying: false, audioProgress: 0, _fromScan: true,
+      _visitVenue: art ? art.venue : this.state._visitVenue,
       screen: 'threed', navDir: 'fwd', sheet: null, modal: null, threeDPlaying: true,
       history: this.state.history.filter(s => s !== 'scan' && s !== 'qrscanner')
     });

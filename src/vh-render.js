@@ -627,11 +627,11 @@ window.VH_RENDER = {
       img: this.vimg(d.seed, 130, 130),
       open: () => this.openVenue(d.venueId || 1)
     }));
-    // card "Tiếp tục tham quan" — di tích đang khám phá dở (x hiện vật đã mở < tổng y)
-    const visitVen = st._visitVenue ? this.venues.find(v => v.id === st._visitVenue) : null;
+    // card "Tiếp tục tham quan" — nơi đang tham quan dở (x hiện vật đã mở < tổng y)
+    const visitVen = st._visitVenue ? this.findVenue(st._visitVenue) : null;
     let showContinue = false, contX = 0, contY = 0;
     if (visitVen) {
-      const arts = this.artifacts.filter(a => a.venue === visitVen.id);
+      const arts = this.venueArtifacts(visitVen.id);
       contY = arts.length;
       contX = arts.filter(a => (st._visited || []).includes(a.id)).length;
       showContinue = contY > 0 && contX < contY;
@@ -1399,14 +1399,8 @@ window.VH_RENDER = {
   placeVals() {
     const st = this.state;
     const cur = this.artifacts.find(a => a.id === st.curArtId) || this.artifacts[0];
-    const allVenues = this.venues.concat(this.destVenues || []);
-    const ven = allVenues.find(v => v.id === st.curVenueId) || this.venues[0];
-    let venArtifacts = this.artifacts.filter(a => a.venue === ven.id);
-    if (venArtifacts.length === 0) {
-      // di tích "Top 10" không có hiện vật riêng → giới thiệu vài hiện vật mẫu (đổi theo nơi)
-      const start = (ven.id * 3) % this.artifacts.length;
-      venArtifacts = [0, 1, 2].map(k => this.artifacts[(start + k) % this.artifacts.length]);
-    }
+    const ven = this.findVenue(st.curVenueId) || this.venues[0];
+    const venArtifacts = this.venueArtifacts(ven.id);
     const isPremium = !!(st.tiers && st.tiers.premium);
     const inAnyCollection = (st.collections || []).some(c => (c.items || []).includes(cur.id));
     const isSaved = st.saved.includes(cur.id) || inAnyCollection;
