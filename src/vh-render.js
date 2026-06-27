@@ -1350,7 +1350,8 @@ window.VH_RENDER = {
     const ven = this.venues.find(v => v.id === st.curVenueId) || this.venues[0];
     const venArtifacts = this.artifacts.filter(a => a.venue === ven.id);
     const isPremium = !!(st.tiers && st.tiers.premium);
-    const isSaved = st.saved.includes(cur.id);
+    const inAnyCollection = (st.collections || []).some(c => (c.items || []).includes(cur.id));
+    const isSaved = st.saved.includes(cur.id) || inAnyCollection;
 
     // Explore
     const mapPins = this.venues.map(v => ({
@@ -1575,7 +1576,19 @@ window.VH_RENDER = {
       saveColor: isSaved ? '#fff' : 'var(--text-primary)',
       saveIcon: isSaved ? 'ti-bookmark-filled' : 'ti-bookmark-plus',
       saveLabel: isSaved ? 'Đã lưu' : 'Thêm vào bộ sưu tập',
-      toggleSaveCur: () => this.toggleSave(cur.id),
+      openSaveSheet: () => this.setState({sheet: 'savecollection'}),
+      sheetSaveCollection: st.sheet === 'savecollection',
+      closeSaveSheet: () => this.setState({sheet: null}),
+      saveSheetRows: [
+        {key: 'saved', emoji: '📌', name: 'Đã lưu', checked: st.saved.includes(cur.id), toggle: () => this.toggleSave(cur.id, true)},
+        ...(st.collections || []).map(c => ({
+          key: c.id, emoji: c.emoji || '📁', name: c.name,
+          checked: (c.items || []).includes(cur.id),
+          toggle: () => this.toggleArtInCollection(c.id),
+        })),
+      ].map(r => ({...r, checkIcon: r.checked ? 'ti-checkbox' : 'ti-square', checkColor: r.checked ? 'var(--cta)' : 'var(--text-tertiary)'})),
+      saveSheetCreateNew: () => this.setState({modal: 'createcollection', _ccName: '', _ccEmoji: '📁', _ccAddArt: cur.id}),
+      closeCreateCollection: () => this.setState({modal: null, sheet: st._ccAddArt ? 'savecollection' : null, _ccName: '', _ccAddArt: null}),
       openShareArt: () => this.setState({sheet: 'share'}),
       openPhoto: () => this.nav('photo', 'fwd'),
       showVoiceDesc: st.a11y.visualBlind,

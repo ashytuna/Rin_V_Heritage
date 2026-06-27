@@ -436,24 +436,40 @@ window.VH_LOGIC = {
   },
 
   // ---- collections / guestbook ----
-  toggleSave(id) {
+  toggleSave(id, quiet) {
     const saved = this.state.saved.slice();
     const i = saved.indexOf(id);
     if (i >= 0) {
       saved.splice(i, 1);
       this.setState({saved});
-      this.showToast('Đã gỡ khỏi bộ sưu tập');
+      if (!quiet) this.showToast('Đã gỡ khỏi bộ sưu tập');
     } else {
       saved.push(id);
       this.setState({saved});
-      this.showToast('Đã thêm vào bộ sưu tập của bạn ✦');
+      if (!quiet) this.showToast('Đã thêm vào bộ sưu tập của bạn ✦');
     }
+  },
+  toggleArtInCollection(colId) {
+    const id = this.state.curArtId;
+    const cols = (this.state.collections || []).map(c => {
+      if (c.id !== colId) return c;
+      const items = (c.items || []).slice();
+      const j = items.indexOf(id);
+      if (j >= 0) items.splice(j, 1); else items.push(id);
+      return {...c, items};
+    });
+    this.setState({collections: cols});
   },
   createCollection() {
     const name = (this.state._ccName || '').trim();
     if (!name) return;
-    const col = {id: 'c' + Date.now(), name, emoji: this.state._ccEmoji || '📁', items: []};
-    this.setState({collections: (this.state.collections || []).concat([col]), modal: null, _ccName: '', _ccEmoji: '📁'});
+    const addId = this.state._ccAddArt;
+    const col = {id: 'c' + Date.now(), name, emoji: this.state._ccEmoji || '📁', items: addId ? [addId] : []};
+    this.setState({
+      collections: (this.state.collections || []).concat([col]),
+      modal: null, _ccName: '', _ccEmoji: '📁', _ccAddArt: null,
+      sheet: addId ? 'savecollection' : this.state.sheet,
+    });
     this.showToast('Đã tạo bộ sưu tập "' + name + '" ✦');
   },
   postGuestbookTemplate(t) {
