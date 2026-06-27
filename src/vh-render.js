@@ -1032,7 +1032,7 @@ window.VH_RENDER = {
           primary: 'Giữ gói',
           secondary: 'Vẫn huỷ',
           onSecondary: () => {
-            this.setState({tier: 'free'});
+            this.setState({tiers: {premium: false, academic: false}});
             this.showToast('Đã huỷ gói — về Khách tham quan');
             this.back();
           }
