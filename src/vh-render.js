@@ -946,7 +946,7 @@ window.VH_RENDER = {
         {icon: 'ti-shield-lock', label: 'Tài khoản & Bảo mật', tap: () => this.nav('accountsecurity', 'fwd')},
         {icon: 'ti-help-circle', label: 'Trợ giúp & FAQ', tap: () => this.nav('help', 'fwd')},
         {icon: 'ti-info-circle', label: 'Về V-Heritage', tap: () => this.nav('about', 'fwd')},
-        {icon: 'ti-logout', label: 'Đăng xuất', tap: () => this.logout()},
+        {icon: 'ti-logout', label: 'Đăng xuất', tap: () => this.setState({modal: 'generic', modalData: {icon: 'ti-logout', iconBg: 'rgba(221,14,14,.1)', iconColor: 'var(--error)', title: 'Đăng xuất?', body: 'Bạn sẽ cần đăng nhập lại để tiếp tục khám phá.', primary: 'Đăng xuất', onPrimary: () => this.logout(), secondary: 'Huỷ'}})},
       ].map((s, i, arr) => ({...s, radius: i === 0 ? '12px 12px 0 0' : i === arr.length - 1 ? '0 0 12px 12px' : '0'})),
       // PAYWALL
       isPaywall: st.screen === 'paywall',

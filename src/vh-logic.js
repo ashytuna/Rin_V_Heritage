@@ -681,7 +681,6 @@ window.VH_LOGIC = {
       history: [],
       screen: 'authchoice'
     });
-    this.showToast('Đã đăng xuất');
   },
   premiumGate() {
     this.setState({
