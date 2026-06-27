@@ -481,7 +481,7 @@ window.VH_RENDER = {
         this.nav('authchoice', 'back');
       },
       // language + permissions
-      langContinue: () => this.nav('permissions', 'fwd'),
+      langContinue: () => this.goTab('home'),
       perms,
       permDisabled: !permOk,
       permOpacity: permOk ? '1' : '0.55',
@@ -490,8 +490,7 @@ window.VH_RENDER = {
           this.showToast('Cần cấp quyền Camera và Âm thanh', 'error');
           return;
         }
-        this.goTab('home');
-        this.showToast('Chào mừng đến với V-Heritage ✦');
+        this.nav('authchoice', 'fwd');
       },
     };
   },

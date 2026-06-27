@@ -170,7 +170,7 @@ window.VH_LOGIC = {
   // ---- walkthrough ----
   nextWalk() {
     const s = this.state.walkStep;
-    if (s < 3) this.setState({walkStep: s + 1}); else this.nav('authchoice', 'fwd');
+    if (s < 3) this.setState({walkStep: s + 1}); else this.nav('permissions', 'fwd');
   },
   prevWalk() {
     const s = this.state.walkStep;
@@ -196,7 +196,7 @@ window.VH_LOGIC = {
     if (dx < 0) this.nextWalk(); else this.prevWalk();
   },
   skipWalk() {
-    this.nav('authchoice', 'fwd');
+    this.nav('permissions', 'fwd');
   },
 
   // ---- auth helpers ----
@@ -250,7 +250,7 @@ window.VH_LOGIC = {
       user: {name: 'Minh Anh', email: liEmail, isLoggedIn: true, age: 31}
     });
     this.showToast('Chào mừng trở lại ✦', 'success');
-    this.nav('permissions', 'fwd');
+    this.nav('language', 'fwd');
   },
   lockLogin() {
     this.setState({lockedUntil: Date.now() + 60000, lockCountdown: 60});

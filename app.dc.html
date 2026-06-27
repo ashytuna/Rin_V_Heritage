@@ -684,14 +684,14 @@
                         style="width:44px;height:44px;border-radius:11px;background:var(--bg-tertiary);display:flex;align-items:center;justify-content:center;flex:none;">
                       <i class="ti {{ p.icon }}" style="font-size:23px;color:var(--primary);"></i>
                     </div>
-                    <div style="flex:1;">
-                      <div style="font-size:14px;font-weight:600;">{{ p.title }} <span
+                    <div style="flex:1;min-width:0;">
+                      <div style="font-size:14px;font-weight:600;white-space:nowrap;">{{ p.title }} <span
                           style="font-size:11px;color:var(--text-tertiary);font-weight:400;">{{ p.req }}</span>
                       </div>
                       <div style="font-size:12px;color:var(--text-tertiary);">{{ p.sub }}</div>
                     </div>
                     <button data-ripple="1" onClick="{{ p.grant }}"
-                            style="position:relative;overflow:hidden;border:none;border-radius:99px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;background:{{ p.btnBg }};color:{{ p.btnColor }};display:flex;align-items:center;gap:5px;">
+                            style="position:relative;overflow:hidden;border:none;border-radius:99px;padding:8px 10px;font-size:12px;font-weight:600;cursor:pointer;background:{{ p.btnBg }};color:{{ p.btnColor }};display:flex;align-items:center;gap:4px;flex-shrink:0;">
                       <i class="ti {{ p.btnIcon }}"
                          style="font-size:14px;display:{{ p.btnIconDisp }};"></i>{{ p.btnLabel }}
                     </button>
