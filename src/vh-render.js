@@ -524,7 +524,15 @@ window.VH_RENDER = {
         this.nav('authchoice', 'back');
       },
       // language + permissions
-      langContinue: () => this.goTab('home'),
+      langContinue: () => this.enterApp(),
+      // NEARBY (gợi ý tải gói AR gần đây sau đăng nhập, khi đã bật vị trí)
+      isNearby: st.screen === 'nearby',
+      nearbyImg: this.vimg(this.venues[1].seed, 200, 200),
+      nearbyName: this.venues[1].name,
+      nearbyLoc: 'Ba Đình, Hà Nội · cách 320 m',
+      nearbyPackInfo: '32 hiện vật · 0,4 GB',
+      downloadNearby: () => this.downloadNearby(),
+      skipNearby: () => this.goTab('home'),
       perms,
       permDisabled: !permOk,
       permOpacity: permOk ? '1' : '0.55',

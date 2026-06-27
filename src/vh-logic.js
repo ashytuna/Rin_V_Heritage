@@ -188,6 +188,23 @@ window.VH_LOGIC = {
   goTab(t) {
     if (this._lpFired) return;
     if (t === 'scan') {
+      if (!(this.state.permissions && this.state.permissions.camera === 1)) {
+        // chưa cấp quyền camera → hỏi; từ chối thì ở lại tab hiện tại
+        this.setState({
+          modal: 'generic',
+          modalData: {
+            icon: 'ti-camera', iconBg: 'rgba(237,137,39,.14)', iconColor: 'var(--cta)',
+            title: 'Cần quyền Camera',
+            body: 'Quét và xem hiện vật bằng AR cần quyền truy cập camera của thiết bị.',
+            primary: 'Cấp quyền', secondary: 'Để sau',
+            onPrimary: () => {
+              this.setState({permissions: Object.assign({}, this.state.permissions, {camera: 1})});
+              this.nav('scan', 'fwd');
+            },
+          }
+        });
+        return;
+      }
       this.nav('scan', 'fwd');
       return;
     }
@@ -282,6 +299,19 @@ window.VH_LOGIC = {
       user: {name: 'Minh Anh', email: liEmail, isLoggedIn: true, age: 31}
     });
     this.showToast('Chào mừng trở lại ✦', 'success');
+    this.enterApp();
+  },
+  // sau đăng nhập/đăng ký: nếu đã bật vị trí → gợi ý tải gói AR gần đây, ngược lại vào thẳng Home
+  enterApp() {
+    if (this.state.permissions && this.state.permissions.location === 1) this.nav('nearby', 'fwd');
+    else this.goTab('home');
+  },
+  downloadNearby() {
+    const packs = this.state.packs || [];
+    if (!packs.some(p => p.id === 'pnear')) {
+      this.setState({packs: [{id: 'pnear', name: 'Bảo tàng Mỹ thuật Việt Nam', size: 0.4, note: 'Vừa tải', fav: false}, ...packs]});
+    }
+    this.showToast('Đã tải gói AR — Bảo tàng Mỹ thuật Việt Nam ✦');
     this.goTab('home');
   },
   lockLogin() {
