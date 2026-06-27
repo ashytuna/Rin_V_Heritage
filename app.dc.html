@@ -121,7 +121,9 @@
                       <i class="ti ti-arrow-left" style="font-size:18px;"></i>
                     </button>
                   </sc-if>
-                  <sc-if value="{{ !showPrevWalk }}"><div style="width:36px;"></div></sc-if>
+                  <sc-if value="{{ !showPrevWalk }}">
+                    <div style="width:36px;"></div>
+                  </sc-if>
                   <button data-ripple="1" onClick="{{ skipWalk }}"
                           style="position:relative;overflow:hidden;border:none;background:transparent;color:var(--text-tertiary);font-size:13px;font-weight:500;cursor:pointer;padding:8px 10px;border-radius:8px;">
                     Bỏ qua
@@ -277,9 +279,21 @@
                     <sc-for list="{{ socialBtns }}" as="s" hint-placeholder-count="4">
                       <button data-ripple="1" onClick="{{ s.tap }}"
                               style="position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:13px;cursor:pointer;color:var(--text-primary);font-size:14px;font-weight:600;">
-                        <sc-if value="{{ s.paths }}"><svg viewBox="0 0 24 24" style="width:20px;height:20px;flex-shrink:0;"><sc-for list="{{ s.paths }}" as="p"><path d="{{ p.d }}" fill="{{ p.fill }}"/></sc-for></svg></sc-if>
-                        <sc-if value="{{ s.svgPath }}"><svg viewBox="0 0 24 24" style="width:20px;height:20px;flex-shrink:0;" fill="{{ s.color }}"><path d="{{ s.svgPath }}"/></svg></sc-if>
-                        <sc-if value="{{ s.icon }}"><i class="ti {{ s.icon }}" style="font-size:20px;color:{{ s.color }};"></i></sc-if>{{ s.name }}
+                        <sc-if value="{{ s.paths }}">
+                          <svg viewBox="0 0 24 24" style="width:20px;height:20px;flex-shrink:0;">
+                            <sc-for list="{{ s.paths }}" as="p">
+                              <path d="{{ p.d }}" fill="{{ p.fill }}"/>
+                            </sc-for>
+                          </svg>
+                        </sc-if>
+                        <sc-if value="{{ s.svgPath }}">
+                          <svg viewBox="0 0 24 24" style="width:20px;height:20px;flex-shrink:0;" fill="{{ s.color }}">
+                            <path d="{{ s.svgPath }}"/>
+                          </svg>
+                        </sc-if>
+                        <sc-if value="{{ s.icon }}"><i class="ti {{ s.icon }}"
+                                                       style="font-size:20px;color:{{ s.color }};"></i></sc-if>
+                        {{ s.name }}
                       </button>
                     </sc-for>
                   </div>
@@ -305,41 +319,54 @@
                           style="position:relative;overflow:hidden;width:42px;height:42px;flex:none;border-radius:99px;border:1px solid var(--border);background:var(--bg-card);cursor:pointer;color:var(--text-primary);display:flex;align-items:center;justify-content:center;">
                     <i class="ti ti-arrow-left" style="font-size:20px;"></i></button>
                   <div style="flex:1;height:6px;border-radius:99px;background:var(--bg-tertiary);position:relative;">
-                    <div style="position:absolute;top:0;bottom:0;width:33.333%;left:{{ rgThumbLeft }};background:var(--cta);border-radius:99px;transition:left .3s ease;"></div>
+                    <div
+                        style="position:absolute;top:0;bottom:0;width:33.333%;left:{{ rgThumbLeft }};background:var(--cta);border-radius:99px;transition:left .3s ease;"></div>
                   </div>
                   <div style="width:42px;flex:none;"></div>
                 </div>
 
                 <!-- STEP 1: tuổi + trợ năng -->
                 <sc-if value="{{ rgStep1 }}" hint-placeholder-val="{{ true }}">
-                  <div class="vh-scroll" key="{{ rgStepKey }}" style="flex:1;overflow-y:auto;padding:18px 28px 28px;animation:{{ rgPanelAnim }} .3s ease;">
+                  <div class="vh-scroll" key="{{ rgStepKey }}"
+                       style="flex:1;overflow-y:auto;padding:18px 28px 28px;animation:{{ rgPanelAnim }} .3s ease;">
                     <div class="vh-serif" style="font-size:28px;font-weight:600;">Tạo tài khoản</div>
-                    <div style="font-size:14px;color:var(--text-secondary);margin-top:6px;">Bắt đầu hành trình khám phá di sản của bạn</div>
+                    <div style="font-size:14px;color:var(--text-secondary);margin-top:6px;">Bắt đầu hành trình khám phá
+                      di sản của bạn
+                    </div>
                     <!-- birth year -->
                     <div style="margin-top:22px;">
                       <label style="font-size:12px;font-weight:600;color:var(--text-secondary);">Năm sinh</label>
-                      <div style="display:flex;align-items:center;gap:10px;background:var(--bg-card);border:2px solid {{ rgBirthBorder }};border-radius:8px;padding:13px 14px;margin-top:6px;">
+                      <div
+                          style="display:flex;align-items:center;gap:10px;background:var(--bg-card);border:2px solid {{ rgBirthBorder }};border-radius:8px;padding:13px 14px;margin-top:6px;">
                         <i class="ti ti-cake" style="font-size:18px;color:var(--text-tertiary);"></i><input
                           value="{{ rgBirth }}" onInput="{{ onRgBirth }}" inputmode="numeric"
                           placeholder="VD: 1995"
                           style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
                       </div>
                       <sc-if value="{{ rgBirthErr }}" hint-placeholder-val="{{ false }}">
-                        <div style="display:flex;align-items:center;gap:6px;margin-top:7px;font-size:12px;color:var(--error);">
+                        <div
+                            style="display:flex;align-items:center;gap:6px;margin-top:7px;font-size:12px;color:var(--error);">
                           <i class="ti ti-alert-circle" style="font-size:14px;"></i>{{ rgBirthErr }}
                         </div>
                       </sc-if>
                     </div>
                     <!-- a11y suggestion (hiện khi tuổi >= 45) -->
                     <sc-if value="{{ rgShowA11ySuggest }}" hint-placeholder-val="{{ false }}">
-                      <div style="margin-top:16px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:12px;padding:16px;">
+                      <div
+                          style="margin-top:16px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:12px;padding:16px;">
                         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                          <div style="width:36px;height:36px;border-radius:99px;background:var(--bg-secondary);display:flex;align-items:center;justify-content:center;flex:none;">
+                          <div
+                              style="width:36px;height:36px;border-radius:99px;background:var(--bg-secondary);display:flex;align-items:center;justify-content:center;flex:none;">
                             <i class="ti ti-eye" style="font-size:20px;color:var(--cta);"></i>
                           </div>
-                          <div style="font-size:14px;font-weight:700;color:var(--text-primary);">Gợi ý: chế độ trợ năng</div>
+                          <div style="font-size:14px;font-weight:700;color:var(--text-primary);">Gợi ý: chế độ trợ
+                            năng
+                          </div>
                         </div>
-                        <div style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin-bottom:14px;">Bật chế độ trợ năng trong Cài đặt để hiển thị chữ lớn hơn và vùng nhấn rộng hơn, phù hợp hơn cho bạn.</div>
+                        <div style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin-bottom:14px;">Bật
+                          chế độ trợ năng trong Cài đặt để hiển thị chữ lớn hơn và vùng nhấn rộng hơn, phù hợp hơn cho
+                          bạn.
+                        </div>
                         <button data-ripple="1" onClick="{{ toggleRgA11y }}"
                                 style="position:relative;overflow:hidden;width:100%;background:{{ rgA11yBtnBg }};color:{{ rgA11yBtnColor }};font-size:15px;font-weight:700;padding:14px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;border:{{ rgA11yBtnBorder }};">
                           <i class="ti {{ rgA11yBtnIcon }}" style="font-size:18px;"></i>
@@ -363,13 +390,18 @@
 
                 <!-- STEP 2: họ và tên -->
                 <sc-if value="{{ rgStep2 }}" hint-placeholder-val="{{ false }}">
-                  <div class="vh-scroll" key="{{ rgStepKey }}" style="flex:1;overflow-y:auto;padding:18px 28px 28px;animation:{{ rgPanelAnim }} .3s ease;">
+                  <div class="vh-scroll" key="{{ rgStepKey }}"
+                       style="flex:1;overflow-y:auto;padding:18px 28px 28px;animation:{{ rgPanelAnim }} .3s ease;">
                     <div class="vh-serif" style="font-size:28px;font-weight:600;">Bạn tên gì?</div>
-                    <div style="font-size:14px;color:var(--text-secondary);margin-top:6px;">Tên này sẽ hiển thị trong ứng dụng của bạn</div>
+                    <div style="font-size:14px;color:var(--text-secondary);margin-top:6px;">Tên này sẽ hiển thị trong
+                      ứng dụng của bạn
+                    </div>
                     <!-- họ (không bắt buộc) -->
                     <div style="margin-top:22px;">
-                      <label style="font-size:12px;font-weight:600;color:var(--text-secondary);">Họ <span style="color:var(--text-tertiary);font-weight:400;">(không bắt buộc)</span></label>
-                      <div style="display:flex;align-items:center;gap:10px;background:var(--bg-card);border:2px solid var(--border);border-radius:8px;padding:13px 14px;margin-top:6px;">
+                      <label style="font-size:12px;font-weight:600;color:var(--text-secondary);">Họ <span
+                          style="color:var(--text-tertiary);font-weight:400;">(không bắt buộc)</span></label>
+                      <div
+                          style="display:flex;align-items:center;gap:10px;background:var(--bg-card);border:2px solid var(--border);border-radius:8px;padding:13px 14px;margin-top:6px;">
                         <i class="ti ti-user" style="font-size:18px;color:var(--text-tertiary);"></i><input
                           value="{{ rgLast }}" onInput="{{ onRgLast }}"
                           placeholder="Nguyễn"
@@ -379,14 +411,16 @@
                     <!-- tên (bắt buộc) -->
                     <div style="margin-top:14px;">
                       <label style="font-size:12px;font-weight:600;color:var(--text-secondary);">Tên</label>
-                      <div style="display:flex;align-items:center;gap:10px;background:var(--bg-card);border:2px solid {{ rgFirstBorder }};border-radius:8px;padding:13px 14px;margin-top:6px;">
+                      <div
+                          style="display:flex;align-items:center;gap:10px;background:var(--bg-card);border:2px solid {{ rgFirstBorder }};border-radius:8px;padding:13px 14px;margin-top:6px;">
                         <i class="ti ti-user-circle" style="font-size:18px;color:var(--text-tertiary);"></i><input
                           value="{{ rgFirst }}" onInput="{{ onRgFirst }}"
                           placeholder="Minh Anh"
                           style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
                       </div>
                       <sc-if value="{{ rgFirstErr }}" hint-placeholder-val="{{ false }}">
-                        <div style="display:flex;align-items:center;gap:6px;margin-top:7px;font-size:12px;color:var(--error);">
+                        <div
+                            style="display:flex;align-items:center;gap:6px;margin-top:7px;font-size:12px;color:var(--error);">
                           <i class="ti ti-alert-circle" style="font-size:14px;"></i>{{ rgFirstErr }}
                         </div>
                       </sc-if>
@@ -400,13 +434,17 @@
 
                 <!-- STEP 3: email + mật khẩu -->
                 <sc-if value="{{ rgStep3 }}" hint-placeholder-val="{{ false }}">
-                  <div class="vh-scroll" key="{{ rgStepKey }}" style="flex:1;overflow-y:auto;padding:18px 28px 28px;animation:{{ rgPanelAnim }} .3s ease;">
+                  <div class="vh-scroll" key="{{ rgStepKey }}"
+                       style="flex:1;overflow-y:auto;padding:18px 28px 28px;animation:{{ rgPanelAnim }} .3s ease;">
                     <div class="vh-serif" style="font-size:28px;font-weight:600;">Tài khoản của bạn</div>
-                    <div style="font-size:14px;color:var(--text-secondary);margin-top:6px;">Nhập email và mật khẩu để đăng nhập sau</div>
+                    <div style="font-size:14px;color:var(--text-secondary);margin-top:6px;">Nhập email và mật khẩu để
+                      đăng nhập sau
+                    </div>
                     <!-- email -->
                     <div style="margin-top:22px;">
                       <label style="font-size:12px;font-weight:600;color:var(--text-secondary);">Email</label>
-                      <div style="display:flex;align-items:center;gap:10px;background:var(--bg-card);border:2px solid {{ rgEmailBorder }};border-radius:8px;padding:13px 14px;margin-top:6px;">
+                      <div
+                          style="display:flex;align-items:center;gap:10px;background:var(--bg-card);border:2px solid {{ rgEmailBorder }};border-radius:8px;padding:13px 14px;margin-top:6px;">
                         <i class="ti ti-mail" style="font-size:18px;color:var(--text-tertiary);"></i><input
                           value="{{ rgEmail }}" onInput="{{ onRgEmail }}"
                           onBlur="{{ onRgEmailBlur }}" inputmode="email"
@@ -414,7 +452,8 @@
                           style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
                       </div>
                       <sc-if value="{{ rgEmailErr }}" hint-placeholder-val="{{ false }}">
-                        <div style="display:flex;align-items:center;gap:6px;margin-top:7px;font-size:12px;color:var(--error);">
+                        <div
+                            style="display:flex;align-items:center;gap:6px;margin-top:7px;font-size:12px;color:var(--error);">
                           <i class="ti ti-alert-circle" style="font-size:14px;"></i><span style="flex:1;">{{ rgEmailErr }}</span>
                           <sc-if value="{{ rgEmailErrAction }}" hint-placeholder-val="{{ false }}">
                             <button data-ripple="1" onClick="{{ goLogin }}"
@@ -428,7 +467,8 @@
                     <!-- password -->
                     <div style="margin-top:14px;">
                       <label style="font-size:12px;font-weight:600;color:var(--text-secondary);">Mật khẩu</label>
-                      <div style="display:flex;align-items:center;gap:10px;background:var(--bg-card);border:2px solid {{ rgPassBorder }};border-radius:8px;padding:13px 14px;margin-top:6px;">
+                      <div
+                          style="display:flex;align-items:center;gap:10px;background:var(--bg-card);border:2px solid {{ rgPassBorder }};border-radius:8px;padding:13px 14px;margin-top:6px;">
                         <i class="ti ti-lock" style="font-size:18px;color:var(--text-tertiary);"></i><input
                           value="{{ rgPass }}" onInput="{{ onRgPass }}" type="{{ rgPassType }}"
                           placeholder="Tối thiểu 8 ký tự"
@@ -440,27 +480,32 @@
                       <sc-if value="{{ rgPassShow }}" hint-placeholder-val="{{ false }}">
                         <div style="display:flex;gap:5px;margin-top:8px;">
                           <sc-for list="{{ strengthBars }}" as="b" hint-placeholder-count="3">
-                            <div style="flex:1;height:5px;border-radius:99px;background:{{ b }};transition:background .2s;"></div>
+                            <div
+                                style="flex:1;height:5px;border-radius:99px;background:{{ b }};transition:background .2s;"></div>
                           </sc-for>
                         </div>
                       </sc-if>
                       <sc-if value="{{ rgPassErr }}" hint-placeholder-val="{{ false }}">
-                        <div style="display:flex;align-items:center;gap:6px;margin-top:7px;font-size:12px;color:var(--error);">
+                        <div
+                            style="display:flex;align-items:center;gap:6px;margin-top:7px;font-size:12px;color:var(--error);">
                           <i class="ti ti-alert-circle" style="font-size:14px;"></i>{{ rgPassErr }}
                         </div>
                       </sc-if>
                     </div>
                     <!-- confirm -->
                     <div style="margin-top:14px;">
-                      <label style="font-size:12px;font-weight:600;color:var(--text-secondary);">Xác nhận mật khẩu</label>
-                      <div style="display:flex;align-items:center;gap:10px;background:var(--bg-card);border:2px solid {{ rgConfirmBorder }};border-radius:8px;padding:13px 14px;margin-top:6px;">
+                      <label style="font-size:12px;font-weight:600;color:var(--text-secondary);">Xác nhận mật
+                        khẩu</label>
+                      <div
+                          style="display:flex;align-items:center;gap:10px;background:var(--bg-card);border:2px solid {{ rgConfirmBorder }};border-radius:8px;padding:13px 14px;margin-top:6px;">
                         <i class="ti ti-lock-check" style="font-size:18px;color:var(--text-tertiary);"></i><input
                           value="{{ rgConfirm }}" onInput="{{ onRgConfirm }}"
                           type="{{ rgPassType }}" placeholder="Nhập lại mật khẩu"
                           style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
                       </div>
                       <sc-if value="{{ rgConfirmErr }}" hint-placeholder-val="{{ false }}">
-                        <div style="display:flex;align-items:center;gap:6px;margin-top:7px;font-size:12px;color:var(--error);">
+                        <div
+                            style="display:flex;align-items:center;gap:6px;margin-top:7px;font-size:12px;color:var(--error);">
                           <i class="ti ti-alert-circle" style="font-size:14px;"></i>{{ rgConfirmErr }}
                         </div>
                       </sc-if>
@@ -468,7 +513,8 @@
                     <!-- terms -->
                     <button data-ripple="1" onClick="{{ toggleTerms }}"
                             style="position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;background:transparent;border:none;cursor:pointer;margin-top:18px;padding:4px;{{ termsShakeAnim }}">
-                      <div style="width:22px;height:22px;border-radius:6px;border:2px solid {{ termsBorder }};background:{{ termsBg }};display:flex;align-items:center;justify-content:center;flex:none;margin-top:1px;">
+                      <div
+                          style="width:22px;height:22px;border-radius:6px;border:2px solid {{ termsBorder }};background:{{ termsBg }};display:flex;align-items:center;justify-content:center;flex:none;margin-top:1px;">
                         <i class="ti ti-check" style="font-size:15px;color:#fff;display:{{ termsCheckDisp }};"></i>
                       </div>
                       <span style="font-size:12px;color:var(--text-secondary);line-height:1.5;">Tôi đồng ý với <span
@@ -1022,7 +1068,7 @@
                   </div>
                 </sc-if>
                 <div ref="{{ exSheetRef }}"
-                    style="position:absolute;left:0;right:0;bottom:0;height:{{ exploreH }};z-index:10;background:var(--bg-card);border-radius:24px 24px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.25);display:flex;flex-direction:column;transition:height .25s cubic-bezier(.32,.72,0,1);">
+                     style="position:absolute;left:0;right:0;bottom:0;height:{{ exploreH }};z-index:10;background:var(--bg-card);border-radius:24px 24px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.25);display:flex;flex-direction:column;transition:height .25s cubic-bezier(.32,.72,0,1);">
                   <div onMouseDown="{{ exDragStart }}" onTouchStart="{{ exDragStart }}" onClick="{{ exToggleH }}"
                        style="flex:none;cursor:grab;touch-action:none;padding-top:4px;">
                     <div
@@ -1139,7 +1185,7 @@
                   </div>
                   <!-- accessibility note (tap -> area map) -->
                   <button data-ripple="1" onClick="{{ openAreaMap }}"
-                      style="position:relative;overflow:hidden;display:flex;align-items:center;gap:8px;width:100%;text-align:left;margin-top:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:11px 13px;cursor:pointer;">
+                          style="position:relative;overflow:hidden;display:flex;align-items:center;gap:8px;width:100%;text-align:left;margin-top:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:11px 13px;cursor:pointer;">
                     <i class="ti {{ venAccessIcon }}"
                        style="font-size:20px;color:{{ venAccessColor }};"></i><span
                       style="flex:1;font-size:12px;color:var(--text-secondary);">{{ venAccessNote }}</span>
@@ -1332,14 +1378,16 @@
                       <div
                           style="height:100%;width:{{ audioPct }};background:var(--cta);border-radius:99px;transition:width .1s linear;"></div>
                     </div>
-                    <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--text-tertiary);font-variant-numeric:tabular-nums;">
+                    <div
+                        style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--text-tertiary);font-variant-numeric:tabular-nums;">
                       <span>{{ audioTime }}</span><span>{{ audioTotal }}</span>
                     </div>
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
                       <button data-ripple="1" onClick="{{ voiceTap }}"
                               style="position:relative;overflow:visible;width:42px;height:42px;border-radius:99px;border:1px solid var(--border);background:var(--bg-tertiary);color:var(--cta);cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center;">
                         <i class="ti ti-microphone" style="font-size:20px;"></i>
-                        <span style="position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:99px;background:var(--cta);color:#fff;align-items:center;justify-content:center;display:{{ voiceCrownDisp }};">
+                        <span
+                            style="position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:99px;background:var(--cta);color:#fff;align-items:center;justify-content:center;display:{{ voiceCrownDisp }};">
                           <i class="ti ti-crown" style="font-size:10px;"></i></span>
                       </button>
                       <button data-ripple="1" onClick="{{ toggleAudio }}"
@@ -1412,7 +1460,8 @@
                     <i class="ti ti-info-circle" style="font-size:22px;"></i></button>
                 </div>
                 <!-- controls (đẩy lên trên) -->
-                <div style="position:absolute;top:100px;left:0;right:0;display:flex;justify-content:center;gap:12px;z-index:10;">
+                <div
+                    style="position:absolute;top:100px;left:0;right:0;display:flex;justify-content:center;gap:12px;z-index:10;">
                   <button data-ripple="1" onClick="{{ toggle3DPlay }}"
                           style="position:relative;overflow:hidden;width:46px;height:46px;border-radius:99px;border:none;background:var(--cta);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;">
                     <i class="ti {{ threeDPlayIcon }}" style="font-size:22px;"></i></button>
@@ -1438,25 +1487,34 @@
                   <div
                       style="position:absolute;top:40%;left:50%;width:18px;height:18px;border-radius:99px;background:var(--success);border:3px solid #fff;animation:vhPulse 2.4s infinite;"></div>
                 </div>
-                <div style="position:absolute;bottom:188px;left:0;right:0;text-align:center;color:rgba(255,255,255,.5);font-size:12px;">
+                <div
+                    style="position:absolute;bottom:188px;left:0;right:0;text-align:center;color:rgba(255,255,255,.5);font-size:12px;">
                   <i class="ti ti-rotate-360" style="font-size:15px;vertical-align:-2px;"></i> Kéo để xoay mô hình
                 </div>
                 <!-- info panel + CTA -->
                 <div
                     style="position:absolute;left:0;right:0;bottom:0;background:var(--bg-card);border-radius:24px 24px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.4);padding:20px 20px 26px;">
-                  <div class="vh-serif" style="font-size:20px;font-weight:600;color:var(--text-primary);">{{ curArt.name }}</div>
+                  <div class="vh-serif" style="font-size:20px;font-weight:600;color:var(--text-primary);">{{ curArt.name
+                    }}
+                  </div>
                   <div style="display:flex;gap:8px;margin-top:12px;">
                     <div style="flex:1;background:var(--bg-tertiary);border-radius:8px;padding:8px 10px;">
                       <div style="font-size:10px;color:var(--text-tertiary);">Niên đại</div>
-                      <div class="vh-serif" style="font-size:13px;font-weight:500;color:var(--text-primary);">{{ curArt.era }}</div>
+                      <div class="vh-serif" style="font-size:13px;font-weight:500;color:var(--text-primary);">{{
+                        curArt.era }}
+                      </div>
                     </div>
                     <div style="flex:1;background:var(--bg-tertiary);border-radius:8px;padding:8px 10px;">
                       <div style="font-size:10px;color:var(--text-tertiary);">Chất liệu</div>
-                      <div class="vh-serif" style="font-size:13px;font-weight:500;color:var(--text-primary);">{{ curArt.material }}</div>
+                      <div class="vh-serif" style="font-size:13px;font-weight:500;color:var(--text-primary);">{{
+                        curArt.material }}
+                      </div>
                     </div>
                     <div style="flex:1;background:var(--bg-tertiary);border-radius:8px;padding:8px 10px;">
                       <div style="font-size:10px;color:var(--text-tertiary);">Lượt khám phá</div>
-                      <div class="vh-serif" style="font-size:13px;font-weight:500;color:var(--text-primary);">{{ curArt.views }}</div>
+                      <div class="vh-serif" style="font-size:13px;font-weight:500;color:var(--text-primary);">{{
+                        curArt.views }}
+                      </div>
                     </div>
                   </div>
                   <div style="display:flex;gap:10px;margin-top:16px;">
@@ -1479,38 +1537,35 @@
                 <button data-ripple="1" onClick="{{ back }}"
                         style="position:absolute;top:48px;left:18px;z-index:10;width:44px;height:44px;border-radius:99px;border:none;background:rgba(255,255,255,.14);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;">
                   <i class="ti ti-arrow-left" style="font-size:22px;"></i></button>
-                <div style="flex:1;position:relative;"><img src="{{ timeImg }}" alt=""
-                                                            style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
-                  <div
-                      style="position:absolute;inset:0;background:linear-gradient(to top,rgba(13,18,32,.95),transparent 50%);"></div>
-                  <div style="position:absolute;bottom:20px;left:0;right:0;text-align:center;">
-                    <div class="vh-serif" style="font-size:22px;font-weight:600;color:#fff;">{{
-                      timeLabel }}
-                    </div>
+                <!-- vùng chính: chỉ hình ảnh, quẹt trái/phải để đổi mốc -->
+                <div onMouseDown="{{ timeSwipe }}" onTouchStart="{{ timeSwipe }}"
+                     style="flex:1;position:relative;overflow:hidden;touch-action:pan-y;">
+                  <img src="{{ timeImg }}" alt=""
+                       style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:{{ timeFilter }};transition:filter .3s;">
+                  <!-- lớp lưới 'phục dựng 3D' -->
+                  <div style="position:absolute;inset:0;display:{{ time3DDisp }};background-image:linear-gradient(rgba(95,138,236,.25) 1px,transparent 1px),linear-gradient(90deg,rgba(95,138,236,.25) 1px,transparent 1px);background-size:34px 34px;mix-blend-mode:screen;"></div>
+                  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(13,18,32,.6),transparent 40%);"></div>
+                  <!-- badge loại hình -->
+                  <div style="position:absolute;top:52px;right:18px;display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);color:#fff;font-size:11px;font-weight:600;padding:6px 12px;border-radius:99px;">
+                    <i class="ti {{ timeBadgeIcon }}" style="font-size:14px;color:var(--cta);"></i>{{ timeBadge }}
                   </div>
                 </div>
-                <div style="flex:none;padding:20px 24px 34px;background:#0d1220;">
-                  <div style="display:flex;justify-content:space-between;gap:8px;">
-                    <sc-for list="{{ timeEras }}" as="e" hint-placeholder-count="3">
-                      <div style="flex:1;text-align:center;font-size:11px;color:rgba(255,255,255,.6);">
-                        {{ e }}
-                      </div>
+                <div style="flex:none;padding:16px 24px 34px;background:#0d1220;">
+                  <!-- title + mô tả (sát thanh trượt) -->
+                  <div class="vh-serif" style="font-size:21px;font-weight:600;color:#fff;text-align:center;">{{ timeLabel }}</div>
+                  <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:6px;text-align:center;line-height:1.6;">{{ timeBigSub }}</div>
+                  <!-- thanh trượt: vùng bấm lớn (label + bar) -->
+                  <div style="display:flex;gap:8px;margin-top:16px;">
+                    <sc-for list="{{ timeStages }}" as="s" hint-placeholder-count="3">
+                      <button data-ripple="1" onClick="{{ s.pick }}"
+                              style="position:relative;overflow:hidden;flex:1;background:transparent;border:none;cursor:pointer;padding:8px 0 4px;display:flex;flex-direction:column;align-items:center;gap:8px;">
+                        <span style="font-size:11px;font-weight:600;color:{{ s.labelColor }};display:flex;align-items:center;gap:3px;">{{ s.label }}<i class="ti ti-crown" style="font-size:11px;color:var(--cta);display:{{ s.crownDisp }};"></i></span>
+                        <span style="width:100%;height:8px;border-radius:99px;background:{{ s.barBg }};transition:background .25s;"></span>
+                      </button>
                     </sc-for>
                   </div>
-                  <div style="display:flex;align-items:center;gap:10px;margin-top:10px;">
-                    <button data-ripple="1" onClick="{{ setTime0 }}"
-                            style="flex:1;height:8px;border-radius:99px;border:none;background:var(--cta);cursor:pointer;"></button>
-                    <button data-ripple="1" onClick="{{ setTime1 }}"
-                            style="flex:1;height:8px;border-radius:99px;border:none;background:rgba(255,255,255,.3);cursor:pointer;"></button>
-                    <button data-ripple="1" onClick="{{ setTime2 }}"
-                            style="flex:1;height:8px;border-radius:99px;border:none;background:rgba(255,255,255,.3);cursor:pointer;position:relative;">
-                      <i class="ti ti-crown"
-                         style="position:absolute;top:-18px;right:0;font-size:13px;color:var(--cta);display:{{ timeLocked2Disp }};"></i>
-                    </button>
-                  </div>
-                  <div style="font-size:12px;color:rgba(255,255,255,.55);text-align:center;margin-top:16px;">
-                    Chạm vào timeline để xem hiện vật qua các thời kỳ. Mốc "Phục dựng" cần gói Nhà
-                    nghiên cứu.
+                  <div style="font-size:11px;color:rgba(255,255,255,.5);text-align:center;margin-top:12px;">
+                    Quẹt trái/phải hoặc chạm mốc để xem qua các thời kỳ · "Phục dựng" cần gói Nhà nghiên cứu.
                   </div>
                 </div>
               </div>
@@ -2944,7 +2999,8 @@
                       </sc-for>
                     </div>
                     <sc-if value="{{ cpNewErr }}" hint-placeholder-val="{{ false }}">
-                      <div style="display:flex;align-items:center;gap:6px;margin-top:7px;font-size:12px;color:var(--error);">
+                      <div
+                          style="display:flex;align-items:center;gap:6px;margin-top:7px;font-size:12px;color:var(--error);">
                         <i class="ti ti-alert-circle" style="font-size:14px;"></i>{{ cpNewErr }}
                       </div>
                     </sc-if>
@@ -3671,7 +3727,8 @@
                   </div>
                 </div>
                 <!-- header -->
-                <div style="position:absolute;top:48px;left:16px;right:16px;display:flex;align-items:center;gap:8px;z-index:10;">
+                <div
+                    style="position:absolute;top:48px;left:16px;right:16px;display:flex;align-items:center;gap:8px;z-index:10;">
                   <button data-ripple="1" onClick="{{ back }}"
                           style="position:relative;overflow:hidden;width:44px;height:44px;flex:none;border-radius:12px;border:1px solid var(--border);background:var(--bg-card);cursor:pointer;color:var(--text-primary);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);">
                     <i class="ti ti-arrow-left" style="font-size:20px;"></i></button>
@@ -3686,8 +3743,11 @@
                     style="position:absolute;left:0;right:0;bottom:0;z-index:10;background:var(--bg-card);border-radius:24px 24px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.25);padding:20px 20px 26px;">
                   <div
                       style="width:38px;height:4px;border-radius:99px;background:var(--border-2);margin:0 auto 16px;"></div>
-                  <div class="vh-serif" style="font-size:18px;font-weight:600;color:var(--text-primary);">{{ amVenName }}</div>
-                  <div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text-secondary);margin-top:5px;">
+                  <div class="vh-serif" style="font-size:18px;font-weight:600;color:var(--text-primary);">{{ amVenName
+                    }}
+                  </div>
+                  <div
+                      style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text-secondary);margin-top:5px;">
                     <i class="ti ti-map-pin" style="font-size:15px;color:var(--cta);"></i>{{ amVenCity }}
                   </div>
                   <div
@@ -3696,7 +3756,9 @@
                        style="font-size:20px;color:{{ amAccessColor }};"></i><span
                       style="flex:1;font-size:13px;font-weight:600;color:{{ amAccessColor }};">{{ amAccessNote }}</span>
                   </div>
-                  <div style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin-top:12px;">{{ amAccessDesc }}</div>
+                  <div style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin-top:12px;">{{
+                    amAccessDesc }}
+                  </div>
                 </div>
               </div>
             </sc-if>
@@ -3724,9 +3786,15 @@
                 </div>
                 <!-- body -->
                 <div class="vh-scroll" style="flex:1;overflow-y:auto;padding:18px 22px 36px;">
-                  <div style="font-size:11px;font-weight:700;color:var(--cta);letter-spacing:.06em;">PHÂN TÍCH CHUYÊN SÂU</div>
-                  <div class="vh-serif" style="font-size:24px;font-weight:600;line-height:1.25;margin-top:8px;color:var(--text-primary);">{{ a3Title }}</div>
-                  <div style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--text-tertiary);">
+                  <div style="font-size:11px;font-weight:700;color:var(--cta);letter-spacing:.06em;">PHÂN TÍCH CHUYÊN
+                    SÂU
+                  </div>
+                  <div class="vh-serif"
+                       style="font-size:24px;font-weight:600;line-height:1.25;margin-top:8px;color:var(--text-primary);">
+                    {{ a3Title }}
+                  </div>
+                  <div
+                      style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--text-tertiary);">
                     <i class="ti ti-clock" style="font-size:14px;"></i>{{ a3Read }}
                   </div>
                   <div class="vh-serif"
@@ -3740,41 +3808,57 @@
                         <div style="font-size:15px;line-height:1.75;color:var(--text-primary);">{{ b.text }}</div>
                       </sc-if>
                       <sc-if value="{{ b.isH }}" hint-placeholder-val="{{ false }}">
-                        <div class="vh-serif" style="font-size:18px;font-weight:600;color:var(--text-primary);">{{ b.text }}</div>
+                        <div class="vh-serif" style="font-size:18px;font-weight:600;color:var(--text-primary);">{{
+                          b.text }}
+                        </div>
                       </sc-if>
                       <sc-if value="{{ b.isImg }}" hint-placeholder-val="{{ false }}">
                         <div>
                           <img src="{{ b.imgUrl }}" alt=""
                                style="width:100%;border-radius:12px;display:block;">
-                          <div style="font-size:12px;color:var(--text-tertiary);font-style:italic;margin-top:6px;text-align:center;">{{ b.cap }}</div>
+                          <div
+                              style="font-size:12px;color:var(--text-tertiary);font-style:italic;margin-top:6px;text-align:center;">
+                            {{ b.cap }}
+                          </div>
                         </div>
                       </sc-if>
                       <sc-if value="{{ b.isSpec }}" hint-placeholder-val="{{ false }}">
-                        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px;">
-                          <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--text-primary);">
+                        <div
+                            style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px;">
+                          <div
+                              style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--text-primary);">
                             <i class="ti ti-ruler-2" style="font-size:18px;color:var(--cta);"></i>{{ b.stitle }}
                           </div>
                           <div style="margin-top:10px;">
                             <sc-for list="{{ b.items }}" as="it" hint-placeholder-count="4">
-                              <div style="display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid var(--border);font-size:13px;">
+                              <div
+                                  style="display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid var(--border);font-size:13px;">
                                 <span style="color:var(--text-tertiary);flex:none;">{{ it.k }}</span>
-                                <span style="color:var(--text-primary);font-weight:600;text-align:right;">{{ it.v }}</span>
+                                <span
+                                    style="color:var(--text-primary);font-weight:600;text-align:right;">{{ it.v }}</span>
                               </div>
                             </sc-for>
                           </div>
                         </div>
                       </sc-if>
                       <sc-if value="{{ b.isQuote }}" hint-placeholder-val="{{ false }}">
-                        <div style="background:linear-gradient(135deg,var(--primary),var(--primary-d));border-radius:14px;padding:18px;">
+                        <div
+                            style="background:linear-gradient(135deg,var(--primary),var(--primary-d));border-radius:14px;padding:18px;">
                           <i class="ti ti-quote" style="font-size:24px;color:var(--cta);"></i>
-                          <div class="vh-serif" style="font-size:16px;font-style:italic;line-height:1.6;color:var(--on-primary);margin-top:6px;">{{ b.text }}</div>
-                          <div style="font-size:12px;color:var(--on-primary);opacity:.8;margin-top:10px;">— {{ b.who }}</div>
+                          <div class="vh-serif"
+                               style="font-size:16px;font-style:italic;line-height:1.6;color:var(--on-primary);margin-top:6px;">
+                            {{ b.text }}
+                          </div>
+                          <div style="font-size:12px;color:var(--on-primary);opacity:.8;margin-top:10px;">— {{ b.who
+                            }}
+                          </div>
                         </div>
                       </sc-if>
                     </div>
                   </sc-for>
                   <!-- author -->
-                  <div style="display:flex;align-items:center;gap:12px;margin-top:26px;padding-top:18px;border-top:1px solid var(--border);">
+                  <div
+                      style="display:flex;align-items:center;gap:12px;margin-top:26px;padding-top:18px;border-top:1px solid var(--border);">
                     <div
                         style="width:46px;height:46px;border-radius:99px;background:var(--primary);color:var(--on-primary);display:flex;align-items:center;justify-content:center;flex:none;">
                       <i class="ti ti-user-edit" style="font-size:22px;"></i></div>
@@ -4357,7 +4441,9 @@
               <div class="vh-serif"
                    style="font-size:18px;font-weight:600;padding:0 22px 4px;flex:none;">Chọn giọng thuyết minh
               </div>
-              <div style="font-size:12px;color:var(--text-tertiary);padding:0 22px 12px;flex:none;">Gói Nhà nghiên cứu — nghe bản HD nhiều giọng nghệ sĩ</div>
+              <div style="font-size:12px;color:var(--text-tertiary);padding:0 22px 12px;flex:none;">Gói Nhà nghiên cứu —
+                nghe bản HD nhiều giọng nghệ sĩ
+              </div>
               <div class="vh-scroll" style="flex:1;overflow-y:auto;padding:0 10px;">
                 <sc-for list="{{ voiceRows }}" as="v" hint-placeholder-count="4">
                   <button data-ripple="1" onClick="{{ v.pick }}"
@@ -4367,7 +4453,8 @@
                       <div style="font-size:15px;font-weight:600;">{{ v.name }}</div>
                       <div style="font-size:12px;color:var(--text-tertiary);">{{ v.desc }}</div>
                     </div>
-                    <i class="ti ti-circle-check-filled" style="font-size:22px;color:var(--cta);flex:none;display:{{ v.check }};"></i>
+                    <i class="ti ti-circle-check-filled"
+                       style="font-size:22px;color:var(--cta);flex:none;display:{{ v.check }};"></i>
                   </button>
                 </sc-for>
               </div>
@@ -4443,48 +4530,59 @@ class Component extends DCLogic {
 Object.assign(Component.prototype, VH_DATA, VH_LOGIC, VH_RENDER);
 </script>
 <script>
-(function () {
-  const SKIP = new Set(['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'A']);
-  let drag = null;
-  let moved = false;
-  function nearestVScroll(el) {
-    let node = el;
-    while (node) {
-      if (node.scrollHeight > node.clientHeight + 1) return node;
-      const par = node.parentElement;
-      node = par ? par.closest('.vh-scroll') : null;
+  (function () {
+    const SKIP = new Set(['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'A']);
+    let drag = null;
+    let moved = false;
+
+    function nearestVScroll(el) {
+      let node = el;
+      while (node) {
+        if (node.scrollHeight > node.clientHeight + 1) return node;
+        const par = node.parentElement;
+        node = par ? par.closest('.vh-scroll') : null;
+      }
+      return el;
     }
-    return el;
-  }
-  document.addEventListener('mousedown', function (e) {
-    if (SKIP.has(e.target.tagName)) return;
-    const el = e.target.closest('.vh-scroll');
-    if (!el) return;
-    const elV = nearestVScroll(el);
-    drag = { el, elV, x: e.clientX, y: e.clientY, sl: el.scrollLeft, st: elV.scrollTop };
-    moved = false;
-  });
-  document.addEventListener('mousemove', function (e) {
-    if (!drag) return;
-    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-    drag.el.scrollLeft = drag.sl - dx;
-    drag.elV.scrollTop = drag.st - dy;
-    if (drag.el.scrollLeft !== drag.sl || drag.elV.scrollTop !== drag.st) { moved = true; document._vhDragged = true; }
-  });
-  document.addEventListener('mouseup', function () {
-    if (moved) {
-      document.addEventListener('click', function block(e) {
-        e.stopPropagation();
-        e.preventDefault();
-        document.removeEventListener('click', block, true);
-      }, true);
-    }
-    drag = null;
-    moved = false;
-    setTimeout(function () { document._vhDragged = false; }, 100);
-  });
-  document.addEventListener('mouseleave', function () { drag = null; moved = false; document._vhDragged = false; });
-})();
+
+    document.addEventListener('mousedown', function (e) {
+      if (SKIP.has(e.target.tagName)) return;
+      const el = e.target.closest('.vh-scroll');
+      if (!el) return;
+      const elV = nearestVScroll(el);
+      drag = {el, elV, x: e.clientX, y: e.clientY, sl: el.scrollLeft, st: elV.scrollTop};
+      moved = false;
+    });
+    document.addEventListener('mousemove', function (e) {
+      if (!drag) return;
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      drag.el.scrollLeft = drag.sl - dx;
+      drag.elV.scrollTop = drag.st - dy;
+      if (drag.el.scrollLeft !== drag.sl || drag.elV.scrollTop !== drag.st) {
+        moved = true;
+        document._vhDragged = true;
+      }
+    });
+    document.addEventListener('mouseup', function () {
+      if (moved) {
+        document.addEventListener('click', function block(e) {
+          e.stopPropagation();
+          e.preventDefault();
+          document.removeEventListener('click', block, true);
+        }, true);
+      }
+      drag = null;
+      moved = false;
+      setTimeout(function () {
+        document._vhDragged = false;
+      }, 100);
+    });
+    document.addEventListener('mouseleave', function () {
+      drag = null;
+      moved = false;
+      document._vhDragged = false;
+    });
+  })();
 </script>
 </body>
 </html>

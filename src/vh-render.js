@@ -1720,19 +1720,37 @@ window.VH_RENDER = {
       // TIME TRAVEL
       isTimeTravel: st.screen === 'timetravel',
       timeIdx: st.timeIdx,
-      timeEras: ['Nguyên bản', 'Hiện tại', 'Phục dựng'],
       timeLabel: ['Nguyên bản (thế kỷ XI)', 'Hiện trạng ngày nay', 'Phục dựng 3D đầy đủ'][st.timeIdx],
-      setTime0: () => this.setState({timeIdx: 0}),
-      setTime1: () => this.setState({timeIdx: 1}),
-      setTime2: () => {
-        if (!isPremium) {
-          this.premiumGate();
-          return;
-        }
-        this.setState({timeIdx: 2});
-      },
-      timeImg: this.vimg(cur.seed, 600, 400),
-      timeLocked2Disp: isPremium ? 'none' : 'block',
+      timeBigSub: [
+        'Tái hiện hiện vật như khi mới được tạo tác, dựa trên tư liệu khảo cổ.',
+        'Hình ảnh hiện vật theo hiện trạng đang được lưu giữ, trưng bày.',
+        'Mô hình phục dựng 3D đầy đủ — chi tiết, màu sắc và hoa văn nguyên gốc.'
+      ][st.timeIdx],
+      timeSwipe: (e) => this.timeSwipeStart(e),
+      timeImg: this.vimg(cur.seed, 600, 760),
+      timeFilter: [
+        'sepia(.55) contrast(1.05) brightness(.92) saturate(.85)',
+        'none',
+        'saturate(1.25) contrast(1.12) hue-rotate(-6deg)'
+      ][st.timeIdx],
+      time3DDisp: st.timeIdx === 2 ? 'block' : 'none',
+      timeBadge: ['Tư liệu phục chế', 'Hiện trạng trưng bày', 'Mô hình phục dựng 3D'][st.timeIdx],
+      timeBadgeIcon: ['ti-photo-scan', 'ti-building-museum', 'ti-cube-3d-sphere'][st.timeIdx],
+      timeStages: [
+        {idx: 0, label: 'Nguyên bản', locked: false},
+        {idx: 1, label: 'Hiện tại', locked: false},
+        {idx: 2, label: 'Phục dựng', locked: !isPremium},
+      ].map(s => {
+        const active = st.timeIdx === s.idx;
+        return {
+          ...s,
+          active,
+          barBg: active ? 'var(--cta)' : 'rgba(255,255,255,.25)',
+          labelColor: active ? '#fff' : 'rgba(255,255,255,.5)',
+          crownDisp: s.locked ? 'inline-block' : 'none',
+          pick: () => this.pickTimeStage(s.idx),
+        };
+      }),
       // PHOTO DETAIL
       isPhoto: st.screen === 'photo',
       photoImg: this.vimg(cur.seed, 600, 700),

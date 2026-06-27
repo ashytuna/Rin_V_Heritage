@@ -150,6 +150,11 @@ window.VH_LOGIC = {
   // ---- navigation ----
   nav(s, dir) {
     if (this._lpFired) return;
+    // ghi nhớ màn gốc khi vào paywall → mua xong quay lại đúng màn
+    if (s === 'paywall') {
+      this._payReturn = this.state.screen;
+      this._payReturnHistory = this.state.history.slice();
+    }
     const h = this.state.history.slice();
     if (this.state.screen && this.state.screen !== s) h.push(this.state.screen);
     this.setState({screen: s, history: h, navDir: dir || 'fwd', sheet: null, modal: null});
@@ -720,6 +725,44 @@ window.VH_LOGIC = {
     document.addEventListener('touchend', up);
   },
 
+  // ---- time travel ----
+  pickTimeStage(idx) {
+    if (idx === 2 && !(this.state.tiers && this.state.tiers.premium)) {
+      this.premiumGate();
+      return;
+    }
+    this.setState({timeIdx: idx});
+  },
+  changeTimeStage(dir) {
+    const next = Math.min(2, Math.max(0, this.state.timeIdx + dir));
+    if (next === this.state.timeIdx) return;
+    this.pickTimeStage(next);
+  },
+  timeSwipeStart(e) {
+    const startX = e.touches ? e.touches[0].clientX : e.clientX;
+    let done = false;
+    const move = (ev) => {
+      if (done) return;
+      const x = ev.touches ? ev.touches[0].clientX : ev.clientX;
+      const dx = x - startX;
+      if (Math.abs(dx) > 45) {
+        done = true;
+        this.changeTimeStage(dx < 0 ? 1 : -1);
+        cleanup();
+      }
+    };
+    const cleanup = () => {
+      document.removeEventListener('mousemove', move);
+      document.removeEventListener('mouseup', cleanup);
+      document.removeEventListener('touchmove', move);
+      document.removeEventListener('touchend', cleanup);
+    };
+    document.addEventListener('mousemove', move);
+    document.addEventListener('mouseup', cleanup);
+    document.addEventListener('touchmove', move, {passive: true});
+    document.addEventListener('touchend', cleanup);
+  },
+
   // ---- payment / profile ----
   processPayment() {
     if (this.state.isOffline) {
@@ -736,7 +779,16 @@ window.VH_LOGIC = {
     tiers[this.state.paymentTier] = true;
     this.setState({tiers: Object.assign({}, tiers), screen: 'paymentsuccess', navDir: 'fwd'});
     this._payT = setTimeout(() => {
-      this.setState({screen: 'profile', history: [], navDir: 'back'});
+      // quay lại màn gốc đã mở paywall (nếu có), khôi phục history; mặc định về Hồ sơ
+      const ret = this._payReturn || 'profile';
+      const retH = (ret === 'profile') ? [] : (this._payReturnHistory || []);
+      this.setState({screen: ret, history: retH, navDir: 'back'});
+      if (ret === 'threed') {
+        this.setState({threeDPlaying: true});
+        this.start3D();
+      }
+      this._payReturn = null;
+      this._payReturnHistory = null;
     }, 2600);
   },
   logout() {
