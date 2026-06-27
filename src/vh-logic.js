@@ -153,6 +153,7 @@ window.VH_LOGIC = {
     const h = this.state.history.slice();
     if (this.state.screen && this.state.screen !== s) h.push(this.state.screen);
     this.setState({screen: s, history: h, navDir: dir || 'fwd', sheet: null, modal: null});
+    this.clearAuthToast(s);
     if (s === 'scan') this.beginScan();
     if (s === 'threed') {
       this.setState({threeDPlaying: true});
@@ -161,6 +162,14 @@ window.VH_LOGIC = {
   },
   replace(s) {
     this.setState({screen: s, sheet: null, modal: null, navDir: 'fwd'});
+    this.clearAuthToast(s);
+  },
+  // xoá toast đang hiện khi vào màn đăng nhập / đăng ký
+  clearAuthToast(s) {
+    if (s === 'authchoice' || s === 'login' || s === 'register') {
+      clearTimeout(this._toastT);
+      this.setState({toast: null});
+    }
   },
   back() {
     const h = this.state.history.slice();
@@ -731,12 +740,14 @@ window.VH_LOGIC = {
     }, 2600);
   },
   logout() {
+    clearTimeout(this._toastT);
     this.setState({
       user: {name: '', email: '', isLoggedIn: false, age: null},
       tiers: {premium: false, academic: false},
       saved: [],
       history: [],
-      screen: 'authchoice'
+      screen: 'authchoice',
+      toast: null
     });
   },
   premiumGate() {

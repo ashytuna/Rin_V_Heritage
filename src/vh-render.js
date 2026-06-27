@@ -725,7 +725,11 @@ window.VH_RENDER = {
       }),
       savedView: savedArts.map(a => ({...a, img: this.vimg(a.seed, 300, 260), open: () => this.openArtifact(a.id)})),
       libSubtitle: savedArts.length + ' hiện vật · 23 đã quét',
-      goExploreLib: () => this.goTab('explore'),
+      goExploreLib: () => {
+        // drill-in từ thư viện: giữ history để back về lại thư viện (qua cổng locperm nếu lần đầu)
+        if (!this._exploreSeen) this.nav('locperm', 'fwd');
+        else this.nav('explore', 'fwd');
+      },
       photoGrid: this.artifacts.slice(0, 4).map(a => ({
         ...a, img: this.vimg(a.seed, 240, 280), open: () => {
           this.setState({curArtId: a.id});
@@ -1495,14 +1499,17 @@ window.VH_RENDER = {
       isLocPerm: st.screen === 'locperm',
       allowLoc: () => {
         this._exploreSeen = true;
-        this.setState({_fallbackLoc: false, permissions: Object.assign({}, st.permissions, {location: 1})});
-        this.nav('explore', 'fwd');
+        // sang explore mà KHÔNG đẩy locperm vào history → back bỏ qua locperm
+        this.setState({
+          _fallbackLoc: false,
+          permissions: Object.assign({}, st.permissions, {location: 1}),
+          screen: 'explore', navDir: 'fwd', sheet: null, modal: null
+        });
       },
       demoLoc: () => {
         this._exploreSeen = true;
-        this.setState({_fallbackLoc: true});
+        this.setState({_fallbackLoc: true, screen: 'explore', navDir: 'fwd', sheet: null, modal: null});
         this.showToast('Đang dùng vị trí mặc định: Hà Nội');
-        this.nav('explore', 'fwd');
       },
       // PLACE DETAIL
       isPlace: st.screen === 'place',
