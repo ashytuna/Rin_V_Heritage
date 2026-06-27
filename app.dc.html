@@ -2709,18 +2709,12 @@
                           style="position:relative;overflow:hidden;width:42px;height:42px;border-radius:99px;border:none;background:transparent;cursor:pointer;color:var(--text-primary);display:flex;align-items:center;justify-content:center;">
                     <i class="ti ti-arrow-left" style="font-size:22px;"></i></button>
                   <div class="vh-serif" style="font-size:20px;font-weight:600;flex:1;">Thông báo</div>
-                </div>
-                <div style="display:flex;gap:8px;flex:none;margin-top:10px;">
                   <button data-ripple="1" onClick="{{ markAllRead }}"
-                          style="position:relative;overflow:hidden;flex:1;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);font-size:12px;font-weight:600;padding:9px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+                          style="position:relative;overflow:hidden;flex:none;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);font-size:12px;font-weight:600;padding:8px 14px;border-radius:99px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
                     <i class="ti ti-checks" style="font-size:16px;"></i>Đọc tất cả
                   </button>
-                  <button data-ripple="1" onClick="{{ clearReadNotifs }}"
-                          style="position:relative;overflow:hidden;flex:1;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);font-size:12px;font-weight:600;padding:9px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
-                    <i class="ti ti-trash" style="font-size:16px;"></i>Xoá tất cả đã đọc
-                  </button>
                 </div>
-                <div style="display:flex;gap:8px;flex:none;margin-top:12px;overflow-x:auto;"
+                <div style="display:flex;gap:8px;flex:none;margin-top:14px;overflow-x:auto;"
                      class="vh-scroll">
                   <sc-for list="{{ notifFilters }}" as="f" hint-placeholder-count="4">
                     <button data-ripple="1" onClick="{{ f.pick }}"
