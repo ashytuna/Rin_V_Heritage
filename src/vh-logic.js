@@ -66,7 +66,9 @@ window.VH_LOGIC = {
     };
     this._lpEnd = () => {
       clearTimeout(this._lpTimer);
-      setTimeout(() => { this._lpFired = false; }, 60);
+      setTimeout(() => {
+        this._lpFired = false;
+      }, 60);
     };
     document.addEventListener('mousedown', this._lpStart, true);
     document.addEventListener('touchstart', this._lpStart, true);
