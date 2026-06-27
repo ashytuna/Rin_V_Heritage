@@ -96,6 +96,7 @@ window.VH_RENDER = {
       showAvatar: false,
       toast: st.toast,
       toastBg: st.toastType === 'error' ? 'var(--error)' : 'var(--primary)',
+      toastColor: st.toastType === 'error' ? '#fff' : 'var(--on-primary)',
       toastIcon: st.toastType === 'error' ? 'ti-alert-triangle' : 'ti-circle-check-filled',
       // overlays
       anyOverlay: (!!st.sheet || !!st.modal),
@@ -840,7 +841,7 @@ window.VH_RENDER = {
       profNotPremium: !hasPremium,
       tierChipLabel: tierName,
       tierChipBg: (hasPremium || hasAcademic) ? 'var(--cta)' : 'var(--primary)',
-      tierChipColor: (hasPremium || hasAcademic) ? '#fff' : 'var(--cream)',
+      tierChipColor: (hasPremium || hasAcademic) ? '#fff' : 'var(--on-primary)',
       tierChipIcon: (hasPremium || hasAcademic) ? 'ti-crown' : 'ti-user',
       profName: st.user.name || 'Khách tham quan',
       profInitial: (st.user.name || 'K')[0],
@@ -1356,6 +1357,7 @@ window.VH_RENDER = {
       ...v,
       select: () => this.selectPin(v.id),
       color: st.curVenueId === v.id ? 'var(--cta)' : 'var(--primary)',
+      txt: st.curVenueId === v.id ? '#fff' : 'var(--on-primary)',
       z: st.curVenueId === v.id ? 6 : 3,
       dim: (st.a11y.motor && !v.wheelchair) ? '0.35' : '1'
     }));
