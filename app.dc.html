@@ -268,8 +268,9 @@
                     <sc-for list="{{ socialBtns }}" as="s" hint-placeholder-count="4">
                       <button data-ripple="1" onClick="{{ s.tap }}"
                               style="position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:13px;cursor:pointer;color:var(--text-primary);font-size:14px;font-weight:600;">
-                        <i class="ti {{ s.icon }}"
-                           style="font-size:20px;color:{{ s.color }};"></i>{{ s.name }}
+                        <sc-if value="{{ s.paths }}"><svg viewBox="0 0 24 24" style="width:20px;height:20px;flex-shrink:0;"><sc-for list="{{ s.paths }}" as="p"><path d="{{ p.d }}" fill="{{ p.fill }}"/></sc-for></svg></sc-if>
+                        <sc-if value="{{ s.svgPath }}"><svg viewBox="0 0 24 24" style="width:20px;height:20px;flex-shrink:0;" fill="{{ s.color }}"><path d="{{ s.svgPath }}"/></svg></sc-if>
+                        <sc-if value="{{ s.icon }}"><i class="ti {{ s.icon }}" style="font-size:20px;color:{{ s.color }};"></i></sc-if>{{ s.name }}
                       </button>
                     </sc-for>
                   </div>
