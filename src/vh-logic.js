@@ -335,34 +335,102 @@ window.VH_LOGIC = {
       } else this.setState({lockCountdown: left});
     }, 500);
   },
+  // thứ tự bước đăng ký; chèn bước 'a11y' khi chọn 45+ (needA11y)
+  rgOrder() {
+    return this.state.rg.needA11y ? ['age', 'a11y', 'name', 'account'] : ['age', 'name', 'account'];
+  },
   rgValidateStep(step) {
     const rg = this.state.rg;
     const err = {};
-    if (step === 1) {
-      const birth = parseInt(rg.birth, 10);
-      const age = birth >= 1900 ? (2026 - birth) : null;
-      if (!age || age < 0 || age > 130) err.birth = 'Năm sinh không hợp lệ';
-    } else if (step === 2) {
+    if (step === 'age') {
+      // năm sinh tuỳ chọn: chọn nhóm tuổi là đủ; nếu có nhập năm thì phải hợp lệ
+      const birthStr = (rg.birth || '').trim();
+      if (birthStr) {
+        const birth = parseInt(birthStr, 10);
+        const age = birth >= 1900 ? (2026 - birth) : null;
+        if (!age || age < 0 || age > 130) err.birth = 'Năm sinh không hợp lệ';
+      } else if (!rg.ageBracket) {
+        err.birth = 'Chọn nhóm tuổi hoặc nhập năm sinh';
+      }
+    } else if (step === 'name') {
       if (!rg.first.trim()) err.first = true;
     }
     return err;
   },
   rgGoNext() {
     const rg = this.state.rg;
-    const step = rg.step || 1;
-    if (step >= 3) return;
+    const step = rg.step || 'age';
     const err = this.rgValidateStep(step);
     if (Object.keys(err).length) {
       this.setState({rg: Object.assign({}, rg, {err})});
       return;
     }
-    this.setState({rg: Object.assign({}, rg, {step: step + 1, err: {}, _dir: 'fwd'})});
+    // rời bước tuổi: tuổi ≥ 45 → chèn bước trợ năng; luôn reset trợ năng về tắt khi rời bước tuổi
+    if (step === 'age') {
+      const birthStr = (rg.birth || '').trim();
+      const birth = parseInt(birthStr, 10);
+      const age = (birthStr && birth >= 1900) ? (2026 - birth) : (rg.ageBracket === 'mature' ? 45 : null);
+      const need = age != null && age >= 45;
+      this.setState({
+        a11y: Object.assign({}, this.state.a11y, {visualLow: false}),
+        rg: Object.assign({}, rg, {needA11y: need, step: need ? 'a11y' : 'name', err: {}, _dir: 'fwd'}),
+      });
+      return;
+    }
+    const order = this.rgOrder();
+    const idx = order.indexOf(step);
+    if (idx < 0 || idx >= order.length - 1) return;
+    this.setState({rg: Object.assign({}, rg, {step: order[idx + 1], err: {}, _dir: 'fwd'})});
   },
   rgGoPrev() {
     const rg = this.state.rg;
-    const step = rg.step || 1;
-    if (step <= 1) return;
-    this.setState({rg: Object.assign({}, rg, {step: step - 1, err: {}, _dir: 'back'})});
+    const order = this.rgOrder();
+    const idx = order.indexOf(rg.step || 'age');
+    if (idx <= 0) return;
+    const target = order[idx - 1];
+    const patch = {rg: Object.assign({}, rg, {step: target, err: {}, _dir: 'back'})};
+    // về lại bước tuổi → tắt xem-trước trợ năng
+    if (target === 'age') patch.a11y = Object.assign({}, this.state.a11y, {visualLow: false});
+    this.setState(patch);
+  },
+  // năm sinh: khoảng năm theo nhóm tuổi (18+ = 18..44 tuổi, 45+ = 45 tuổi trở lên)
+  rgYearRange(bracket) {
+    const cur = 2026;
+    if (bracket === 'young') return {min: cur - 44, max: cur - 18};   // 1982..2008
+    if (bracket === 'mature') return {min: 1932, max: cur - 45};      // 1932..1981
+    return {min: 1932, max: cur - 18};                                // đầy đủ 1932..2008
+  },
+  // chọn nhóm tuổi: young → bỏ qua trợ năng (3 bước); mature (45+) → chèn bước trợ năng (4 bước)
+  rgPickBracket(b) {
+    const rg = this.state.rg;
+    const {min, max} = this.rgYearRange(b);
+    const n = parseInt(rg.birth, 10);
+    const keep = (n >= min && n <= max) ? rg.birth : '';
+    const a11yOff = Object.assign({}, this.state.a11y, {visualLow: false});
+    if (b === 'mature') {
+      this.setState({a11y: a11yOff, rg: Object.assign({}, rg, {ageBracket: b, birth: keep, needA11y: true, step: 'a11y', _dir: 'fwd', err: {}})});
+      return;
+    }
+    this.setState({a11y: a11yOff, rg: Object.assign({}, rg, {ageBracket: b, birth: keep, needA11y: false, step: 'name', _dir: 'fwd', err: {}})});
+  },
+  // gạt toggle ở bước trợ năng → đổi trực tiếp (xem trước ngay trên màn)
+  toggleA11yAsk() {
+    this.setState({a11y: Object.assign({}, this.state.a11y, {visualLow: !this.state.a11y.visualLow})});
+  },
+  // gõ/chọn năm sinh; nếu đã đủ 4 số thì tự suy ra nhóm tuổi cho khớp highlight + dropdown
+  rgSetBirth(val) {
+    const rg = this.state.rg;
+    const s = String(val);
+    const n = parseInt(s, 10);
+    let bracket = rg.ageBracket;
+    if (n >= 1900 && s.length === 4) bracket = (2026 - n) >= 45 ? 'mature' : 'young';
+    const err = Object.assign({}, rg.err);
+    delete err.birth;
+    this.setState({rg: Object.assign({}, rg, {birth: s, ageBracket: bracket, err})});
+  },
+  rgPickYear(y) {
+    this.rgSetBirth(y);
+    this.setState({sheet: null});
   },
   onRgTouchStart(e) {
     this._rgTSwipeOk = ['INPUT', 'TEXTAREA', 'BUTTON'].indexOf(e.target.tagName) === -1;
@@ -395,8 +463,10 @@ window.VH_LOGIC = {
       if (err.terms && Object.keys(err).length === 1) this.showToast('Vui lòng đồng ý điều khoản để tiếp tục', 'error');
       return;
     }
-    const birth = parseInt(rg.birth, 10);
-    const age = birth >= 1900 ? (2026 - birth) : null;
+    // năm sinh tuỳ chọn: nếu trống thì suy tuổi từ nhóm đã chọn (mặc định là người lớn)
+    const birthStr = (rg.birth || '').trim();
+    const birth = parseInt(birthStr, 10);
+    const age = (birthStr && birth >= 1900) ? (2026 - birth) : (rg.ageBracket === 'mature' ? 45 : 18);
     if (age < 13) {
       this.nav('parental', 'fwd');
       return;

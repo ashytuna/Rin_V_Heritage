@@ -333,28 +333,53 @@
                     <i class="ti ti-arrow-left" style="font-size:20px;"></i></button>
                   <div style="flex:1;height:6px;border-radius:99px;background:var(--bg-tertiary);position:relative;">
                     <div
-                        style="position:absolute;top:0;bottom:0;width:33.333%;left:{{ rgThumbLeft }};background:var(--cta);border-radius:99px;transition:left .3s ease;"></div>
+                        style="position:absolute;top:0;bottom:0;width:{{ rgThumbWidth }};left:{{ rgThumbLeft }};background:var(--cta);border-radius:99px;transition:left .3s ease,width .3s ease;"></div>
                   </div>
                   <div style="width:42px;flex:none;"></div>
                 </div>
 
-                <!-- STEP 1: tuổi + trợ năng -->
-                <sc-if value="{{ rgStep1 }}" hint-placeholder-val="{{ true }}">
+                <!-- STEP: tuổi -->
+                <sc-if value="{{ rgStepAge }}" hint-placeholder-val="{{ true }}">
                   <div class="vh-scroll" key="{{ rgStepKey }}"
                        style="flex:1;overflow-y:auto;padding:18px 28px 28px;animation:{{ rgPanelAnim }} .3s ease;">
-                    <div class="vh-serif" style="font-size:28px;font-weight:600;">Tạo tài khoản</div>
-                    <div style="font-size:14px;color:var(--text-secondary);margin-top:6px;">Bắt đầu hành trình khám phá
-                      di sản của bạn
+                    <div class="vh-serif" style="font-size:28px;font-weight:600;">Bạn bao nhiêu tuổi?</div>
+                    <div style="font-size:14px;color:var(--text-secondary);margin-top:6px;">Giúp chúng tôi cá nhân hoá
+                      trải nghiệm phù hợp với bạn
                     </div>
-                    <!-- birth year -->
+                    <!-- 2 nút nhóm tuổi -->
+                    <div style="display:flex;gap:12px;margin-top:22px;">
+                      <button data-ripple="1" onClick="{{ pickYoung }}" type="button"
+                              style="position:relative;overflow:hidden;flex:1;border:2px solid {{ rgYoungBorder }};background:{{ rgYoungBg }};border-radius:14px;padding:16px 10px;cursor:pointer;color:var(--text-primary);text-align:center;transition:all .2s;">
+                        <i class="ti ti-confetti" style="font-size:28px;color:var(--cta);"></i>
+                        <div style="font-size:13px;font-weight:600;margin-top:8px;line-height:1.3;">Mãi mãi tuổi 18</div>
+                        <div style="font-size:13px;font-weight:700;color:var(--cta);margin-top:3px;">18+</div>
+                      </button>
+                      <button data-ripple="1" onClick="{{ pickMature }}" type="button"
+                              style="position:relative;overflow:hidden;flex:1;border:2px solid {{ rgMatureBorder }};background:{{ rgMatureBg }};border-radius:14px;padding:16px 10px;cursor:pointer;color:var(--text-primary);text-align:center;transition:all .2s;">
+                        <i class="ti ti-flower" style="font-size:28px;color:var(--cta);"></i>
+                        <div style="font-size:13px;font-weight:600;margin-top:8px;line-height:1.3;">Mãi mãi trẻ trung</div>
+                        <div style="font-size:13px;font-weight:700;color:var(--cta);margin-top:3px;">45+</div>
+                      </button>
+                    </div>
+                    <!-- đường thay thế: nhập năm sinh chính xác (tuỳ chọn) -->
                     <div style="margin-top:22px;">
-                      <label style="font-size:12px;font-weight:600;color:var(--text-secondary);">Năm sinh</label>
-                      <div
-                          style="display:flex;align-items:center;gap:10px;background:var(--bg-card);border:2px solid {{ rgBirthBorder }};border-radius:8px;padding:13px 14px;margin-top:6px;">
-                        <i class="ti ti-cake" style="font-size:18px;color:var(--text-tertiary);"></i><input
-                          value="{{ rgBirth }}" onInput="{{ onRgBirth }}" inputmode="numeric"
-                          placeholder="VD: 1995"
-                          style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
+                      <label style="font-size:14px;font-weight:600;color:var(--text-secondary);">Hoặc bạn có thể nhập
+                        năm sinh</label>
+                      <div style="display:flex;gap:10px;align-items:stretch;margin-top:8px;">
+                        <div
+                            style="flex:1;min-width:0;display:flex;align-items:center;gap:8px;background:var(--bg-card);border:2px solid {{ rgBirthBorder }};border-radius:8px;padding:13px 12px;">
+                          <i class="ti ti-cake" style="font-size:18px;color:var(--text-tertiary);flex:none;"></i><input
+                            value="{{ rgBirthVal }}" onInput="{{ onRgBirthYear }}" inputmode="numeric"
+                            placeholder="Năm sinh"
+                            style="flex:1;min-width:0;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
+                          <button data-ripple="1" onClick="{{ openYearSheet }}" type="button"
+                                  style="position:relative;overflow:hidden;border:none;background:transparent;cursor:pointer;color:var(--text-tertiary);display:flex;align-items:center;padding:0;flex:none;">
+                            <i class="ti ti-chevron-down" style="font-size:20px;"></i></button>
+                        </div>
+                        <button data-ripple="1" onClick="{{ rgGoNext }}"
+                                style="position:relative;overflow:hidden;flex:none;border:none;background:var(--cta);color:#fff;font-size:15px;font-weight:600;padding:0 20px;border-radius:8px;cursor:pointer;">
+                          Tiếp tục
+                        </button>
                       </div>
                       <sc-if value="{{ rgBirthErr }}" hint-placeholder-val="{{ false }}">
                         <div
@@ -363,35 +388,7 @@
                         </div>
                       </sc-if>
                     </div>
-                    <!-- a11y suggestion (hiện khi tuổi >= 45) -->
-                    <sc-if value="{{ rgShowA11ySuggest }}" hint-placeholder-val="{{ false }}">
-                      <div
-                          style="margin-top:16px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:12px;padding:16px;">
-                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                          <div
-                              style="width:36px;height:36px;border-radius:99px;background:var(--bg-secondary);display:flex;align-items:center;justify-content:center;flex:none;">
-                            <i class="ti ti-eye" style="font-size:20px;color:var(--cta);"></i>
-                          </div>
-                          <div style="font-size:14px;font-weight:700;color:var(--text-primary);">Gợi ý: chế độ trợ
-                            năng
-                          </div>
-                        </div>
-                        <div style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin-bottom:14px;">Bật
-                          chế độ trợ năng trong Cài đặt để hiển thị chữ lớn hơn và vùng nhấn rộng hơn, phù hợp hơn cho
-                          bạn.
-                        </div>
-                        <button data-ripple="1" onClick="{{ toggleRgA11y }}"
-                                style="position:relative;overflow:hidden;width:100%;background:{{ rgA11yBtnBg }};color:{{ rgA11yBtnColor }};font-size:15px;font-weight:700;padding:14px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;border:{{ rgA11yBtnBorder }};">
-                          <i class="ti {{ rgA11yBtnIcon }}" style="font-size:18px;"></i>
-                          {{ rgA11yBtnLabel }}
-                        </button>
-                      </div>
-                    </sc-if>
-                    <button data-ripple="1" onClick="{{ rgGoNext }}"
-                            style="position:relative;overflow:hidden;width:100%;border:none;background:var(--cta);color:#fff;font-size:16px;font-weight:600;padding:16px;border-radius:8px;cursor:pointer;margin-top:28px;">
-                      Tiếp tục
-                    </button>
-                    <div style="text-align:center;margin-top:18px;font-size:13px;color:var(--text-secondary);">
+                    <div style="text-align:center;margin-top:22px;font-size:13px;color:var(--text-secondary);">
                       Đã có tài khoản?
                       <button data-ripple="1" onClick="{{ goLogin }}"
                               style="position:relative;overflow:hidden;border:none;background:transparent;color:var(--cta);font-weight:700;font-size:13px;cursor:pointer;">
@@ -401,8 +398,37 @@
                   </div>
                 </sc-if>
 
-                <!-- STEP 2: họ và tên -->
-                <sc-if value="{{ rgStep2 }}" hint-placeholder-val="{{ false }}">
+                <!-- STEP: trợ năng (chỉ khi 45+) — xem trước trực tiếp, toggle màu cam -->
+                <sc-if value="{{ rgStepA11y }}" hint-placeholder-val="{{ false }}">
+                  <div class="vh-scroll" key="{{ rgStepKey }}"
+                       style="flex:1;overflow-y:auto;padding:18px 28px 28px;animation:{{ rgPanelAnim }} .3s ease;">
+                    <div class="vh-serif" style="font-size:28px;font-weight:600;">Chế độ trợ năng</div>
+                    <div style="font-size:14px;color:var(--text-secondary);margin-top:6px;line-height:1.6;">
+                      Hiển thị chữ lớn hơn và vùng nhấn rộng hơn, giúp bạn dùng ứng dụng thoải mái hơn. Gạt thử để xem
+                      trước ngay trên màn hình này.
+                    </div>
+                    <div
+                        style="display:flex;align-items:center;gap:14px;margin-top:24px;background:var(--bg-card);border:1.5px solid {{ a11yAskRowBorder }};border-radius:14px;padding:16px 18px;transition:border-color .2s;">
+                      <i class="ti ti-eye" style="font-size:24px;color:var(--cta);flex:none;"></i>
+                      <div style="flex:1;">
+                        <div style="font-size:15px;font-weight:600;">Bật chế độ trợ năng</div>
+                        <div style="font-size:13px;color:var(--text-tertiary);">{{ a11yAskStateLabel }}</div>
+                      </div>
+                      <button data-ripple="1" onClick="{{ toggleA11yAsk }}"
+                              style="position:relative;overflow:hidden;width:52px;height:30px;border-radius:99px;border:none;cursor:pointer;background:{{ a11yAskTrack }};transition:background .2s;flex:none;">
+                        <div
+                            style="width:24px;height:24px;border-radius:99px;background:#fff;position:absolute;top:3px;left:{{ a11yAskKnob }};transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.3);"></div>
+                      </button>
+                    </div>
+                    <button data-ripple="1" onClick="{{ rgGoNext }}"
+                            style="position:relative;overflow:hidden;width:100%;border:none;background:var(--cta);color:#fff;font-size:16px;font-weight:600;padding:16px;border-radius:8px;cursor:pointer;margin-top:28px;">
+                      Tiếp tục
+                    </button>
+                  </div>
+                </sc-if>
+
+                <!-- STEP: họ và tên -->
+                <sc-if value="{{ rgStepName }}" hint-placeholder-val="{{ false }}">
                   <div class="vh-scroll" key="{{ rgStepKey }}"
                        style="flex:1;overflow-y:auto;padding:18px 28px 28px;animation:{{ rgPanelAnim }} .3s ease;">
                     <div class="vh-serif" style="font-size:28px;font-weight:600;">Bạn tên gì?</div>
@@ -445,8 +471,8 @@
                   </div>
                 </sc-if>
 
-                <!-- STEP 3: email + mật khẩu -->
-                <sc-if value="{{ rgStep3 }}" hint-placeholder-val="{{ false }}">
+                <!-- STEP: email + mật khẩu -->
+                <sc-if value="{{ rgStepAccount }}" hint-placeholder-val="{{ false }}">
                   <div class="vh-scroll" key="{{ rgStepKey }}"
                        style="flex:1;overflow-y:auto;padding:18px 28px 28px;animation:{{ rgPanelAnim }} .3s ease;">
                     <div class="vh-serif" style="font-size:28px;font-weight:600;">Tài khoản của bạn</div>
@@ -549,7 +575,6 @@
                 </sc-if>
               </div>
             </sc-if>
-
 
             <!-- 09 FORGOT PASSWORD (OTP flow) -->
             <sc-if value="{{ isForgot }}" hint-placeholder-val="{{ false }}">
@@ -4607,6 +4632,31 @@
           </div>
         </sc-if>
 
+        <!-- YEAR PICKER SHEET (năm sinh khi đăng ký) -->
+        <sc-if value="{{ sheetYearPick }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ closeYearPick }}"
+               style="position:absolute;inset:0;z-index:170;background:rgba(10,13,20,.4);">
+            <div onClick="{{ stopProp }}"
+                 style="position:absolute;left:0;right:0;bottom:0;background:var(--bg-card);border-radius:24px 24px 0 0;padding:8px 0 20px;animation:vhSheetUp .28s cubic-bezier(.32,.72,0,1);box-shadow:0 -8px 30px rgba(0,0,0,.25);display:flex;flex-direction:column;max-height:72%;">
+              <div
+                  style="width:40px;height:4px;border-radius:99px;background:var(--border-2);margin:8px auto 12px;flex:none;"></div>
+              <div class="vh-serif" style="font-size:18px;font-weight:600;padding:0 22px 12px;flex:none;">{{
+                yearSheetTitle }}
+              </div>
+              <div class="vh-scroll" style="flex:1;overflow-y:auto;padding:0 12px;">
+                <sc-for list="{{ yearRows }}" as="y" hint-placeholder-count="8">
+                  <button data-ripple="1" onClick="{{ y.pick }}"
+                          style="position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;background:{{ y.bg }};border:1.5px solid {{ y.border }};padding:14px 16px;cursor:pointer;color:var(--text-primary);border-radius:10px;margin-bottom:6px;font-size:16px;font-weight:600;">
+                    {{ y.year }}
+                    <i class="ti ti-circle-check-filled"
+                       style="font-size:20px;color:var(--cta);flex:none;display:{{ y.check }};"></i>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
         <!-- AI AVATAR removed (v8 #20) -->
 
         <!-- TOAST -->
@@ -4647,7 +4697,7 @@ class Component extends DCLogic {
     failedLogin: 0, lockedUntil: 0, lockCountdown: 0,
     // forms
     liEmail: '', liPass: '', liPassShow: false, liErr: { email: null, pass: null },
-    rg: { first: '', last: '', email: '', birth: '', pass: '', confirm: '', terms: false, show: false, err: {}, step: 1 }, rgTermsShake: 0,
+    rg: { first: '', last: '', email: '', birth: '', pass: '', confirm: '', terms: false, show: false, err: {}, step: 'age', ageBracket: null, needA11y: false }, rgTermsShake: 0,
     fpStep: 'email', fpEmail: '', fpErr: null, fpOtp: '', fpOtpErr: null, fpNewPass: '', fpResendCd: 0, parentEmail: '', otpArr: ['', '', '', '', '', ''],
     // overlays
     sheet: null, modal: null, modalData: {},

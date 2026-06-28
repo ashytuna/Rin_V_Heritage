@@ -355,7 +355,7 @@ window.VH_RENDER = {
       onWalkMouseUp: (e) => this.onWalkMouseUp(e),
       goLogin: () => this.nav('login', 'fwd'),
       goRegister: () => {
-        this.setState({rg: Object.assign({}, rg, {step: 1, err: {}, _dir: 'fwd'})});
+        this.setState({rg: Object.assign({}, rg, {step: 'age', needA11y: false, err: {}, _dir: 'fwd'})});
         this.nav('register', 'fwd');
       },
       guestEnter: () => {
@@ -399,17 +399,26 @@ window.VH_RENDER = {
         this.nav('forgot', 'fwd');
       },
       // register
-      rgStep: rg.step || 1,
-      rgStep1: (rg.step || 1) === 1,
-      rgStep2: (rg.step || 1) === 2,
-      rgStep3: (rg.step || 1) === 3,
-      rgThumbLeft: ((rg.step || 1) - 1) * 33.333 + '%',
-      rgStepKey: 'rgstep-' + (rg.step || 1),
+      rgStepAge: (rg.step || 'age') === 'age',
+      rgStepA11y: rg.step === 'a11y',
+      rgStepName: rg.step === 'name',
+      rgStepAccount: rg.step === 'account',
+      ...((() => {
+        const order = this.rgOrder();
+        const idx = Math.max(0, order.indexOf(rg.step || 'age'));
+        const pct = 100 / order.length;
+        return {
+          rgThumbWidth: pct + '%',
+          rgThumbLeft: (idx * pct) + '%',
+        };
+      })()),
+      rgStepKey: 'rgstep-' + (rg.step || 'age'),
       rgPanelAnim: rg._dir === 'back' ? 'vhPopIn' : 'vhPushIn',
       rgGoNext: () => this.rgGoNext(),
       rgGoPrev: () => this.rgGoPrev(),
       rgBackTap: () => {
-        if ((rg.step || 1) <= 1) this.back(); else this.rgGoPrev();
+        const order = this.rgOrder();
+        if (order.indexOf(rg.step || 'age') <= 0) this.back(); else this.rgGoPrev();
       },
       onRgTouchStart: (e) => this.onRgTouchStart(e),
       onRgTouchEnd: (e) => this.onRgTouchEnd(e),
@@ -430,6 +439,40 @@ window.VH_RENDER = {
       rgEmailErr: rerr.email,
       rgEmailErrAction: rerr.emailAction,
       rgBirthErr: rerr.birth,
+      // năm sinh: nhóm tuổi + dropdown chọn năm
+      rgBirthVal: rg.birth || '',
+      rgYoungBorder: rg.ageBracket === 'young' ? 'var(--cta)' : 'var(--border)',
+      rgYoungBg: rg.ageBracket === 'young' ? 'rgba(237,137,39,.10)' : 'var(--bg-card)',
+      rgMatureBorder: rg.ageBracket === 'mature' ? 'var(--cta)' : 'var(--border)',
+      rgMatureBg: rg.ageBracket === 'mature' ? 'rgba(237,137,39,.10)' : 'var(--bg-card)',
+      pickYoung: () => this.rgPickBracket('young'),
+      pickMature: () => this.rgPickBracket('mature'),
+      onRgBirthYear: (e) => this.rgSetBirth(e.target.value),
+      // bước trợ năng (chỉ khi 45+) — xem trước trực tiếp, toggle màu cam
+      a11yAskStateLabel: st.a11y.visualLow ? 'Đang bật' : 'Đang tắt',
+      a11yAskTrack: st.a11y.visualLow ? 'var(--cta)' : 'var(--border-2)',
+      a11yAskKnob: st.a11y.visualLow ? '25px' : '3px',
+      a11yAskRowBorder: st.a11y.visualLow ? 'var(--cta)' : 'var(--border)',
+      toggleA11yAsk: () => this.toggleA11yAsk(),
+      openYearSheet: () => this.setState({sheet: 'yearpick'}),
+      sheetYearPick: st.sheet === 'yearpick',
+      closeYearPick: () => this.setState({sheet: null}),
+      yearSheetTitle: rg.ageBracket === 'mature' ? 'Chọn năm sinh (45+)' : rg.ageBracket === 'young' ? 'Chọn năm sinh (18+)' : 'Chọn năm sinh',
+      yearRows: (() => {
+        const {min, max} = this.rgYearRange(rg.ageBracket);
+        const rows = [];
+        for (let y = max; y >= min; y--) {
+          const sel = String(y) === String(rg.birth);
+          rows.push({
+            year: y,
+            border: sel ? 'var(--cta)' : 'transparent',
+            bg: sel ? 'rgba(237,137,39,.10)' : 'transparent',
+            check: sel ? 'inline' : 'none',
+            pick: () => this.rgPickYear(y),
+          });
+        }
+        return rows;
+      })(),
       rgPassShow: rg.pass.length > 0,
       strengthBars,
       strengthColor: strengthColors[strength],
