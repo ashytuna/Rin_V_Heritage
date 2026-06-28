@@ -318,7 +318,7 @@ window.VH_RENDER = {
     const strength = this.passStrength(rg.pass);
     const strengthColors = ['var(--cta)', 'var(--cta)', '#F2C21A', 'var(--success)'];
     const strengthLabels = ['Yếu — cần ít nhất 8 ký tự, 1 chữ hoa, 1 số', 'Trung bình', 'Khá', 'Mạnh'];
-    const strengthBars = [0, 1, 2].map(i => i < strength ? strengthColors[strength] : 'var(--bg-tertiary)');
+    const strengthBars = [0, 1, 2].map(i => i < strength ? strengthColors[strength] : 'var(--bar-track)');
     const locked = Date.now() < st.lockedUntil;
 
     const perms = [
@@ -621,7 +621,7 @@ window.VH_RENDER = {
       },
       fpNewPass: st.fpNewPass,
       onNewPass: (e) => this.setState({fpNewPass: e.target.value}),
-      fpNewBars: [0, 1, 2].map(i => i < this.passStrength(st.fpNewPass) ? ['var(--cta)', 'var(--cta)', '#F2C21A', 'var(--success)'][this.passStrength(st.fpNewPass)] : 'var(--bg-tertiary)'),
+      fpNewBars: [0, 1, 2].map(i => i < this.passStrength(st.fpNewPass) ? ['var(--cta)', 'var(--cta)', '#F2C21A', 'var(--success)'][this.passStrength(st.fpNewPass)] : 'var(--bar-track)'),
       fpNewType: st._fpShowNew ? 'text' : 'password',
       fpNewEye: st._fpShowNew ? 'ti-eye-off' : 'ti-eye',
       toggleFpNew: () => this.setState({_fpShowNew: !st._fpShowNew}),
@@ -1337,7 +1337,7 @@ window.VH_RENDER = {
       toggleCpOld: () => this.setState({_cpShowOld: !st._cpShowOld}),
       toggleCpNew: () => this.setState({_cpShowNew: !st._cpShowNew}),
       toggleCpConfirm: () => this.setState({_cpShowConfirm: !st._cpShowConfirm}),
-      cpBars: [0, 1, 2].map(i => i < cpStrength ? cpStrengthColor : 'var(--bg-tertiary)'),
+      cpBars: [0, 1, 2].map(i => i < cpStrength ? cpStrengthColor : 'var(--bar-track)'),
       cpConfirmBorder: (st._cpConfirm && st._cpConfirm !== st._cpNew) ? 'var(--error)' : 'var(--border)',
       cpErr: (st._cpConfirm && st._cpConfirm !== st._cpNew) ? 'Mật khẩu xác nhận không khớp' : null,
       cpNewBorder: cpNewInvalid ? 'var(--error)' : 'var(--border)',
