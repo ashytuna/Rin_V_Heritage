@@ -210,12 +210,44 @@ window.VH_LOGIC = {
       this.nav('scan', 'fwd');
       return;
     }
+    if (t === 'explore') {
+      // chưa bật vị trí & chưa hoãn trong hôm nay → sang màn hỏi bật vị trí
+      const locOn = this.state.permissions && this.state.permissions.location === 1;
+      const snoozed = this.state._locSnoozeDay === new Date().toDateString();
+      if (!locOn && !snoozed) {
+        this.setState({screen: 'locationask', history: [], navDir: 'fwd', sheet: null, modal: null, _locAskChecked: false});
+        return;
+      }
+    }
     const built = {home: 1, explore: 1, library: 1, profile: 1};
     if (!built[t]) {
       this.stub(t);
       return;
     }
     this.setState({screen: t, history: [], navDir: 'fwd', sheet: null, modal: null});
+  },
+  // ---- màn hỏi bật vị trí (trước khi vào Khám phá) ----
+  toggleLocAsk() {
+    this.setState({_locAskChecked: !this.state._locAskChecked});
+  },
+  locAskGrant() {
+    // bật vị trí → vào thẳng Explore (bản đồ), history rỗng nên không lui về màn hỏi được
+    this.setState({
+      permissions: Object.assign({}, this.state.permissions, {location: 1}),
+      _exploreH: 18, screen: 'explore', history: [], navDir: 'fwd', sheet: null, modal: null
+    });
+  },
+  locAskSkip() {
+    if (this.state._locAskChecked) {
+      // không nhắc lại trong hôm nay → hoãn cả ngày, vào Explore (Hà Nội), không lui về màn hỏi
+      this.setState({
+        _locSnoozeDay: new Date().toDateString(),
+        screen: 'explore', history: [], navDir: 'fwd', sheet: null, modal: null
+      });
+    } else {
+      // không bật, không hoãn → đẩy Explore lên trên màn hỏi (từ Explore lui về được)
+      this.nav('explore', 'fwd');
+    }
   },
 
   // ---- walkthrough ----

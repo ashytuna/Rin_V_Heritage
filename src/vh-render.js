@@ -84,6 +84,15 @@ window.VH_RENDER = {
       isParental: st.screen === 'parental',
       isLangScreen: st.screen === 'language',
       isPermissions: st.screen === 'permissions',
+      isLocationAsk: st.screen === 'locationask',
+      locAskChecked: !!st._locAskChecked,
+      locAskBoxBorder: st._locAskChecked ? 'var(--cta)' : 'var(--border-2)',
+      locAskBoxBg: st._locAskChecked ? 'var(--cta)' : 'transparent',
+      locAskCheckDisp: st._locAskChecked ? 'block' : 'none',
+      toggleLocAsk: () => this.toggleLocAsk(),
+      locAskGrant: () => this.locAskGrant(),
+      locAskSkip: () => this.locAskSkip(),
+      locAskBack: () => this.back(),
       offlineBanner: st.isOffline && st.hasPacks && mainTabsSet,
       t_offlineBanner: this.t('offlineBanner'),
       toggleOffline: () => {
@@ -879,7 +888,7 @@ window.VH_RENDER = {
       }),
       savedView: savedArts.map(a => ({...a, img: this.vimg(a.seed, 300, 260), open: () => this.openArtifact(a.id)})),
       libSubtitle: savedArts.length + ' hiện vật · 23 đã quét',
-      goExploreLib: () => this.nav('explore', 'fwd'),
+      goExploreLib: () => this.goTab('explore'),
       photoGrid: this.artifacts.slice(0, 4).map(a => ({
         ...a, img: this.vimg(a.seed, 240, 280), open: () => {
           this.setState({curArtId: a.id});
