@@ -471,8 +471,8 @@
                         </div>
                       </sc-if>
                     </div>
-                    <button data-ripple="1" onClick="{{ rgGoNext }}"
-                            style="position:relative;overflow:hidden;width:100%;border:none;background:var(--cta);color:#fff;font-size:16px;font-weight:600;padding:16px;border-radius:8px;cursor:pointer;margin-top:28px;">
+                    <button data-ripple="1" onClick="{{ rgNameContinue }}" disabled="{{ rgNameDisabled }}"
+                            style="position:relative;overflow:hidden;width:100%;border:none;background:{{ rgNameBtnBg }};color:{{ rgNameBtnColor }};font-size:16px;font-weight:600;padding:16px;border-radius:8px;cursor:{{ rgNameBtnCursor }};margin-top:28px;transition:background .2s,color .2s;">
                       Tiếp tục
                     </button>
                   </div>
@@ -568,8 +568,8 @@
                           style="color:var(--cta);font-weight:600;">Điều khoản sử dụng</span> và <span
                           style="color:var(--cta);font-weight:600;">Chính sách bảo mật</span> của V-Heritage</span>
                     </button>
-                    <button data-ripple="1" onClick="{{ doRegister }}"
-                            style="position:relative;overflow:hidden;width:100%;border:none;background:var(--cta);color:#fff;font-size:16px;font-weight:600;padding:16px;border-radius:8px;cursor:pointer;margin-top:18px;">
+                    <button data-ripple="1" onClick="{{ doRegister }}" disabled="{{ rgAccDisabled }}"
+                            style="position:relative;overflow:hidden;width:100%;border:none;background:{{ rgAccBtnBg }};color:{{ rgAccBtnColor }};font-size:16px;font-weight:600;padding:16px;border-radius:8px;cursor:{{ rgAccBtnCursor }};margin-top:18px;transition:background .2s,color .2s;">
                       Tạo tài khoản
                     </button>
                     <div style="text-align:center;margin-top:18px;font-size:13px;color:var(--text-secondary);">
@@ -591,7 +591,7 @@
                     </div>
                     <div class="vh-serif" style="font-size:28px;font-weight:600;margin-top:16px;">Xác thực Email</div>
                     <div style="font-size:14px;color:var(--text-secondary);margin-top:8px;line-height:1.6;">
-                      Chúng tôi đã gửi mã OTP gồm 6 chữ số đến email <strong
+                      Mã OTP 6 chữ số đã được gửi đến email <strong
                         style="color:var(--text-primary);">{{ rgOtpEmail }}</strong>. Vui lòng nhập mã để hoàn tất đăng
                       ký.
                     </div>
@@ -615,8 +615,8 @@
                         {{ rgResendLabel }}
                       </button>
                     </div>
-                    <button data-ripple="1" onClick="{{ verifyOtp }}"
-                            style="position:relative;overflow:hidden;width:100%;border:none;background:var(--cta);color:#fff;font-size:16px;font-weight:600;padding:16px;border-radius:8px;cursor:pointer;margin-top:14px;">
+                    <button data-ripple="1" onClick="{{ verifyOtp }}" disabled="{{ otpDisabled }}"
+                            style="position:relative;overflow:hidden;width:100%;border:none;background:{{ otpBtnBg }};color:{{ otpBtnColor }};font-size:16px;font-weight:600;padding:16px;border-radius:8px;cursor:{{ otpBtnCursor }};margin-top:14px;transition:background .2s,color .2s;">
                       Xác nhận
                     </button>
                   </div>
@@ -667,17 +667,15 @@
                 </sc-if>
                 <!-- step: otp -->
                 <sc-if value="{{ fpStepOtp }}" hint-placeholder-val="{{ false }}">
-                  <div style="flex:1;padding:18px 28px;animation:vhUp .3s ease;">
+                  <div style="flex:1;padding:18px 28px 28px;animation:vhUp .3s ease;">
                     <div
                         style="width:64px;height:64px;border-radius:16px;background:rgba(237,137,39,.12);display:flex;align-items:center;justify-content:center;">
                       <i class="ti ti-shield-lock" style="font-size:34px;color:var(--cta);"></i>
                     </div>
-                    <div class="vh-serif" style="font-size:24px;font-weight:600;margin-top:16px;">
-                      Nhập mã xác minh
-                    </div>
+                    <div class="vh-serif" style="font-size:28px;font-weight:600;margin-top:16px;">Xác thực tài khoản</div>
                     <div style="font-size:14px;color:var(--text-secondary);margin-top:8px;line-height:1.6;">
-                      Mã OTP 6 chữ số đã gửi đến <strong style="color:var(--text-primary);">{{
-                      fpEmail }}</strong></div>
+                      Mã OTP 6 chữ số đã được gửi đến email <strong style="color:var(--text-primary);">{{
+                      fpEmail }}</strong>. Vui lòng nhập mã để đặt lại mật khẩu.</div>
                     <div style="display:flex;gap:9px;margin-top:22px;{{ fpOtpShake }}">
                       <sc-for list="{{ otpBoxes }}" as="b" hint-placeholder-count="6"><input
                           value="{{ b.val }}" onInput="{{ b.input }}"
@@ -698,9 +696,9 @@
                         {{ resendLabel }}
                       </button>
                     </div>
-                    <button data-ripple="1" onClick="{{ verifyOtp }}"
-                            style="position:relative;overflow:hidden;width:100%;border:none;background:var(--cta);color:#fff;font-size:16px;font-weight:600;padding:16px;border-radius:8px;cursor:pointer;margin-top:14px;">
-                      Xác minh
+                    <button data-ripple="1" onClick="{{ verifyOtp }}" disabled="{{ otpDisabled }}"
+                            style="position:relative;overflow:hidden;width:100%;border:none;background:{{ otpBtnBg }};color:{{ otpBtnColor }};font-size:16px;font-weight:600;padding:16px;border-radius:8px;cursor:{{ otpBtnCursor }};margin-top:14px;transition:background .2s,color .2s;">
+                      Xác nhận
                     </button>
                   </div>
                 </sc-if>
@@ -818,8 +816,8 @@
                     </div>
                   </div>
                 </div>
-                <button data-ripple="1" onClick="{{ sendParental }}"
-                        style="position:relative;overflow:hidden;width:100%;border:none;background:var(--cta);color:#fff;font-size:16px;font-weight:600;padding:16px;border-radius:8px;cursor:pointer;flex:none;">
+                <button data-ripple="1" onClick="{{ sendParental }}" disabled="{{ parentDisabled }}"
+                        style="position:relative;overflow:hidden;width:100%;border:none;background:{{ parentBtnBg }};color:{{ parentBtnColor }};font-size:16px;font-weight:600;padding:16px;border-radius:8px;cursor:{{ parentBtnCursor }};flex:none;transition:background .2s,color .2s;">
                   Gửi link xin phép
                 </button>
               </div>

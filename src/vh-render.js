@@ -463,10 +463,29 @@ window.VH_RENDER = {
       rgBirthVal: rg.birth || '',
       // nút "Tiếp tục" bước tuổi: disabled tới khi chọn nhóm tuổi hoặc nhập năm hợp lệ
       rgYearDisabled: !rgAgeStepOk,
-      rgYearBtnBg: rgAgeStepOk ? 'var(--cta)' : 'var(--bg-tertiary)',
-      rgYearBtnColor: rgAgeStepOk ? '#fff' : 'var(--text-tertiary)',
+      rgYearBtnBg: rgAgeStepOk ? 'var(--cta)' : 'var(--disabled-bg)',
+      rgYearBtnColor: rgAgeStepOk ? '#fff' : 'var(--disabled-fg)',
       rgYearBtnCursor: rgAgeStepOk ? 'pointer' : 'not-allowed',
       rgYearContinue: () => { if (rgAgeStepOk) this.rgGoNext(); },
+      // ---- trạng thái disabled cho các nút bước đăng ký ----
+      // bước họ tên: bật khi đã nhập tên (bắt buộc)
+      ...((() => {
+        const nameOk = (rg.first || '').trim().length > 0;
+        const accOk = this.validEmail(rg.email) && this.passOk(rg.pass) && rg.pass.length > 0 && rg.confirm === rg.pass && !!rg.terms;
+        const otpOk = (st.otpArr || ['', '', '', '', '', '']).every(x => x !== '' && x != null);
+        const dim = (ok) => ({
+          bg: ok ? 'var(--cta)' : 'var(--disabled-bg)',
+          color: ok ? '#fff' : 'var(--disabled-fg)',
+          cursor: ok ? 'pointer' : 'not-allowed',
+        });
+        const n = dim(nameOk), a = dim(accOk), o = dim(otpOk);
+        return {
+          rgNameDisabled: !nameOk, rgNameBtnBg: n.bg, rgNameBtnColor: n.color, rgNameBtnCursor: n.cursor,
+          rgNameContinue: () => { if (nameOk) this.rgGoNext(); },
+          rgAccDisabled: !accOk, rgAccBtnBg: a.bg, rgAccBtnColor: a.color, rgAccBtnCursor: a.cursor,
+          otpDisabled: !otpOk, otpBtnBg: o.bg, otpBtnColor: o.color, otpBtnCursor: o.cursor,
+        };
+      })()),
       rgMinorBorder: rg.ageBracket === 'minor' ? 'var(--cta)' : 'var(--border)',
       rgMinorBg: rg.ageBracket === 'minor' ? 'rgba(237,137,39,.10)' : 'var(--bg-card)',
       rgYoungBorder: rg.ageBracket === 'young' ? 'var(--cta)' : 'var(--border)',
@@ -589,7 +608,7 @@ window.VH_RENDER = {
         keydown: (e) => this.otpKey(i, e),
       })),
       verifyOtp: () => this.verifyOtp(),
-      resendLabel: st.fpResendCd > 0 ? ('Gửi lại sau ' + st.fpResendCd + 's') : 'Gửi lại mã',
+      resendLabel: st.fpResendCd > 0 ? ('Gửi lại mã sau (' + st.fpResendCd + 's)') : 'Gửi lại mã',
       resendColor: st.fpResendCd > 0 ? 'var(--text-tertiary)' : 'var(--cta)',
       resendOtp: () => {
         if (st.fpResendCd > 0) return;
@@ -633,6 +652,15 @@ window.VH_RENDER = {
       // parental
       parentEmail: st.parentEmail,
       onParent: (e) => this.setState({parentEmail: e.target.value}),
+      ...((() => {
+        const ok = this.validEmail(st.parentEmail);
+        return {
+          parentDisabled: !ok,
+          parentBtnBg: ok ? 'var(--cta)' : 'var(--disabled-bg)',
+          parentBtnColor: ok ? '#fff' : 'var(--disabled-fg)',
+          parentBtnCursor: ok ? 'pointer' : 'not-allowed',
+        };
+      })()),
       sendParental: () => {
         if (!this.validEmail(st.parentEmail)) {
           this.showToast('Nhập email phụ huynh hợp lệ', 'error');
