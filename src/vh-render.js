@@ -434,6 +434,8 @@ window.VH_RENDER = {
       rgConfirm: rg.confirm,
       rgPassType: rg.show ? 'text' : 'password',
       rgPassEye: rg.show ? 'ti-eye-off' : 'ti-eye',
+      rgConfirmType: rg.showConfirm ? 'text' : 'password',
+      rgConfirmEye: rg.showConfirm ? 'ti-eye-off' : 'ti-eye',
       rgEmailBorder: rerr.email ? 'var(--error)' : 'var(--border)',
       rgBirthBorder: rerr.birth ? 'var(--error)' : 'var(--border)',
       rgEmailErr: rerr.email,
@@ -507,6 +509,7 @@ window.VH_RENDER = {
       onRgPass: (e) => this.upRg('pass', e.target.value, ['pass']),
       onRgConfirm: (e) => this.upRg('confirm', e.target.value, ['confirm']),
       toggleRgPass: () => this.setState({rg: Object.assign({}, rg, {show: !rg.show})}),
+      toggleRgConfirm: () => this.setState({rg: Object.assign({}, rg, {showConfirm: !rg.showConfirm})}),
       toggleTerms: () => this.setState({
         rg: Object.assign({}, rg, {
           terms: !rg.terms,
@@ -1301,6 +1304,9 @@ window.VH_RENDER = {
       isDeleteAccount: st.screen === 'deleteaccount',
       daPass: st._daPass,
       onDaPass: (e) => this.setState({_daPass: e.target.value}),
+      daPassType: st._daShow ? 'text' : 'password',
+      daPassEye: st._daShow ? 'ti-eye-off' : 'ti-eye',
+      toggleDaPass: () => this.setState({_daShow: !st._daShow}),
       toggleDaConfirm: () => this.setState({_daConfirm: !st._daConfirm}),
       daCheckBorder: st._daConfirm ? 'var(--error)' : 'var(--border-2)',
       daCheckBg: st._daConfirm ? 'var(--error)' : 'transparent',

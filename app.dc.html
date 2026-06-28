@@ -212,7 +212,7 @@
                       <input value="{{ liEmail }}" onInput="{{ onLiEmail }}"
                              onBlur="{{ onLiEmailBlur }}" inputmode="email"
                              placeholder="ban@email.com"
-                             style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
+                             style="flex:1;min-width:0;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
                     </div>
                     <sc-if value="{{ liEmailErr }}" hint-placeholder-val="{{ false }}">
                       <div
@@ -239,7 +239,7 @@
                          style="font-size:18px;color:var(--text-tertiary);"></i>
                       <input value="{{ liPass }}" onInput="{{ onLiPass }}" type="{{ liPassType }}"
                              placeholder="••••••••"
-                             style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
+                             style="flex:1;min-width:0;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
                       <button data-ripple="1" onClick="{{ toggleLiPass }}"
                               style="position:relative;overflow:hidden;border:none;background:transparent;cursor:pointer;color:var(--text-tertiary);display:flex;align-items:center;padding:0;flex:none;">
                         <i class="ti {{ liPassEye }}" style="font-size:18px;"></i></button>
@@ -446,7 +446,7 @@
                         <i class="ti ti-user" style="font-size:18px;color:var(--text-tertiary);"></i><input
                           value="{{ rgLast }}" onInput="{{ onRgLast }}"
                           placeholder="Nguyễn"
-                          style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
+                          style="flex:1;min-width:0;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
                       </div>
                     </div>
                     <!-- tên (bắt buộc) -->
@@ -457,7 +457,7 @@
                         <i class="ti ti-user-circle" style="font-size:18px;color:var(--text-tertiary);"></i><input
                           value="{{ rgFirst }}" onInput="{{ onRgFirst }}"
                           placeholder="Minh Anh"
-                          style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
+                          style="flex:1;min-width:0;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
                       </div>
                       <sc-if value="{{ rgFirstErr }}" hint-placeholder-val="{{ false }}">
                         <div
@@ -490,7 +490,7 @@
                           value="{{ rgEmail }}" onInput="{{ onRgEmail }}"
                           onBlur="{{ onRgEmailBlur }}" inputmode="email"
                           placeholder="ban@email.com"
-                          style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
+                          style="flex:1;min-width:0;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
                       </div>
                       <sc-if value="{{ rgEmailErr }}" hint-placeholder-val="{{ false }}">
                         <div
@@ -513,7 +513,7 @@
                         <i class="ti ti-lock" style="font-size:18px;color:var(--text-tertiary);"></i><input
                           value="{{ rgPass }}" onInput="{{ onRgPass }}" type="{{ rgPassType }}"
                           placeholder="Tối thiểu 8 ký tự"
-                          style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
+                          style="flex:1;min-width:0;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
                         <button data-ripple="1" onClick="{{ toggleRgPass }}"
                                 style="position:relative;overflow:hidden;border:none;background:transparent;cursor:pointer;color:var(--text-tertiary);display:flex;align-items:center;padding:0;flex:none;">
                           <i class="ti {{ rgPassEye }}" style="font-size:18px;"></i></button>
@@ -541,8 +541,11 @@
                           style="display:flex;align-items:center;gap:10px;background:var(--bg-card);border:2px solid {{ rgConfirmBorder }};border-radius:8px;padding:13px 14px;margin-top:6px;">
                         <i class="ti ti-lock-check" style="font-size:18px;color:var(--text-tertiary);"></i><input
                           value="{{ rgConfirm }}" onInput="{{ onRgConfirm }}"
-                          type="{{ rgPassType }}" placeholder="Nhập lại mật khẩu"
-                          style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
+                          type="{{ rgConfirmType }}" placeholder="Nhập lại mật khẩu"
+                          style="flex:1;min-width:0;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
+                        <button data-ripple="1" onClick="{{ toggleRgConfirm }}"
+                                style="position:relative;overflow:hidden;border:none;background:transparent;cursor:pointer;color:var(--text-tertiary);display:flex;align-items:center;padding:0;flex:none;">
+                          <i class="ti {{ rgConfirmEye }}" style="font-size:18px;"></i></button>
                       </div>
                       <sc-if value="{{ rgConfirmErr }}" hint-placeholder-val="{{ false }}">
                         <div
@@ -603,7 +606,7 @@
                            style="font-size:18px;color:var(--text-tertiary);"></i><input
                           value="{{ fpEmail }}" onInput="{{ onFp }}" inputmode="email"
                           placeholder="ban@email.com"
-                          style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
+                          style="flex:1;min-width:0;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
                       </div>
                       <sc-if value="{{ fpErr }}" hint-placeholder-val="{{ false }}">
                         <div
@@ -671,7 +674,7 @@
                         <i class="ti ti-lock-plus" style="font-size:18px;color:var(--text-tertiary);"></i>
                         <input value="{{ fpNewPass }}" onInput="{{ onNewPass }}" type="{{ fpNewType }}"
                                placeholder="Nhập mật khẩu mới"
-                               style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
+                               style="flex:1;min-width:0;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
                         <button data-ripple="1" onClick="{{ toggleFpNew }}" type="button"
                                 style="border:none;background:transparent;cursor:pointer;color:var(--text-tertiary);display:flex;align-items:center;padding:0;flex:none;">
                           <i class="ti {{ fpNewEye }}" style="font-size:18px;"></i></button>
@@ -693,7 +696,7 @@
                         <i class="ti ti-lock-check" style="font-size:18px;color:var(--text-tertiary);"></i>
                         <input value="{{ fpConfirm }}" onInput="{{ onFpConfirm }}" type="{{ fpConfirmType }}"
                                placeholder="Nhập lại mật khẩu mới"
-                               style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
+                               style="flex:1;min-width:0;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
                         <button data-ripple="1" onClick="{{ toggleFpConfirm }}" type="button"
                                 style="border:none;background:transparent;cursor:pointer;color:var(--text-tertiary);display:flex;align-items:center;padding:0;flex:none;">
                           <i class="ti {{ fpConfirmEye }}" style="font-size:18px;"></i></button>
@@ -768,7 +771,7 @@
                          style="font-size:18px;color:var(--text-tertiary);"></i><input
                         value="{{ parentEmail }}" onInput="{{ onParent }}" inputmode="email"
                         placeholder="phuhuynh@email.com"
-                        style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
+                        style="flex:1;min-width:0;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
                     </div>
                   </div>
                 </div>
@@ -2907,7 +2910,7 @@
                       <i class="ti ti-user"
                          style="font-size:18px;color:var(--text-tertiary);"></i><input
                         value="{{ editName }}" onInput="{{ onEditName }}"
-                        style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
+                        style="flex:1;min-width:0;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
                     </div>
                   </div>
                 </div>
@@ -3110,7 +3113,7 @@
                          style="font-size:18px;color:var(--text-tertiary);"></i><input
                         value="{{ cpOld }}" onInput="{{ onCpOld }}" type="{{ cpOldType }}"
                         placeholder="••••••••"
-                        style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
+                        style="flex:1;min-width:0;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
                       <button data-ripple="1" onClick="{{ toggleCpOld }}" type="button"
                               style="border:none;background:transparent;cursor:pointer;color:var(--text-tertiary);display:flex;align-items:center;padding:0;flex:none;">
                         <i class="ti {{ cpOldEye }}" style="font-size:18px;"></i></button>
@@ -3128,7 +3131,7 @@
                          style="font-size:18px;color:var(--text-tertiary);"></i><input
                         value="{{ cpNew }}" onInput="{{ onCpNew }}" type="{{ cpNewType }}"
                         placeholder="Nhập mật khẩu mới"
-                        style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
+                        style="flex:1;min-width:0;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
                       <button data-ripple="1" onClick="{{ toggleCpNew }}" type="button"
                               style="border:none;background:transparent;cursor:pointer;color:var(--text-tertiary);display:flex;align-items:center;padding:0;flex:none;">
                         <i class="ti {{ cpNewEye }}" style="font-size:18px;"></i></button>
@@ -3155,7 +3158,7 @@
                          style="font-size:18px;color:var(--text-tertiary);"></i><input
                         value="{{ cpConfirm }}" onInput="{{ onCpConfirm }}" type="{{ cpConfirmType }}"
                         placeholder="Nhập lại mật khẩu mới"
-                        style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
+                        style="flex:1;min-width:0;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
                       <button data-ripple="1" onClick="{{ toggleCpConfirm }}" type="button"
                               style="border:none;background:transparent;cursor:pointer;color:var(--text-tertiary);display:flex;align-items:center;padding:0;flex:none;">
                         <i class="ti {{ cpConfirmEye }}" style="font-size:18px;"></i></button>
@@ -3206,7 +3209,7 @@
                          style="font-size:18px;color:var(--text-tertiary);"></i><input
                         value="{{ ceNew }}" onInput="{{ onCeNew }}" inputmode="email"
                         placeholder="email-moi@email.com"
-                        style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
+                        style="flex:1;min-width:0;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
                     </div>
                     <sc-if value="{{ ceErr }}" hint-placeholder-val="{{ false }}">
                       <div
@@ -3316,9 +3319,12 @@
                         style="display:flex;align-items:center;gap:10px;background:var(--bg-card);border:2px solid var(--border);border-radius:8px;padding:13px 14px;margin-top:6px;">
                       <i class="ti ti-lock"
                          style="font-size:18px;color:var(--text-tertiary);"></i><input
-                        value="{{ daPass }}" onInput="{{ onDaPass }}" type="password"
+                        value="{{ daPass }}" onInput="{{ onDaPass }}" type="{{ daPassType }}"
                         placeholder="Mật khẩu của bạn"
-                        style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
+                        style="flex:1;min-width:0;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
+                      <button data-ripple="1" onClick="{{ toggleDaPass }}" type="button"
+                              style="position:relative;overflow:hidden;border:none;background:transparent;cursor:pointer;color:var(--text-tertiary);display:flex;align-items:center;padding:0;flex:none;">
+                        <i class="ti {{ daPassEye }}" style="font-size:18px;"></i></button>
                     </div>
                   </div>
                 </div>
@@ -3746,7 +3752,7 @@
                       <i class="ti ti-user"
                          style="font-size:18px;color:var(--text-tertiary);"></i><input
                         value="{{ csName }}" onInput="{{ onCsName }}" placeholder="Tên của bạn"
-                        style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
+                        style="flex:1;min-width:0;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
                     </div>
                   </div>
                   <div style="margin-top:14px;"><label
@@ -3758,7 +3764,7 @@
                          style="font-size:18px;color:var(--text-tertiary);"></i><input
                         value="{{ csEmail }}" onInput="{{ onCsEmail }}" inputmode="email"
                         placeholder="ban@email.com"
-                        style="flex:1;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
+                        style="flex:1;min-width:0;border:none;background:transparent;outline:none;font-size:15px;color:var(--text-primary);">
                     </div>
                   </div>
                   <div style="margin-top:14px;"><label
@@ -4701,7 +4707,7 @@ class Component extends DCLogic {
     failedLogin: 0, lockedUntil: 0, lockCountdown: 0,
     // forms
     liEmail: '', liPass: '', liPassShow: false, liErr: { email: null, pass: null },
-    rg: { first: '', last: '', email: '', birth: '', pass: '', confirm: '', terms: false, show: false, err: {}, step: 'age', ageBracket: null, needA11y: false }, rgTermsShake: 0,
+    rg: { first: '', last: '', email: '', birth: '', pass: '', confirm: '', terms: false, show: false, showConfirm: false, err: {}, step: 'age', ageBracket: null, needA11y: false }, rgTermsShake: 0,
     fpStep: 'email', fpEmail: '', fpErr: null, fpOtp: '', fpOtpErr: null, fpNewPass: '', fpResendCd: 0, parentEmail: '', otpArr: ['', '', '', '', '', ''],
     // overlays
     sheet: null, modal: null, modalData: {},
