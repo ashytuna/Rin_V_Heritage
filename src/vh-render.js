@@ -754,6 +754,8 @@ window.VH_RENDER = {
       openNotifs: () => this.nav('notifications', 'fwd'),
       openSearch: () => this.nav('search', 'fwd'),
       heroImg: this.vimg('congchieng', 600, 420), heroOpen: () => this.openArtifact(7),
+      heroDur: this.fmtTime(100),
+      featImg: this.vimg('trongdong', 800, 600), featOpen: () => this.openArtifactModel(1),
       goExplore: () => this.goTab('explore'),
       artifactsView, venuesTop, articlesView, topDestinations,
       goArticles: () => this.nav('articles', 'fwd'),
