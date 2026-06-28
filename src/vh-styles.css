@@ -1,6 +1,9 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;}
 html,body{margin:0;padding:0;}
 .vh-app img{display:block;vertical-align:bottom;}
+/* ẩn icon hiện/xoá mật khẩu mặc định của trình duyệt (Edge ::-ms-reveal, Safari/Chrome auto-fill) → tránh trùng với nút mắt tự làm */
+.vh-app input::-ms-reveal,.vh-app input::-ms-clear{display:none;}
+.vh-app input::-webkit-credentials-auto-fill-button,.vh-app input::-webkit-strong-password-auto-fill-button{visibility:hidden;display:none !important;pointer-events:none;height:0;width:0;margin:0;}
 .vh-app *{font-family:'Be Vietnam Pro',sans-serif;}
 .vh-serif,.vh-serif *{font-family:'Literata',serif;}
 .vh-scroll::-webkit-scrollbar{width:0;height:0;display:none;}
