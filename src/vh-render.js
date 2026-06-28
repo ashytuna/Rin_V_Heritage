@@ -309,6 +309,12 @@ window.VH_RENDER = {
 
     const rg = st.rg;
     const rerr = rg.err || {};
+    // năm sinh hợp lệ (4 chữ số, tuổi 0–130) → bật nút "Tiếp tục"
+    const rgYearStr = (rg.birth || '').trim();
+    const rgYearNum = parseInt(rgYearStr, 10);
+    const rgYearOk = /^\d{4}$/.test(rgYearStr) && rgYearNum >= 1900 && (2026 - rgYearNum) >= 0 && (2026 - rgYearNum) <= 130;
+    // nút "Tiếp tục" bật khi: có nhập năm thì năm phải hợp lệ; nếu năm trống thì phải đã chọn nhóm tuổi
+    const rgAgeStepOk = rgYearStr ? rgYearOk : !!rg.ageBracket;
     const strength = this.passStrength(rg.pass);
     const strengthColors = ['var(--cta)', 'var(--cta)', '#F2C21A', 'var(--success)'];
     const strengthLabels = ['Yếu — cần ít nhất 8 ký tự, 1 chữ hoa, 1 số', 'Trung bình', 'Khá', 'Mạnh'];
@@ -452,10 +458,19 @@ window.VH_RENDER = {
       rgBirthErr: rerr.birth,
       // năm sinh: nhóm tuổi + dropdown chọn năm
       rgBirthVal: rg.birth || '',
+      // nút "Tiếp tục" bước tuổi: disabled tới khi chọn nhóm tuổi hoặc nhập năm hợp lệ
+      rgYearDisabled: !rgAgeStepOk,
+      rgYearBtnBg: rgAgeStepOk ? 'var(--cta)' : 'var(--bg-tertiary)',
+      rgYearBtnColor: rgAgeStepOk ? '#fff' : 'var(--text-tertiary)',
+      rgYearBtnCursor: rgAgeStepOk ? 'pointer' : 'not-allowed',
+      rgYearContinue: () => { if (rgAgeStepOk) this.rgGoNext(); },
+      rgMinorBorder: rg.ageBracket === 'minor' ? 'var(--cta)' : 'var(--border)',
+      rgMinorBg: rg.ageBracket === 'minor' ? 'rgba(237,137,39,.10)' : 'var(--bg-card)',
       rgYoungBorder: rg.ageBracket === 'young' ? 'var(--cta)' : 'var(--border)',
       rgYoungBg: rg.ageBracket === 'young' ? 'rgba(237,137,39,.10)' : 'var(--bg-card)',
       rgMatureBorder: rg.ageBracket === 'mature' ? 'var(--cta)' : 'var(--border)',
       rgMatureBg: rg.ageBracket === 'mature' ? 'rgba(237,137,39,.10)' : 'var(--bg-card)',
+      pickMinor: () => this.rgPickBracket('minor'),
       pickYoung: () => this.rgPickBracket('young'),
       pickMature: () => this.rgPickBracket('mature'),
       onRgBirthYear: (e) => this.rgSetBirth(e.target.value),
@@ -468,7 +483,7 @@ window.VH_RENDER = {
       openYearSheet: () => this.setState({sheet: 'yearpick'}),
       sheetYearPick: st.sheet === 'yearpick',
       closeYearPick: () => this.setState({sheet: null}),
-      yearSheetTitle: rg.ageBracket === 'mature' ? 'Chọn năm sinh (45+)' : rg.ageBracket === 'young' ? 'Chọn năm sinh (18+)' : 'Chọn năm sinh',
+      yearSheetTitle: rg.ageBracket === 'mature' ? 'Chọn năm sinh (45+)' : rg.ageBracket === 'young' ? 'Chọn năm sinh (18+)' : rg.ageBracket === 'minor' ? 'Chọn năm sinh (Dưới 18)' : 'Chọn năm sinh',
       yearRows: (() => {
         const {min, max} = this.rgYearRange(rg.ageBracket);
         const rows = [];

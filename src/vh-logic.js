@@ -442,22 +442,22 @@ window.VH_LOGIC = {
   // năm sinh: khoảng năm theo nhóm tuổi (18+ = 18..44 tuổi, 45+ = 45 tuổi trở lên)
   rgYearRange(bracket) {
     const cur = 2026;
+    if (bracket === 'minor') return {min: cur - 17, max: cur};       // 2009..2026 (dưới 18)
     if (bracket === 'young') return {min: cur - 44, max: cur - 18};   // 1982..2008
     if (bracket === 'mature') return {min: 1932, max: cur - 45};      // 1932..1981
-    return {min: 1932, max: cur - 18};                                // đầy đủ 1932..2008
+    return {min: 1932, max: cur};                                     // đầy đủ 1932..2026
   },
-  // chọn nhóm tuổi: young → bỏ qua trợ năng (3 bước); mature (45+) → chèn bước trợ năng (4 bước)
+  // chọn nhóm tuổi: CHỈ đổi trạng thái select (bấm lại để bỏ chọn), KHÔNG tự chuyển bước — phải bấm "Tiếp tục"
   rgPickBracket(b) {
     const rg = this.state.rg;
+    if (rg.ageBracket === b) {
+      this.setState({rg: Object.assign({}, rg, {ageBracket: null, err: {}})});
+      return;
+    }
     const {min, max} = this.rgYearRange(b);
     const n = parseInt(rg.birth, 10);
     const keep = (n >= min && n <= max) ? rg.birth : '';
-    const a11yOff = Object.assign({}, this.state.a11y, {visualLow: false});
-    if (b === 'mature') {
-      this.setState({a11y: a11yOff, rg: Object.assign({}, rg, {ageBracket: b, birth: keep, needA11y: true, step: 'a11y', _dir: 'fwd', err: {}})});
-      return;
-    }
-    this.setState({a11y: a11yOff, rg: Object.assign({}, rg, {ageBracket: b, birth: keep, needA11y: false, step: 'name', _dir: 'fwd', err: {}})});
+    this.setState({rg: Object.assign({}, rg, {ageBracket: b, birth: keep, err: {}})});
   },
   // gạt toggle ở bước trợ năng → đổi trực tiếp (xem trước ngay trên màn)
   toggleA11yAsk() {
@@ -469,7 +469,10 @@ window.VH_LOGIC = {
     const s = String(val);
     const n = parseInt(s, 10);
     let bracket = rg.ageBracket;
-    if (n >= 1900 && s.length === 4) bracket = (2026 - n) >= 45 ? 'mature' : 'young';
+    if (n >= 1900 && s.length === 4) {
+      const a = 2026 - n;
+      bracket = a >= 45 ? 'mature' : (a < 18 ? 'minor' : 'young');
+    }
     const err = Object.assign({}, rg.err);
     delete err.birth;
     this.setState({rg: Object.assign({}, rg, {birth: s, ageBracket: bracket, err})});
@@ -512,7 +515,7 @@ window.VH_LOGIC = {
     // năm sinh tuỳ chọn: nếu trống thì suy tuổi từ nhóm đã chọn (mặc định là người lớn)
     const birthStr = (rg.birth || '').trim();
     const birth = parseInt(birthStr, 10);
-    const age = (birthStr && birth >= 1900) ? (2026 - birth) : (rg.ageBracket === 'mature' ? 45 : 18);
+    const age = (birthStr && birth >= 1900) ? (2026 - birth) : (rg.ageBracket === 'mature' ? 45 : rg.ageBracket === 'minor' ? 16 : 18);
     if (age < 13) {
       this.nav('parental', 'fwd');
       return;
