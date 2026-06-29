@@ -84,7 +84,7 @@ window.VH_RENDER = {
       isForgot: st.screen === 'forgot',
       isParental: st.screen === 'parental',
       isLangScreen: st.screen === 'language',
-      isPermissions: st.screen === 'permissions',
+      isSpecial: st.screen === 'special',
       isLocationAsk: st.screen === 'locationask',
       locAskChecked: !!st._locAskChecked,
       locAskBoxBorder: st._locAskChecked ? 'var(--cta)' : 'var(--border-2)',
@@ -324,34 +324,14 @@ window.VH_RENDER = {
     const strengthBars = [0, 1, 2].map(i => i < strength ? strengthColors[strength] : 'var(--bar-track)');
     const locked = Date.now() < st.lockedUntil;
 
-    const perms = [
-      {
-        key: 'notification',
-        icon: 'ti-bell',
-        title: 'Thông báo',
-        req: '(bắt buộc)',
-        sub: 'Nhận tin di tích mới & nhắc nhở hành trình'
-      },
-      {key: 'camera', icon: 'ti-camera', title: 'Camera', req: '(tuỳ chọn)', sub: 'Quét và xem hiện vật bằng AR'},
-      {key: 'location', icon: 'ti-map-pin', title: 'Vị trí', req: '(tuỳ chọn)', sub: 'Gợi ý di tích gần bạn'},
-    ].map(p => {
-      const g = st.permissions[p.key] === 1;
-      return {
-        ...p,
-        cardBorder: g ? 'var(--success)' : 'var(--border)',
-        btnLabel: g ? 'Đã cấp' : 'Cấp quyền',
-        btnBg: g ? 'var(--success)' : 'var(--cta)',
-        btnColor: '#fff',
-        btnIcon: 'ti-check',
-        btnIconDisp: g ? 'inline' : 'none',
-        grant: () => {
-          const np = Object.assign({}, st.permissions, {[p.key]: 1});
-          this.setState({permissions: np});
-          this.showToast('Đã cấp quyền ' + p.title);
-        }
-      };
+    // màn "Hỗ trợ đặc biệt" (tuỳ chọn): chỉ 2 trợ năng đặc thù
+    const specialItems = [
+      {icon: 'ti-ear', iconBg: 'rgba(95,138,236,.14)', iconColor: 'var(--info)', title: 'Khiếm thị / Screen reader', sub: 'Mô tả bằng giọng nói, điều hướng giọng, focus ring rõ ràng', on: st.a11y.visualBlind, toggle: () => this.toggleA11y('visualBlind')},
+      {icon: 'ti-wheelchair', iconBg: 'rgba(0,128,0,.12)', iconColor: 'var(--success)', title: 'Vận động khó khăn / xe lăn', sub: 'Lộ trình & marker thân thiện xe lăn, lọc nơi có lối tiếp cận', on: st.a11y.motor, toggle: () => this.toggleA11y('motor')},
+    ].map(it => {
+      const s = this.sw(it.on);
+      return Object.assign({}, it, {track: s.track, knob: s.knob, rowBorder: it.on ? 'var(--cta)' : 'var(--border)'});
     });
-    const permOk = st.permissions.notification === 1;
 
     return {
       walkStep: st.walkStep,
@@ -424,7 +404,6 @@ window.VH_RENDER = {
       },
       // register
       rgStepAge: (rg.step || 'age') === 'age',
-      rgStepA11y: rg.step === 'a11y',
       rgStepName: rg.step === 'name',
       rgStepAccount: rg.step === 'account',
       rgStepOtp: rg.step === 'otp',
@@ -495,6 +474,8 @@ window.VH_RENDER = {
           otpDisabled: !otpOk, otpBtnBg: o.bg, otpBtnColor: o.color, otpBtnCursor: o.cursor,
         };
       })()),
+      // khối trợ năng inline: chỉ hiện khi chọn nhóm 45+ (mature)
+      rgShow45A11y: rg.ageBracket === 'mature',
       rgMinorBorder: rg.ageBracket === 'minor' ? 'var(--cta)' : 'var(--border)',
       rgMinorBg: rg.ageBracket === 'minor' ? 'rgba(237,137,39,.10)' : 'var(--bg-card)',
       rgYoungBorder: rg.ageBracket === 'young' ? 'var(--cta)' : 'var(--border)',
@@ -692,16 +673,8 @@ window.VH_RENDER = {
       nearbyPackInfo: '32 hiện vật · 0,4 GB',
       downloadNearby: () => this.downloadNearby(),
       skipNearby: () => this.goTab('home'),
-      perms,
-      permDisabled: !permOk,
-      permOpacity: permOk ? '1' : '0.55',
-      finishPerms: () => {
-        if (!permOk) {
-          this.showToast('Cần cấp quyền Camera và Âm thanh', 'error');
-          return;
-        }
-        this.nav('authchoice', 'fwd');
-      },
+      specialItems,
+      finishSpecial: () => this.finishSpecial(),
     };
   },
 
@@ -1468,6 +1441,39 @@ window.VH_RENDER = {
     const hq = (st._helpQuery || '').toLowerCase().trim();
     const helpFiltered = hq ? faqs.filter(f => f.q.toLowerCase().includes(hq) || f.a.toLowerCase().includes(hq)) : faqs;
     const csInvalid = !st._csName.trim() || !this.validEmail(st._csEmail) || !st._csIssue || !st._csDesc.trim();
+    // Màn Quyền truy cập (đồng bộ trạng thái quyền thật của thiết bị)
+    const dperm = st.devicePerm || {};
+    const permCardDefs = [
+      {kind: 'notification', icon: 'ti-bell', iconBg: 'rgba(237,137,39,.14)', iconColor: 'var(--cta)',
+        title: 'Nhận thông báo ứng dụng', desc: 'Nhắc nhở hành trình, sự kiện và tin tức di sản mới.'},
+      {kind: 'location', icon: 'ti-map-pin', iconBg: 'rgba(95,138,236,.14)', iconColor: 'var(--info)',
+        title: 'Định vị di sản xung quanh', desc: 'Dùng vị trí để gợi ý địa điểm và hiện vật ở gần bạn.'},
+      {kind: 'camera', icon: 'ti-camera', iconBg: 'rgba(0,128,0,.12)', iconColor: 'var(--success)',
+        title: 'Quét hiện vật AR', desc: 'Mở camera để quét và nhận diện hiện vật bằng AR.'},
+    ];
+    const appPermItems = permCardDefs.map((d) => {
+      const state = dperm[d.kind] || 'prompt';
+      const denied = state === 'denied';
+      const unsupported = state === 'unsupported';
+      const on = !denied && !unsupported && st.permissions[d.kind] === 1;
+      const blocked = denied || unsupported;
+      let status, statusColor;
+      if (unsupported) { status = 'Thiết bị không hỗ trợ'; statusColor = 'var(--text-tertiary)'; }
+      else if (denied) { status = 'Đã bị tắt trong cài đặt hệ thống'; statusColor = 'var(--error)'; }
+      else if (state === 'prompt') { status = 'Chạm để cấp quyền'; statusColor = 'var(--text-tertiary)'; }
+      else { status = on ? 'Đang bật' : 'Đang tắt nhận trong ứng dụng'; statusColor = on ? 'var(--success)' : 'var(--text-tertiary)'; }
+      const sw = this.sw(on);
+      return {
+        icon: d.icon, iconBg: d.iconBg, iconColor: d.iconColor, title: d.title, desc: d.desc,
+        status, statusColor,
+        track: blocked ? 'var(--bar-track)' : sw.track,
+        knob: sw.knob,
+        knobBg: blocked ? 'var(--text-tertiary)' : '#fff',
+        cardOpacity: blocked ? '.7' : '1',
+        tap: () => this.handlePermissionToggle(d.kind),
+      };
+    });
+
     const settingsItems = [
       {
         icon: 'ti-language',
@@ -1482,6 +1488,7 @@ window.VH_RENDER = {
         tap: () => this.setState({theme: st.theme === 'light' ? 'dark' : 'light'})
       },
       {icon: 'ti-accessible', label: 'Trợ năng', value: '', tap: () => this.nav('accessibility', 'fwd')},
+      {icon: 'ti-lock-cog', label: 'Quyền truy cập', value: '', tap: () => this.openAppPermissions()},
       {icon: 'ti-bell', label: 'Thông báo', value: '', tap: () => this.nav('notifications', 'fwd')},
       {icon: 'ti-database', label: 'Quản lý bộ nhớ', value: '7,2 GB', tap: () => this.nav('downloads', 'fwd')},
       {icon: 'ti-shield-lock', label: 'Tài khoản & Bảo mật', value: '', tap: () => this.nav('accountsecurity', 'fwd')},
@@ -1492,6 +1499,9 @@ window.VH_RENDER = {
       // SETTINGS
       isSettings: st.screen === 'settings',
       settingsItems,
+      // APP PERMISSIONS
+      isAppPermissions: st.screen === 'apppermissions',
+      appPermItems,
       offlineSwitchOn: st.isOffline,
       offTrack: offSw.track,
       offKnob: offSw.knob,

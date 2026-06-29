@@ -26,6 +26,7 @@ html,body{margin:0;padding:0;}
 @keyframes vhSheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 @keyframes vhFade{from{opacity:0}to{opacity:1}}
 @keyframes vhUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes vhSlideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes vhModalIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
 @keyframes vhShake{10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(3px)}30%,50%,70%{transform:translateX(-7px)}40%,60%{transform:translateX(7px)}}
 @keyframes vhRipple{to{transform:scale(4);opacity:0}}

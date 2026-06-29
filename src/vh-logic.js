@@ -26,6 +26,11 @@ window.VH_LOGIC = {
     try {
       const sl = localStorage.getItem('vh_lang');
       if (sl && this.langDefs.some(l => l.code === sl)) this.setState({language: sl});
+      const sa = localStorage.getItem('vh_a11y');
+      if (sa) {
+        const a = JSON.parse(sa);
+        if (a && typeof a === 'object') this.setState({a11y: Object.assign({}, this.state.a11y, a)});
+      }
     } catch (e) {}
     // onboarding: splash → chọn ngôn ngữ (màn cấu hình đầu tiên)
     this._splashT = setTimeout(() => this.nav('language', 'fwd'), 1600);
@@ -100,6 +105,20 @@ window.VH_LOGIC = {
     document.addEventListener('mouseup', this._rgUp, true);
   },
   componentDidUpdate() {
+    // pre-permission Thông báo: lần đầu vào Home sau khi tạo tài khoản (chỉ 1 lần)
+    if (this.state.screen === 'home' && this._notifPromptPending && !this._notifPromptHandled) {
+      this._notifPromptHandled = true;
+      this._notifPromptPending = false;
+      let asked = false;
+      try { asked = localStorage.getItem('vh_notif_prompted') === '1'; } catch (e) {}
+      const granted = this.state.permissions && this.state.permissions.notification === 1;
+      if (!asked && !granted) {
+        try { localStorage.setItem('vh_notif_prompted', '1'); } catch (e) {}
+        // chờ Home render xong rồi mới hiện dialog mồi, tránh đột ngột
+        clearTimeout(this._notifPromptT);
+        this._notifPromptT = setTimeout(() => this.showNotifPrompt(), 650);
+      }
+    }
     if (this.state.screen === 'audioplayer' && this._apLyricsEl) {
       const act = this._apLyricsEl.querySelector('[data-lyric-active="true"]');
       if (act) {
@@ -111,6 +130,7 @@ window.VH_LOGIC = {
   },
   componentWillUnmount() {
     clearTimeout(this._splashT);
+    clearTimeout(this._notifPromptT);
     clearTimeout(this._scanT);
     clearTimeout(this._lpTimer);
     clearInterval(this._audioT);
@@ -259,7 +279,7 @@ window.VH_LOGIC = {
   // ---- walkthrough ----
   nextWalk() {
     const s = this.state.walkStep;
-    if (s < 3) this.setState({walkStep: s + 1}); else this.nav('permissions', 'fwd');
+    if (s < 3) this.setState({walkStep: s + 1}); else this.nav('authchoice', 'fwd');
   },
   prevWalk() {
     const s = this.state.walkStep;
@@ -285,7 +305,7 @@ window.VH_LOGIC = {
     if (dx < 0) this.nextWalk(); else this.prevWalk();
   },
   skipWalk() {
-    this.nav('permissions', 'fwd');
+    this.nav('authchoice', 'fwd');
   },
 
   // ---- auth helpers ----
@@ -360,6 +380,156 @@ window.VH_LOGIC = {
     if (this.state.permissions && this.state.permissions.location === 1) this.nav('nearby', 'fwd');
     else this.goTab('home');
   },
+  // ---- màn "Hỗ trợ đặc biệt" (tuỳ chọn) ----
+  finishSpecial() {
+    // lưu cấu hình trợ năng rồi vào app
+    try { localStorage.setItem('vh_a11y', JSON.stringify(this.state.a11y)); } catch (e) {}
+    this.enterApp();
+  },
+  // ---- pre-permission Thông báo: chỉ hiện 1 lần đầu khi user mới vào Home ----
+  showNotifPrompt() {
+    this.setState({
+      modal: 'generic',
+      modalData: {
+        icon: 'ti-bell-ringing', iconBg: 'rgba(237,137,39,.14)', iconColor: 'var(--cta)',
+        title: 'Bật thông báo hành trình',
+        body: 'Cho phép V-Heritage gửi thông báo để bạn không bỏ lỡ các sự kiện văn hóa di sản và bài thuyết minh đặc sắc xung quanh nhé.',
+        primary: 'Nhận thông báo', secondary: 'Để sau',
+        onPrimary: () => this.requestNotif(),
+      },
+    });
+  },
+  requestNotif() {
+    if (typeof Notification !== 'undefined' && Notification.requestPermission) {
+      try {
+        Promise.resolve(Notification.requestPermission()).then((res) => {
+          if (res === 'granted') {
+            this.setState({permissions: Object.assign({}, this.state.permissions, {notification: 1})});
+            this.showToast('Đã bật thông báo hành trình ✦');
+          } else {
+            this.showToast('Bạn có thể bật lại trong Cài đặt');
+          }
+        });
+      } catch (e) {}
+    } else {
+      this.showToast('Trình duyệt không hỗ trợ thông báo', 'error');
+    }
+  },
+  // ============== MÀN QUYỀN TRUY CẬP (đồng bộ quyền hệ thống) ==============
+  _permLabel(kind) {
+    return {notification: 'Thông báo', camera: 'Camera', location: 'Vị trí'}[kind] || kind;
+  },
+  _setPermFlag(key, val) {
+    this.setState({permissions: Object.assign({}, this.state.permissions, {[key]: val})});
+  },
+  _setDevicePerm(key, val) {
+    this.setState({devicePerm: Object.assign({}, this.state.devicePerm, {[key]: val})});
+  },
+  // trạng thái quyền THẬT ở thiết bị → Promise<'granted'|'denied'|'prompt'|'unsupported'>
+  _devicePermState(kind) {
+    if (kind === 'notification') {
+      if (typeof Notification === 'undefined') return Promise.resolve('unsupported');
+      return Promise.resolve(Notification.permission === 'default' ? 'prompt' : Notification.permission);
+    }
+    const name = kind === 'camera' ? 'camera' : 'geolocation';
+    if (navigator.permissions && navigator.permissions.query) {
+      try {
+        return Promise.resolve(navigator.permissions.query({name: name})).then((r) => r.state).catch(() => 'prompt');
+      } catch (e) {
+        return Promise.resolve('prompt');
+      }
+    }
+    return Promise.resolve('prompt');
+  },
+  // gọi pop-up xin quyền GỐC của thiết bị → Promise<boolean granted>
+  _requestDevicePerm(kind) {
+    if (kind === 'notification') {
+      if (typeof Notification === 'undefined') return Promise.resolve(false);
+      return Promise.resolve(Notification.requestPermission()).then((r) => r === 'granted');
+    }
+    if (kind === 'camera') {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        return navigator.mediaDevices.getUserMedia({video: true}).then((s) => {
+          s.getTracks().forEach((t) => t.stop());
+          return true;
+        }).catch(() => false);
+      }
+      return Promise.resolve(false);
+    }
+    if (kind === 'location') {
+      if (navigator.geolocation) {
+        return new Promise((res) => navigator.geolocation.getCurrentPosition(() => res(true), () => res(false), {timeout: 8000}));
+      }
+      return Promise.resolve(false);
+    }
+    return Promise.resolve(false);
+  },
+  // vào màn → gọi API kiểm tra trạng thái quyền thật của thiết bị (3 quyền)
+  refreshDevicePerms() {
+    ['notification', 'location', 'camera'].forEach((kind) => {
+      this._devicePermState(kind).then((state) => {
+        const patch = {[kind]: state};
+        const next = Object.assign({}, this.state.devicePerm, patch);
+        // quyền bị thu hồi ngoài hệ thống → đồng bộ tắt cờ nhận nội bộ
+        const perms = Object.assign({}, this.state.permissions);
+        if (state !== 'granted') perms[kind] = 0;
+        this.setState({devicePerm: next, permissions: perms});
+      });
+    });
+  },
+  openAppPermissions() {
+    this.refreshDevicePerms();
+    this.nav('apppermissions', 'fwd');
+  },
+  // bộ xử lý đồng bộ chính cho toggle 3 quyền
+  handlePermissionToggle(kind) {
+    const dev = (this.state.devicePerm || {})[kind] || 'prompt';
+    if (dev === 'unsupported') {
+      this.showToast('Thiết bị không hỗ trợ ' + this._permLabel(kind), 'error');
+      return;
+    }
+    // BỊ KHÓA ở hệ thống ('denied') → dialog mời mở Cài đặt máy
+    if (dev === 'denied') {
+      this.showSystemSettingsDialog(kind);
+      return;
+    }
+    // ĐÃ CẤP ('granted') → tự do bật/tắt nhận dữ liệu nội bộ
+    if (dev === 'granted') {
+      const on = this.state.permissions[kind] === 1;
+      this._setPermFlag(kind, on ? 0 : 1);
+      this.showToast(on ? 'Đã tắt nhận ' + this._permLabel(kind) : 'Đã bật ' + this._permLabel(kind) + ' ✦');
+      return;
+    }
+    // CHƯA HỎI ('prompt') → gọi pop-up xin quyền gốc; từ chối thì hướng dẫn vào Cài đặt
+    this._requestDevicePerm(kind).then((ok) => {
+      this._setDevicePerm(kind, ok ? 'granted' : 'denied');
+      if (ok) {
+        this._setPermFlag(kind, 1);
+        this.showToast('Đã bật ' + this._permLabel(kind) + ' ✦');
+      } else {
+        this.showSystemSettingsDialog(kind);
+      }
+    });
+  },
+  showSystemSettingsDialog(kind) {
+    const label = this._permLabel(kind);
+    this.setState({
+      modal: 'generic',
+      modalData: {
+        icon: 'ti-settings-exclamation', iconBg: 'rgba(221,14,14,.12)', iconColor: 'var(--error)',
+        title: 'Quyền đang bị tắt',
+        body: 'Quyền ' + label + ' đã bị tắt trong cài đặt hệ thống. Bạn có muốn mở Cài đặt máy để bật lại không?',
+        primary: 'Mở Cài đặt máy', secondary: 'Để sau',
+        onPrimary: () => this.openSystemSettings(kind),
+      },
+    });
+  },
+  openSystemSettings(kind) {
+    // RN/Flutter: Linking.openSettings() → mở thẳng trang quản lý quyền của App.
+    // Web/PWA: trình duyệt không cho mở cài đặt OS bằng JS → hướng dẫn người dùng thao tác tay.
+    if (typeof Linking !== 'undefined' && Linking.openSettings) { Linking.openSettings(); return; }
+    this.showToast('Mở Cài đặt thiết bị → Ứng dụng → V-Heritage → bật lại quyền ' + this._permLabel(kind));
+  },
   downloadNearby() {
     const packs = this.state.packs || [];
     if (!packs.some(p => p.id === 'pnear')) {
@@ -417,15 +587,10 @@ window.VH_LOGIC = {
       this.setState({rg: Object.assign({}, rg, {err})});
       return;
     }
-    // rời bước tuổi: tuổi ≥ 45 → chèn bước trợ năng; luôn reset trợ năng về tắt khi rời bước tuổi
+    // rời bước tuổi → sang nhập tên; trợ năng nay thiết lập ở màn riêng sau đăng ký
     if (step === 'age') {
-      const birthStr = (rg.birth || '').trim();
-      const birth = parseInt(birthStr, 10);
-      const age = (birthStr && birth >= 1900) ? (2026 - birth) : (rg.ageBracket === 'mature' ? 45 : null);
-      const need = age != null && age >= 45;
       this.setState({
-        a11y: Object.assign({}, this.state.a11y, {visualLow: false}),
-        rg: Object.assign({}, rg, {needA11y: need, step: need ? 'a11y' : 'name', err: {}, _dir: 'fwd'}),
+        rg: Object.assign({}, rg, {needA11y: false, step: 'name', err: {}, _dir: 'fwd'}),
       });
       return;
     }
@@ -459,13 +624,21 @@ window.VH_LOGIC = {
   rgPickBracket(b) {
     const rg = this.state.rg;
     if (rg.ageBracket === b) {
-      this.setState({rg: Object.assign({}, rg, {ageBracket: null, err: {}})});
+      // bỏ chọn → ẩn khối trợ năng, tắt visualLow
+      this.setState({
+        rg: Object.assign({}, rg, {ageBracket: null, err: {}}),
+        a11y: Object.assign({}, this.state.a11y, {visualLow: false}),
+      });
       return;
     }
     const {min, max} = this.rgYearRange(b);
     const n = parseInt(rg.birth, 10);
     const keep = (n >= min && n <= max) ? rg.birth : '';
-    this.setState({rg: Object.assign({}, rg, {ageBracket: b, birth: keep, err: {}})});
+    // chọn nhóm 45+ → tự bật sẵn trợ năng "Người cao tuổi / mắt yếu"; nhóm khác → tắt
+    this.setState({
+      rg: Object.assign({}, rg, {ageBracket: b, birth: keep, err: {}}),
+      a11y: Object.assign({}, this.state.a11y, {visualLow: b === 'mature'}),
+    });
   },
   // gạt toggle ở bước trợ năng → đổi trực tiếp (xem trước ngay trên màn)
   toggleA11yAsk() {
@@ -477,13 +650,18 @@ window.VH_LOGIC = {
     const s = String(val);
     const n = parseInt(s, 10);
     let bracket = rg.ageBracket;
+    let recomputed = false;
     if (n >= 1900 && s.length === 4) {
       const a = 2026 - n;
       bracket = a >= 45 ? 'mature' : (a < 18 ? 'minor' : 'young');
+      recomputed = true;
     }
     const err = Object.assign({}, rg.err);
     delete err.birth;
-    this.setState({rg: Object.assign({}, rg, {birth: s, ageBracket: bracket, err})});
+    const patch = {rg: Object.assign({}, rg, {birth: s, ageBracket: bracket, err})};
+    // năm sinh đủ 4 số → 45+ tự bật trợ năng, ngược lại tắt
+    if (recomputed) patch.a11y = Object.assign({}, this.state.a11y, {visualLow: bracket === 'mature'});
+    this.setState(patch);
   },
   rgPickYear(y) {
     this.rgSetBirth(y);
@@ -546,7 +724,10 @@ window.VH_LOGIC = {
     const fullName = (rg.last.trim() + ' ' + rg.first.trim()).trim();
     this.setState({user: {name: fullName, email: rg.email, isLoggedIn: true, age}});
     this.showToast('Chào mừng đến với V-Heritage ✦', 'success');
-    this.enterApp();
+    // user mới → cần nhắc bật thông báo lần đầu vào Home (xử lý ở componentDidUpdate)
+    this._notifPromptPending = true;
+    // màn đệm tuỳ chọn: Hỗ trợ đặc biệt (khiếm thị / xe lăn)
+    this.nav('special', 'fwd');
   },
   socialLogin(name, icon, color) {
     this.setState({modal: 'social', modalData: {name, icon, color}});

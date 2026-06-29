@@ -391,6 +391,27 @@
                         <div style="font-size:13px;font-weight:700;color:var(--cta);margin-top:3px;">45+</div>
                       </button>
                     </div>
+                    <!-- khối trợ năng: CHỈ hiện khi chọn nhóm 45+ (tự bật sẵn, slide-down) -->
+                    <sc-if value="{{ rgShow45A11y }}" hint-placeholder-val="{{ false }}">
+                      <div
+                          style="margin-top:16px;background:var(--bg-card);border:1.5px solid {{ a11yAskRowBorder }};border-radius:14px;padding:16px;display:flex;align-items:flex-start;gap:12px;animation:vhSlideDown .3s ease;transition:border-color .2s;">
+                        <div
+                            style="width:44px;height:44px;border-radius:11px;background:rgba(237,137,39,.14);display:flex;align-items:center;justify-content:center;flex:none;">
+                          <i class="ti ti-eyeglass-2" style="font-size:24px;color:var(--cta);"></i>
+                        </div>
+                        <div style="flex:1;">
+                          <div style="font-size:15px;font-weight:600;">Người cao tuổi / mắt yếu</div>
+                          <div style="font-size:12px;color:var(--text-tertiary);margin-top:3px;line-height:1.4;">
+                            Chữ lớn hơn, nút bấm rộng, độ tương phản cao để bạn dùng thoải mái hơn.
+                          </div>
+                        </div>
+                        <button data-ripple="1" onClick="{{ toggleLow }}"
+                                style="position:relative;overflow:hidden;width:44px;height:25px;border-radius:99px;border:none;padding:2px;cursor:pointer;background:{{ acLowTrack }};flex:none;transition:background .2s;">
+                          <div
+                              style="width:21px;height:21px;border-radius:99px;background:#fff;transform:translateX({{ acLowKnob }});transition:.2s;"></div>
+                        </button>
+                      </div>
+                    </sc-if>
                     <!-- đường thay thế: nhập năm sinh chính xác (tuỳ chọn) -->
                     <div style="margin-top:22px;">
                       <label style="font-size:14px;font-weight:600;color:var(--text-secondary);">Hoặc bạn có thể nhập
@@ -424,35 +445,6 @@
                         Đăng nhập
                       </button>
                     </div>
-                  </div>
-                </sc-if>
-
-                <!-- STEP: trợ năng (chỉ khi 45+) — xem trước trực tiếp, toggle màu cam -->
-                <sc-if value="{{ rgStepA11y }}" hint-placeholder-val="{{ false }}">
-                  <div class="vh-scroll" key="{{ rgStepKey }}"
-                       style="flex:1;overflow-y:auto;padding:18px 28px 28px;animation:{{ rgPanelAnim }} .3s ease;">
-                    <div class="vh-serif" style="font-size:28px;font-weight:600;">Chế độ trợ năng</div>
-                    <div style="font-size:14px;color:var(--text-secondary);margin-top:6px;line-height:1.6;">
-                      Hiển thị chữ lớn hơn và vùng nhấn rộng hơn, giúp bạn dùng ứng dụng thoải mái hơn. Gạt thử để xem
-                      trước ngay trên màn hình này.
-                    </div>
-                    <div
-                        style="display:flex;align-items:center;gap:14px;margin-top:24px;background:var(--bg-card);border:1.5px solid {{ a11yAskRowBorder }};border-radius:14px;padding:16px 18px;transition:border-color .2s;">
-                      <i class="ti ti-eye" style="font-size:24px;color:var(--cta);flex:none;"></i>
-                      <div style="flex:1;">
-                        <div style="font-size:15px;font-weight:600;">Bật chế độ trợ năng</div>
-                        <div style="font-size:13px;color:var(--text-tertiary);">{{ a11yAskStateLabel }}</div>
-                      </div>
-                      <button data-ripple="1" onClick="{{ toggleA11yAsk }}"
-                              style="position:relative;overflow:hidden;width:52px;height:30px;border-radius:99px;border:none;cursor:pointer;background:{{ a11yAskTrack }};transition:background .2s;flex:none;">
-                        <div
-                            style="width:24px;height:24px;border-radius:99px;background:#fff;position:absolute;top:3px;left:{{ a11yAskKnob }};transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.3);"></div>
-                      </button>
-                    </div>
-                    <button data-ripple="1" onClick="{{ rgGoNext }}"
-                            style="position:relative;overflow:hidden;width:100%;border:none;background:var(--cta);color:#fff;font-size:16px;font-weight:600;padding:16px;border-radius:8px;cursor:pointer;margin-top:28px;">
-                      Tiếp tục
-                    </button>
                   </div>
                 </sc-if>
 
@@ -879,41 +871,39 @@
               </div>
             </sc-if>
 
-            <!-- 12 PERMISSIONS -->
-            <sc-if value="{{ isPermissions }}" hint-placeholder-val="{{ false }}">
-              <div data-screen-label="Permissions"
-                   style="position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg-primary);padding:54px 28px 30px;">
-                <div class="vh-serif" style="font-size:26px;font-weight:600;">Vài quyền truy cập</div>
-                <div style="font-size:14px;color:var(--text-secondary);margin-top:6px;margin-bottom:24px;">
-                  Để trải nghiệm AR hoạt động trọn vẹn
-                </div>
-                <sc-for list="{{ perms }}" as="p" hint-placeholder-count="3">
-                  <div
-                      style="display:flex;align-items:center;gap:14px;background:var(--bg-card);border:1px solid {{ p.cardBorder }};border-radius:12px;padding:16px;margin-bottom:12px;">
-                    <div
-                        style="width:44px;height:44px;border-radius:11px;background:var(--bg-tertiary);display:flex;align-items:center;justify-content:center;flex:none;">
-                      <i class="ti {{ p.icon }}" style="font-size:23px;color:var(--primary);"></i>
-                    </div>
-                    <div style="flex:1;min-width:0;">
-                      <div style="font-size:14px;font-weight:600;white-space:nowrap;">{{ p.title }} <span
-                          style="font-size:11px;color:var(--text-tertiary);font-weight:400;">{{ p.req }}</span>
-                      </div>
-                      <div style="font-size:12px;color:var(--text-tertiary);">{{ p.sub }}</div>
-                    </div>
-                    <button data-ripple="1" onClick="{{ p.grant }}"
-                            style="position:relative;overflow:hidden;border:none;border-radius:99px;padding:8px 10px;font-size:12px;font-weight:600;cursor:pointer;background:{{ p.btnBg }};color:{{ p.btnColor }};display:flex;align-items:center;gap:4px;flex-shrink:0;">
-                      <i class="ti {{ p.btnIcon }}"
-                         style="font-size:14px;display:{{ p.btnIconDisp }};"></i>{{ p.btnLabel }}
-                    </button>
+            <!-- 12 HỖ TRỢ ĐẶC BIỆT (tuỳ chọn) -->
+            <sc-if value="{{ isSpecial }}" hint-placeholder-val="{{ false }}">
+              <div data-screen-label="SpecialSupport"
+                   style="position:absolute;inset:0;display:flex;flex-direction:column;box-sizing:border-box;background:var(--bg-primary);padding:52px 24px 24px;">
+                <div style="flex:none;">
+                  <div class="vh-serif" style="font-size:26px;font-weight:600;">Hỗ trợ đặc biệt</div>
+                  <div style="font-size:14px;color:var(--text-secondary);margin-top:6px;line-height:1.5;">
+                    Tuỳ chọn — bật nếu bạn có nhu cầu đặc thù. Có thể đổi lại bất cứ lúc nào trong Cài đặt → Trợ năng.
                   </div>
-                </sc-for>
-                <div style="font-size:12px;color:var(--text-tertiary);line-height:1.5;margin-top:4px;">
-                  Bạn cần cấp ít nhất quyền Camera và Âm thanh để tiếp tục. Quyền Vị trí là tuỳ chọn.
                 </div>
-                <div style="flex:1;"></div>
-                <button data-ripple="1" onClick="{{ finishPerms }}" disabled="{{ permDisabled }}"
-                        style="position:relative;overflow:hidden;width:100%;border:none;background:var(--cta);color:#fff;font-size:16px;font-weight:600;padding:16px;border-radius:8px;cursor:pointer;opacity:{{ permOpacity }};">
-                  Bắt đầu khám phá
+                <div class="vh-scroll" style="flex:1;min-height:0;overflow-y:auto;margin-top:18px;">
+                  <sc-for list="{{ specialItems }}" as="it" hint-placeholder-count="2">
+                    <div
+                        style="display:flex;align-items:center;gap:12px;background:var(--bg-card);border:1px solid {{ it.rowBorder }};border-radius:14px;padding:14px;margin-bottom:10px;transition:border-color .2s;">
+                      <div
+                          style="width:42px;height:42px;border-radius:11px;background:{{ it.iconBg }};display:flex;align-items:center;justify-content:center;flex:none;">
+                        <i class="ti {{ it.icon }}" style="font-size:22px;color:{{ it.iconColor }};"></i>
+                      </div>
+                      <div style="flex:1;min-width:0;">
+                        <div style="font-size:14px;font-weight:600;">{{ it.title }}</div>
+                        <div style="font-size:12px;color:var(--text-tertiary);margin-top:2px;line-height:1.4;">{{ it.sub }}</div>
+                      </div>
+                      <button data-ripple="1" onClick="{{ it.toggle }}"
+                              style="position:relative;overflow:hidden;width:44px;height:25px;border-radius:99px;border:none;padding:2px;cursor:pointer;background:{{ it.track }};flex:none;transition:background .2s;">
+                        <div
+                            style="width:21px;height:21px;border-radius:99px;background:#fff;transform:translateX({{ it.knob }});transition:.2s;"></div>
+                      </button>
+                    </div>
+                  </sc-for>
+                </div>
+                <button data-ripple="1" onClick="{{ finishSpecial }}"
+                        style="flex:none;position:relative;overflow:hidden;width:100%;border:none;background:var(--cta);color:#fff;font-size:16px;font-weight:600;padding:16px;border-radius:12px;cursor:pointer;margin-top:12px;">
+                  Vào ứng dụng
                 </button>
               </div>
             </sc-if>
@@ -3766,6 +3756,48 @@
               </div>
             </sc-if>
 
+            <!-- 46b APP PERMISSIONS (Quyền truy cập) -->
+            <sc-if value="{{ isAppPermissions }}" hint-placeholder-val="{{ false }}">
+              <div data-screen-label="AppPermissions"
+                   style="position:absolute;inset:0;background:var(--bg-primary);display:flex;flex-direction:column;">
+                <div style="padding:48px 18px 8px;flex:none;display:flex;align-items:center;gap:12px;">
+                  <button data-ripple="1" onClick="{{ back }}"
+                          style="position:relative;overflow:hidden;width:42px;height:42px;border-radius:99px;border:none;background:transparent;cursor:pointer;color:var(--text-primary);display:flex;align-items:center;justify-content:center;">
+                    <i class="ti ti-arrow-left" style="font-size:22px;"></i></button>
+                  <div class="vh-serif" style="font-size:20px;font-weight:600;">Quyền truy cập</div>
+                </div>
+                <div class="vh-scroll" style="flex:1;overflow-y:auto;padding:8px 18px 24px;">
+                  <div style="font-size:13px;color:var(--text-secondary);line-height:1.5;margin-bottom:14px;">
+                    Quản lý quyền hệ thống ứng dụng dùng. Quyền bị tắt trong cài đặt máy sẽ hiển thị mờ — chạm để mở cài đặt thiết bị.
+                  </div>
+                  <sc-for list="{{ appPermItems }}" as="p" hint-placeholder-count="3">
+                    <div
+                        style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;opacity:{{ p.cardOpacity }};">
+                      <div style="display:flex;align-items:flex-start;gap:12px;">
+                        <div
+                            style="width:44px;height:44px;border-radius:11px;background:{{ p.iconBg }};display:flex;align-items:center;justify-content:center;flex:none;">
+                          <i class="ti {{ p.icon }}" style="font-size:24px;color:{{ p.iconColor }};"></i></div>
+                        <div style="flex:1;min-width:0;">
+                          <div style="font-size:15px;font-weight:600;">{{ p.title }}</div>
+                          <div style="font-size:12px;color:var(--text-tertiary);margin-top:3px;line-height:1.4;">
+                            {{ p.desc }}
+                          </div>
+                          <div style="font-size:11.5px;font-weight:600;color:{{ p.statusColor }};margin-top:6px;">
+                            {{ p.status }}
+                          </div>
+                        </div>
+                        <button data-ripple="1" onClick="{{ p.tap }}"
+                                style="position:relative;overflow:hidden;width:44px;height:25px;border-radius:99px;background:{{ p.track }};border:none;padding:2px;cursor:pointer;flex:none;">
+                          <div
+                              style="width:21px;height:21px;border-radius:99px;background:{{ p.knobBg }};transform:translateX({{ p.knob }});transition:.2s;"></div>
+                        </button>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+
             <!-- 47 ACCESSIBILITY -->
             <sc-if value="{{ isAccessibility }}" hint-placeholder-val="{{ false }}">
               <div data-screen-label="AccessibilityScreen"
@@ -4960,6 +4992,7 @@ class Component extends DCLogic {
     _refundTier: null, _refundReason: null,
     walkStep: 0,
     permissions: { camera: 0, location: 0, audio: 0, notification: 0 },
+    devicePerm: { camera: 'prompt', location: 'prompt', notification: 'prompt' },
     failedLogin: 0, lockedUntil: 0, lockCountdown: 0,
     // forms
     liEmail: '', liPass: '', liPassShow: false, liErr: { email: null, pass: null },
