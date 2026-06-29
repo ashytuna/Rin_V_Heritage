@@ -1024,12 +1024,6 @@
                         <i class="ti ti-arrow-right" style="font-size:22px;"></i></button>
                     </div>
                   </div>
-                  <!-- vạch phân cách sau Tiếp tục tham quan (chỉ hiện cùng card này) -->
-                  <div style="display:flex;align-items:center;justify-content:center;gap:12px;padding:28px 18px 4px;">
-                    <div style="flex:1;height:1px;background:var(--border);"></div>
-                    <div style="color:var(--cta);font-size:13px;">✦</div>
-                    <div style="flex:1;height:1px;background:var(--border);"></div>
-                  </div>
                 </sc-if>
                 <!-- card địa điểm nổi bật -->
                 <div style="padding:14px 18px 0;">
@@ -1146,6 +1140,24 @@
                     </div>
                   </sc-for>
                 </div>
+                <!-- premium upsell -->
+                <sc-if value="{{ profNotPremium }}" hint-placeholder-val="{{ true }}">
+                  <div
+                      style="margin:24px 18px 0;border-radius:16px;background:linear-gradient(135deg,var(--primary),var(--primary-d));padding:18px;position:relative;overflow:hidden;">
+                    <i class="ti ti-crown"
+                       style="position:absolute;right:-10px;top:-10px;font-size:90px;color:rgba(255,255,255,.08);"></i>
+                    <div class="vh-serif" style="font-size:18px;font-weight:600;color:var(--on-primary);">Khám
+                      phá chiều sâu của di sản
+                    </div>
+                    <div style="font-size:13px;color:var(--on-primary);margin-top:6px;line-height:1.5;">
+                      Audio HD, du hành thời gian, bộ lọc AR 3D và hơn thế nữa.
+                    </div>
+                    <button data-ripple="1" onClick="{{ openPaywall }}"
+                            style="position:relative;overflow:hidden;margin-top:14px;border:none;background:var(--cta);color:#fff;font-size:14px;font-weight:600;padding:11px 18px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;">
+                      <i class="ti ti-crown" style="font-size:17px;"></i>Xem các gói nâng cấp
+                    </button>
+                  </div>
+                </sc-if>
                 <!-- nhóm: TP.HCM -->
                 <div class="vh-serif" style="font-size:18px;font-weight:600;padding:24px 18px 12px;">TP.HCM có gì hay
                 </div>
@@ -1201,59 +1213,8 @@
                     </div>
                   </sc-for>
                 </div>
-                <!-- nhóm: thiên nhiên & biển cả -->
-                <div class="vh-serif" style="font-size:18px;font-weight:600;padding:24px 18px 12px;">Kỳ quan thiên nhiên &
-                  biển cả
-                </div>
-                <div class="vh-scroll" style="display:flex;gap:12px;overflow-x:auto;padding:0 18px 4px;">
-                  <sc-for list="{{ grpNature }}" as="p" hint-placeholder-count="4">
-                    <div data-ripple="1" onClick="{{ p.open }}"
-                         style="position:relative;overflow:hidden;flex:none;width:272px;height:248px;border-radius:14px;box-shadow:var(--shadow);cursor:pointer;">
-                      <img src="{{ p.img }}" alt=""
-                           style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
-                      <div
-                          style="position:absolute;inset:0;background:linear-gradient(to top,rgba(26,37,64,.96) 34%,rgba(26,37,64,.45) 64%,transparent 90%);"></div>
-                      <div
-                          style="position:absolute;top:10px;left:10px;background:rgba(255,255,255,.92);color:var(--primary);font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;">
-                        {{ p.type }}
-                      </div>
-                      <div style="position:absolute;left:14px;right:14px;bottom:14px;">
-                        <div class="vh-serif"
-                             style="font-size:17px;font-weight:600;color:#fff;line-height:1.22;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
-                          {{ p.name }}
-                        </div>
-                        <div style="display:flex;align-items:center;gap:4px;margin-top:7px;font-size:11.5px;color:var(--cream);">
-                          <i class="ti ti-map-pin" style="font-size:13px;flex:none;"></i>{{ p.city }}
-                        </div>
-                      </div>
-                    </div>
-                  </sc-for>
-                </div>
-                <!-- premium upsell -->
-                <sc-if value="{{ profNotPremium }}" hint-placeholder-val="{{ true }}">
-                  <div
-                      style="margin:24px 18px 0;border-radius:16px;background:linear-gradient(135deg,var(--primary),var(--primary-d));padding:18px;position:relative;overflow:hidden;">
-                    <i class="ti ti-crown"
-                       style="position:absolute;right:-10px;top:-10px;font-size:90px;color:rgba(255,255,255,.08);"></i>
-                    <div class="vh-serif" style="font-size:18px;font-weight:600;color:var(--on-primary);">Khám
-                      phá chiều sâu của di sản
-                    </div>
-                    <div style="font-size:13px;color:var(--on-primary);margin-top:6px;line-height:1.5;">
-                      Audio HD, du hành thời gian, bộ lọc AR 3D và hơn thế nữa.
-                    </div>
-                    <button data-ripple="1" onClick="{{ openPaywall }}"
-                            style="position:relative;overflow:hidden;margin-top:14px;border:none;background:var(--cta);color:#fff;font-size:14px;font-weight:600;padding:11px 18px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;">
-                      <i class="ti ti-crown" style="font-size:17px;"></i>Xem các gói nâng cấp
-                    </button>
-                  </div>
-                </sc-if>
                 <!-- articles: Badge "BÀI VIẾT", subtitle tag + thời gian đọc -->
-                <div style="display:flex;align-items:center;justify-content:center;gap:12px;padding:28px 18px 4px;">
-                  <div style="flex:1;height:1px;background:var(--border);"></div>
-                  <div style="color:var(--cta);font-size:13px;">✦</div>
-                  <div style="flex:1;height:1px;background:var(--border);"></div>
-                </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 18px 10px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:24px 18px 10px;">
                   <div class="vh-serif" style="font-size:18px;font-weight:600;">Bài viết hay</div>
                   <button data-ripple="1" onClick="{{ goArticles }}"
                           style="position:relative;overflow:hidden;border:none;background:transparent;color:var(--cta);font-size:12px;font-weight:600;cursor:pointer;">
