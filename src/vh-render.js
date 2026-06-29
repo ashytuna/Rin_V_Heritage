@@ -347,7 +347,7 @@ window.VH_RENDER = {
       isLastWalk,
       isFirstWalk: st.walkStep === 0,
       t_walkStart: this.t('walkStart'),
-      showPrevArrow: st.walkStep > 0 && !isLastWalk,
+      showPrevArrow: st.walkStep > 0,
       showNextArrow: !isLastWalk,
       showPrevWalk: st.walkStep > 0,
       nextWalk: () => this.nextWalk(),
@@ -656,9 +656,11 @@ window.VH_RENDER = {
           this.showToast('Nhập email phụ huynh hợp lệ', 'error');
           return;
         }
-        this.showToast('Đã gửi link xin phép đến phụ huynh ✦');
-        this.nav('authchoice', 'back');
+        this.setState({parentalSent: true});
+        this.showToast('Đã gửi link xác nhận đến phụ huynh ✦');
       },
+      isParentalSent: !!st.parentalSent,
+      backToAuthChoice: () => { this.setState({parentalSent: false, parentEmail: ''}); this.nav('authchoice', 'back'); },
       // language + permissions
       langContinue: () => {
         // lưu cấu hình ngôn ngữ vào localStorage rồi sang Tutorial

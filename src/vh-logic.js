@@ -329,10 +329,9 @@ window.VH_LOGIC = {
   },
   passErr(p) {
     if (!p) return null;
-    const bad = [];
-    if (p.length < 8) bad.push('ít nhất 8 ký tự');
-    if (this.passCharTypes(p) < 2) bad.push('ít nhất 2 trong 3: chữ hoa, chữ thường, chữ số');
-    return bad.length ? 'Mật khẩu cần ' + bad.join(' và ') : null;
+    if (p.length < 8) return 'Mật khẩu cần ít nhất 8 ký tự.';
+    if (this.passCharTypes(p) < 2) return 'Mật khẩu cần kết hợp chữ hoa, chữ thường hoặc chữ số.';
+    return null;
   },
 
   // ---- auth actions ----
@@ -718,6 +717,7 @@ window.VH_LOGIC = {
     const birth = parseInt(birthStr, 10);
     const age = (birthStr && birth >= 1900) ? (2026 - birth) : (rg.ageBracket === 'mature' ? 45 : rg.ageBracket === 'minor' ? 16 : 18);
     if (age < 13) {
+      this.setState({parentalSent: false, parentEmail: ''});
       this.nav('parental', 'fwd');
       return;
     }
@@ -726,7 +726,8 @@ window.VH_LOGIC = {
     this.showToast('Chào mừng đến với V-Heritage ✦', 'success');
     // user mới → cần nhắc bật thông báo lần đầu vào Home (xử lý ở componentDidUpdate)
     this._notifPromptPending = true;
-    // màn đệm tuỳ chọn: Hỗ trợ đặc biệt (khiếm thị / xe lăn)
+    // reset visualBlind + motor về mặc định trước màn Hỗ trợ đặc biệt (tránh kế thừa localStorage cũ)
+    this.setState({a11y: Object.assign({}, this.state.a11y, {visualBlind: false, motor: false})});
     this.nav('special', 'fwd');
   },
   socialLogin(name, icon, color) {
