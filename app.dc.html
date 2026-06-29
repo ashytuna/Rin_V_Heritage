@@ -1942,14 +1942,7 @@
                     </div>
                     <div style="width:42px;"></div>
                   </div>
-                  <!-- rotating disc -->
-                  <div style="flex:none;display:flex;justify-content:center;margin-top:18px;">
-                    <div
-                        style="width:210px;height:210px;border-radius:99px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.5);border:6px solid rgba(255,255,255,.08);animation:vhSpin 8s linear infinite;animation-play-state:{{ apSpin }};">
-                      <img src="{{ apImg }}" alt=""
-                           style="width:100%;height:100%;object-fit:cover;"></div>
-                  </div>
-                  <div style="text-align:center;margin-top:18px;flex:none;">
+                  <div style="text-align:center;margin-top:16px;flex:none;">
                     <div class="vh-serif" style="font-size:21px;font-weight:600;color:#fff;">{{
                       apName }}
                     </div>
@@ -1957,15 +1950,15 @@
                       }}
                     </div>
                   </div>
-                  <!-- lyrics auto-scroll -->
+                  <!-- transcript paragraph -->
                   <div ref="{{ apLyricsRef }}" class="vh-scroll"
-                       style="flex:1;overflow-y:auto;margin-top:18px;padding:0 6px;-webkit-mask-image:linear-gradient(to bottom,transparent,#000 14%,#000 86%,transparent);">
-                    <sc-for list="{{ apLyrics }}" as="l" hint-placeholder-count="5">
-                      <div data-lyric-active="{{ l.active }}" onClick="{{ l.seek }}"
-                           style="font-size:{{ l.size }};font-weight:600;line-height:1.5;color:{{ l.color }};padding:7px 0;cursor:pointer;transition:color .3s;text-align:center;">
-                        {{ l.text }}
-                      </div>
-                    </sc-for>
+                       style="flex:1;min-height:0;overflow-y:auto;margin-top:20px;padding:0 4px;-webkit-mask-image:linear-gradient(to bottom,transparent,#000 10%,#000 90%,transparent);">
+                    <div style="font-size:16px;line-height:2.2;text-align:justify;">
+                      <sc-for list="{{ apLyrics }}" as="l" hint-placeholder-count="5">
+                        <span data-lyric-active="{{ l.active }}"
+                              style="color:{{ l.color }};transition:color .6s ease;">{{ l.text }} </span>
+                      </sc-for>
+                    </div>
                   </div>
                   <!-- seek -->
                   <div style="flex:none;margin-top:12px;">

@@ -1916,7 +1916,6 @@ window.VH_RENDER = {
       apImg: this.vimg(cur.seed, 500, 500),
       apName: cur.name,
       apSub: (cur.era || '') + ' · Thuyết minh',
-      apSpin: st.isPlaying ? 'running' : 'paused',
       apSpeedLabel: (st.audioSpeed || 1) + 'x',
       apSpeed: () => {
         const seq = [1, 1.25, 1.5, 0.75];
@@ -1937,19 +1936,32 @@ window.VH_RENDER = {
       apLyricsRef: (el) => {
         this._apLyricsEl = el;
       },
-      apLyrics: this.audioLyrics.map((l, i) => {
-        const arr = this.audioLyrics;
-        const next = arr[i + 1];
+      apLyrics: (() => {
+        const lyrics = this.audioLyrics;
         const cp = st.audioProgress;
-        const active = cp >= l.p && (!next || cp < next.p);
-        return {
-          ...l,
-          active,
-          color: active ? '#fff' : 'rgba(255,255,255,.4)',
-          size: active ? '18px' : '15px',
-          seek: () => this.setState({audioProgress: l.p})
-        };
-      }),
+        const words = [];
+        for (let i = 0; i < lyrics.length; i++) {
+          const l = lyrics[i];
+          const next = lyrics[i + 1];
+          const segStart = l.p;
+          const segEnd = next ? next.p : 100;
+          const segDur = segEnd - segStart;
+          const ws = l.text.split(' ').filter(w => w);
+          ws.forEach((word, wi) => {
+            const wStart = segStart + (wi / ws.length) * segDur;
+            const wEnd = segStart + ((wi + 1) / ws.length) * segDur;
+            const active = cp >= wStart && cp < wEnd;
+            const past = cp >= wEnd;
+            words.push({
+              text: word,
+              active,
+              color: active ? '#fff' : past ? 'rgba(255,255,255,.88)' : 'rgba(255,255,255,.22)',
+              seek: () => this.setState({audioProgress: wStart}),
+            });
+          });
+        }
+        return words;
+      })(),
       open3D: () => {
         this.nav('threed', 'fwd');
         this.start3D();

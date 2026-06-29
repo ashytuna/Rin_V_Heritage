@@ -124,7 +124,7 @@ window.VH_LOGIC = {
       if (act) {
         const c = this._apLyricsEl;
         const target = act.offsetTop - c.clientHeight / 2 + act.clientHeight / 2;
-        c.scrollTo({top: target, behavior: 'smooth'});
+        c.scrollTo({top: Math.max(0, target), behavior: 'smooth'});
       }
     }
   },
