@@ -2226,29 +2226,42 @@
                       </button>
                     </div>
                   </sc-if>
-                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px 18px 20px;">
-                    <sc-for list="{{ collectionsView }}" as="c" hint-placeholder-count="0">
-                      <div data-ripple="1" onClick="{{ c.open }}"
-                           style="position:relative;overflow:hidden;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;cursor:pointer;">
-                        <div
-                            style="height:104px;position:relative;background:var(--bg-tertiary);display:flex;align-items:center;justify-content:center;">
-                          <sc-if value="{{ c.hasImg }}" hint-placeholder-val="{{ false }}">
-                            <img src="{{ c.img }}" alt=""
-                                 style="width:100%;height:100%;object-fit:cover;"></sc-if>
-                          <span style="position:absolute;font-size:34px;">{{ c.emoji }}</span>
+                  <sc-if value="{{ !collectionsEmpty }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px 18px 20px;">
+                      <button data-ripple="1" onClick="{{ openCreateCollection }}"
+                              class="vh-collection-card vh-collection-create-card">
+                        <div class="vh-collection-card-media">
+                          <div class="vh-collection-create-icon">
+                            <i class="ti ti-plus" style="font-size:24px;"></i>
+                          </div>
                         </div>
-                        <div style="padding:11px 13px 13px;">
+                        <div class="vh-collection-card-body">
                           <div class="vh-serif"
-                               style="font-size:14px;font-weight:600;line-height:1.2;">{{
-                            c.name }}
-                          </div>
-                          <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px;">
-                            {{ c.count }} hiện vật
+                               style="font-size:14px;font-weight:600;line-height:1.2;">Tạo bộ sưu tập
                           </div>
                         </div>
-                      </div>
-                    </sc-for>
-                  </div>
+                      </button>
+                      <sc-for list="{{ collectionsView }}" as="c" hint-placeholder-count="0">
+                        <div data-ripple="1" onClick="{{ c.open }}" class="vh-collection-card">
+                          <div class="vh-collection-card-media">
+                            <sc-if value="{{ c.hasImg }}" hint-placeholder-val="{{ false }}">
+                              <img src="{{ c.img }}" alt=""
+                                   style="width:100%;height:100%;object-fit:cover;"></sc-if>
+                            <span style="position:absolute;font-size:34px;">{{ c.emoji }}</span>
+                          </div>
+                          <div class="vh-collection-card-body">
+                            <div class="vh-serif"
+                                 style="font-size:14px;font-weight:600;line-height:1.2;">{{
+                              c.name }}
+                            </div>
+                            <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px;">
+                              {{ c.count }} hiện vật
+                            </div>
+                          </div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
                 </sc-if>
                 <!-- TAB: Ảnh AR -->
                 <sc-if value="{{ libPhotoTab }}" hint-placeholder-val="{{ false }}">
