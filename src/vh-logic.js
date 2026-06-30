@@ -341,20 +341,9 @@ window.VH_LOGIC = {
     if (this._lpFired) return;
     if (t === 'scan') {
       if (!(this.state.permissions && this.state.permissions.camera === 1)) {
-        // chưa cấp quyền camera → hỏi; từ chối thì ở lại tab hiện tại
-        this.setState({
-          modal: 'generic',
-          modalData: {
-            icon: 'ti-camera', iconBg: 'rgba(237,137,39,.14)', iconColor: 'var(--cta)',
-            title: 'Cần quyền Camera',
-            body: 'Quét và xem hiện vật bằng AR cần quyền truy cập camera của thiết bị.',
-            primary: 'Cấp quyền', secondary: 'Để sau',
-            onPrimary: () => {
-              this.setState({permissions: Object.assign({}, this.state.permissions, {camera: 1})});
-              this.nav('scan', 'fwd');
-            },
-          }
-        });
+        // chưa cấp quyền camera → chuyển sang màn hình cameraask dùng chung
+        this._camAskReturnTab = 'scan';
+        this.nav('cameraask', 'fwd');
         return;
       }
       this.nav('scan', 'fwd');
@@ -727,7 +716,12 @@ window.VH_LOGIC = {
       if (ok) {
         this._setPermFlag('camera', 1);
         this.showToast('Đã cấp quyền camera ✦', 'success');
-        this.replace('camerashot');
+        if (this._camAskReturnTab === 'scan') {
+          this._camAskReturnTab = null;
+          this.replace('scan');
+        } else {
+          this.replace('camerashot');
+        }
       } else {
         this.showSystemSettingsDialog('camera');
       }
@@ -737,10 +731,13 @@ window.VH_LOGIC = {
     if (this.state._camAskChecked) {
       this.setState({_camSnoozeDay: new Date().toDateString()});
     }
-    this.showToast('Bạn cần cấp quyền camera để chụp hình AR.');
+    const isScan = this._camAskReturnTab === 'scan';
+    this._camAskReturnTab = null;
+    this.showToast(isScan ? 'Bạn cần cấp quyền camera để quét hiện vật.' : 'Bạn cần cấp quyền camera để chụp hình AR.');
     this.back();
   },
   camAskBack() {
+    this._camAskReturnTab = null;
     this.back();
   },
   toggleCamAsk() {

@@ -89,7 +89,9 @@ window.VH_RENDER = {
       permIcon: st.screen === 'cameraask' ? 'ti-camera' : 'ti-map-pin',
       permTitle: st.screen === 'cameraask' ? 'Cấp quyền Camera?' : 'Bật vị trí của bạn?',
       permDesc: st.screen === 'cameraask' 
-        ? 'V-Heritage cần quyền truy cập camera để đưa mô hình hiện vật 3D hiển thị ngay trong không gian thực và cho phép bạn chụp hình lưu niệm.'
+        ? (this._camAskReturnTab === 'scan'
+          ? 'V-Heritage cần quyền truy cập camera để quét nhận diện hiện vật và trải nghiệm các tính năng AR.'
+          : 'V-Heritage cần quyền truy cập camera để đưa mô hình hiện vật 3D hiển thị ngay trong không gian thực và cho phép bạn chụp hình lưu niệm.')
         : 'Cho phép truy cập vị trí để xem bản đồ di tích quanh bạn và gợi ý điểm đến gần nhất. Nếu bỏ qua, bản đồ sẽ mặc định ở Hà Nội.',
       permCta: st.screen === 'cameraask' ? 'Cấp quyền Camera' : 'Bật vị trí',
       permBoxBorder: st.screen === 'cameraask' 
