@@ -1466,14 +1466,11 @@
                   <button data-ripple="1" onClick="{{ downloadVenuePack }}"
                           disabled="{{ venueDownloadDisabled }}"
                           class="vh-place-download">
+                    <span class="vh-place-download-fill" style="width:{{ venueDownloadProgressW }};"></span>
                     <i class="ti {{ venueDownloadIcon }}"
-                       style="font-size:20px;color:var(--primary);animation:{{ venueDownloadIconSpin }};"></i><span>{{ venueDownloadText }}</span>
+                       style="font-size:20px;color:var(--primary);animation:{{ venueDownloadIconSpin }};"></i><span class="vh-place-download-label">{{ venueDownloadText }}</span>
+                    <span class="vh-place-download-percent" style="display:{{ venueDownloadPercentDisp }};">{{ venueDownloadPercent }}</span>
                   </button>
-                  <sc-if value="{{ showVenueDownloadProgress }}" hint-placeholder-val="{{ false }}">
-                    <div class="vh-place-download-progress">
-                      <div class="vh-place-download-progress-bar" style="width:{{ venueDownloadProgressW }};"></div>
-                    </div>
-                  </sc-if>
                   <sc-if value="{{ showVenueDownloadError }}" hint-placeholder-val="{{ false }}">
                     <div class="vh-place-download-error">
                       <i class="ti ti-alert-triangle" style="font-size:14px;"></i>{{ venueDownloadError }}
