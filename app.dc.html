@@ -1936,28 +1936,27 @@
 
                 <!-- info panel + CTA -->
                 <div
-                    style="position:absolute;left:0;right:0;bottom:0;background:var(--bg-card);border-radius:24px 24px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.4);padding:10px 20px 24px;transform:translateY({{ threeDPanelY }}px);transition:{{ panelTransition }};height:440px;z-index:20;display:flex;flex-direction:column;">
+                    style="position:absolute;left:0;right:0;bottom:0;background:var(--bg-card);border-radius:24px 24px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.4);padding:8px 20px 20px;transform:translateY({{ threeDPanelY }}px);transition:{{ panelTransition }};height:440px;z-index:20;display:flex;flex-direction:column;gap:10px;">
                   <!-- Drag Handle -->
                   <div onMouseDown="{{ dragPanelStart }}" onTouchStart="{{ dragPanelStart }}"
-                       style="width:100%;height:22px;display:flex;align-items:center;justify-content:center;cursor:ns-resize;flex:none;margin-bottom:2px;">
-                    <div style="width:44px;height:5px;border-radius:99px;background:var(--border-2);"></div>
+                       style="width:100%;height:20px;display:flex;align-items:center;justify-content:center;cursor:ns-resize;flex:none;">
+                    <div style="width:44px;height:4px;border-radius:99px;background:var(--border-2);"></div>
                   </div>
-                  
-                  <!-- Nút quay lại tổng quan - ngoài scroll area, luôn hiện đầu panel -->
+
+                  <!-- Nút quay lại tổng quan - luôn hiện đầu panel khi đang xem hotspot -->
                   <sc-if value="{{ hasActiveHotspot }}" hint-placeholder-val="{{ false }}">
                     <button onClick="{{ clearHotspot }}"
-                            style="display:flex;align-items:center;gap:6px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:99px;padding:6px 14px 6px 10px;font-size:12px;font-weight:600;color:var(--text-secondary);cursor:pointer;flex:none;margin-bottom:2px;">
-                      <i class="ti ti-chevron-left" style="font-size:14px;"></i>Tổng quan hiện vật
+                            style="display:flex;align-items:center;align-self:flex-start;gap:5px;background:rgba(237,137,39,.12);border:1px solid rgba(237,137,39,.3);border-radius:99px;padding:5px 12px 5px 8px;font-size:11.5px;font-weight:600;color:var(--cta);cursor:pointer;flex:none;">
+                      <i class="ti ti-arrow-left" style="font-size:13px;"></i>Tổng quan hiện vật
                     </button>
                   </sc-if>
 
                   <!-- Panel content area with transitions on hotspot changes -->
                   <div key="hotspot-content-{{ activeHotspot }}" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding-right:2px;animation:vhFadeIn .25s ease-out;">
 
-
                     <div class="vh-serif" style="font-size:20px;font-weight:600;color:var(--text-primary);line-height:1.2;">{{ curArtName }}</div>
-                    
-                    <div style="display:flex;gap:12px;flex:none;width:100%;">
+
+                    <div style="display:flex;gap:10px;flex:none;width:100%;">
                       <div style="flex:1;background:var(--bg-tertiary);border-radius:8px;padding:6px 12px;border:1px solid var(--border);">
                         <div style="font-size:9px;color:var(--text-tertiary);text-transform:uppercase;font-weight:600;">Niên đại</div>
                         <div class="vh-serif" style="font-size:13.5px;font-weight:600;color:var(--text-primary);margin-top:2px;">{{ curArt.era }}</div>
@@ -1967,7 +1966,6 @@
                         <div class="vh-serif" style="font-size:13.5px;font-weight:600;color:var(--text-primary);margin-top:2px;">{{ curArt.material }}</div>
                       </div>
                     </div>
-
 
                     <!-- full description (only visible when expanded) -->
                     <sc-if value="{{ showDetailBtn }}" hint-placeholder-val="{{ false }}">
@@ -1979,9 +1977,9 @@
                   </div>
 
                   <!-- CTA — luôn hiển thị dưới cùng panel -->
-                  <div style="display:flex;gap:10px;margin-top:12px;flex:none;">
+                  <div style="flex:none;">
                     <button data-ripple="1" onClick="{{ toDetail }}"
-                            style="position:relative;overflow:hidden;flex:1;border:none;background:var(--cta);color:#fff;font-size:14.5px;font-weight:600;padding:13px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 12px rgba(237,137,39,.25);">
+                            style="position:relative;overflow:hidden;width:100%;border:none;background:var(--cta);color:#fff;font-size:14.5px;font-weight:600;padding:13px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 12px rgba(237,137,39,.3);">
                       Xem chi tiết hiện vật<i class="ti ti-arrow-right" style="font-size:18px;"></i>
                     </button>
                   </div>
