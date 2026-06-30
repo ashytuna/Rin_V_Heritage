@@ -29,7 +29,6 @@ window.VH_LOGIC = {
   },
   exToggleH() {
     if (!(this.state.permissions && this.state.permissions.location === 1)) return;
-    if (this._blockClick) return;
     const cur = this.state._exploreH || 18;
     let next = 46;
     if (cur >= 32 && cur < 60) next = 80;
@@ -62,8 +61,13 @@ window.VH_LOGIC = {
       if (el) el.style.transition = 'height .25s cubic-bezier(.32,.72,0,1)'; // Bật lại transition
       
       if (this._exDragged) {
-        this._blockClick = true;
-        setTimeout(() => { this._blockClick = false; }, 80);
+        // Đăng ký capturing click listener tạm thời để nuốt gọn click event giả lập ngay sau khi drag
+        const blockGhostClick = (clickEv) => {
+          clickEv.stopPropagation();
+          clickEv.preventDefault();
+          document.removeEventListener('click', blockGhostClick, true);
+        };
+        document.addEventListener('click', blockGhostClick, true);
         this._exDragged = false;
         
         const dy = liveH - sh;
