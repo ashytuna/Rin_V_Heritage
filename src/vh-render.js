@@ -413,9 +413,12 @@ window.VH_RENDER = {
       doLogin: () => this.doLogin(),
       loginLocked: locked,
       lockCountdown: st.lockCountdown,
-      loginDisabled: locked,
-      loginBtnBg: locked ? 'var(--text-tertiary)' : 'var(--cta)',
-      loginBtnOpacity: locked ? '0.6' : '1',
+      loginDisabled: locked || !(st.liEmail || '').trim() || !(st.liPass || '').trim(),
+      loginBtnBg: locked ? 'var(--text-tertiary)' : ((st.liEmail || '').trim() && (st.liPass || '').trim() ? 'var(--cta)' : 'var(--disabled-bg)'),
+      loginBtnFg: locked ? '#fff' : ((st.liEmail || '').trim() && (st.liPass || '').trim() ? '#fff' : 'var(--disabled-fg)'),
+      loginBtnCursor: locked || !(st.liEmail || '').trim() || !(st.liPass || '').trim() ? 'not-allowed' : 'pointer',
+      loginBtnPointerEvents: locked || !(st.liEmail || '').trim() || !(st.liPass || '').trim() ? 'none' : 'auto',
+      loginBtnOpacity: '1',
       loginBtnLabel: locked ? 'Đã khoá (' + st.lockCountdown + 's)' : 'Đăng nhập',
       socialBtns: social,
       goForgot: () => {
@@ -730,6 +733,41 @@ window.VH_RENDER = {
   arVals() {
     const st = this.state;
     const ss = st.scanState;
+    const arMode = st._arMode || 'camera';
+    const isARGbMode = arMode === 'guestbook';
+
+    // Dữ liệu bubble AR (lấy từ guestbook, tối đa 5 cái)
+    // Vị trí không che model (center ~44% top) + không che thanh dưới (~200px)
+    const arBubbles = this.guestbook.slice(0, 5).map((g, i) => {
+      const positions = [
+        {left: '6%',  top: '18%'},
+        {left: '54%', top: '12%'},
+        {left: '8%',  top: '48%'},
+        {left: '56%', top: '40%'},
+        {left: '10%', top: '66%'},
+      ];
+      const pos = positions[i] || positions[0];
+      const isSelected = st._arGbBubble === g.id;
+      const delays = ['0s', '0.7s', '1.4s', '0.35s', '1.05s'];
+      return {
+        ...g,
+        initial: (g.author || 'B')[0],
+        preview: g.text.length > 28 ? g.text.slice(0, 28) + '…' : g.text,
+        isSelected,
+        bubbleClass: isSelected ? 'vh-ar-bubble vh-ar-bubble--selected' : 'vh-ar-bubble',
+        // animation-delay: bubble-in delay, float delay (float bắt đầu sau khi in xong)
+        bubbleStyle: 'left:' + pos.left + ';top:' + pos.top + ';animation-delay:' + delays[i] + ',' + delays[i] + ';',
+        heartIcon: (st.liked && st.liked[g.id]) ? 'ti-heart-filled' : 'ti-heart',
+        heartColor: (st.liked && st.liked[g.id]) ? 'var(--error)' : 'var(--text-tertiary)',
+        likeCount: (g.likes || 0) + ((st.liked && st.liked[g.id]) ? 1 : 0),
+        tap: () => this.selectARBubble(g.id),
+        toggleLike: () => this.toggleGbLike(g.id),
+      };
+    });
+
+    const selectedBubble = isARGbMode ? (arBubbles.find(b => b.id === st._arGbBubble) || null) : null;
+    const hasSelectedBubble = !!selectedBubble;
+
     return {
       isScan: st.screen === 'scan',
       isQR: st.screen === 'qrscanner',
@@ -761,8 +799,41 @@ window.VH_RENDER = {
           this.nav('artifact', 'back');
         }
       })),
+      // Switch Mode toggle
+      switchARMode: () => this.switchARMode(),
+      isARGbMode,
+      // Label + icon của nút Switch Mode (thể hiện chế độ SẮP chuyển sang)
+      switchModeLabel: isARGbMode ? '📷 Camera' : '💬 Guestbook',
+      switchModeBorder: isARGbMode ? '1px solid rgba(237,137,39,.6)' : '1px solid rgba(255,255,255,.3)',
+      switchModeBg: isARGbMode ? 'rgba(237,137,39,.2)' : 'rgba(255,255,255,.14)',
+      // Overlay bubble guestbook
+      arBubbles,
+      hasARBubbles: isARGbMode && arBubbles.length > 0,
+      // Opacity overlay — fade in/out khi toggle
+      arGbOverlayDisp: isARGbMode ? 'block' : 'none',
+      hasSelectedBubble,
+      selectedBubbleAuthor: selectedBubble ? selectedBubble.author : '',
+      selectedBubbleTime: selectedBubble ? selectedBubble.time : '',
+      selectedBubbleText: selectedBubble ? selectedBubble.text : '',
+      selectedBubbleInitial: selectedBubble ? selectedBubble.initial : '',
+      selectedBubbleHeartIcon: selectedBubble ? selectedBubble.heartIcon : 'ti-heart',
+      selectedBubbleHeartColor: selectedBubble ? selectedBubble.heartColor : 'var(--text-tertiary)',
+      selectedBubbleLikeCount: selectedBubble ? selectedBubble.likeCount : 0,
+      selectedBubbleToggleLike: selectedBubble ? selectedBubble.toggleLike : () => {},
+      closeARBubble: () => this.closeARBubble(),
+      // Compose lời nhắn AR
+      arGbText: st._arGbText || '',
+      arGbCharCount: (st._arGbText || '').length,
+      onARGbText: (e) => this.setState({_arGbText: e.target.value.slice(0, 200)}),
+      postARMessage: () => this.postARMessage(),
+      arGbIsPremium: !!(st.tiers && st.tiers.premium),
+      arGbPostBg: (st._arGbText || '').trim() ? 'var(--cta)' : 'var(--disabled-bg)',
+      arGbPostFg: (st._arGbText || '').trim() ? '#fff' : 'var(--disabled-fg)',
+      arGbPostCursor: (st._arGbText || '').trim() ? 'pointer' : 'not-allowed',
+      arGbPostPointerEvents: (st._arGbText || '').trim() ? 'auto' : 'none',
     };
   },
+
 
   mainVals() {
     const st = this.state;
@@ -2147,24 +2218,51 @@ window.VH_RENDER = {
       })),
       showDetailBtn: (st.threeDPanelY !== undefined ? st.threeDPanelY : 130) <= 170,
 
-      // Report artifact flow
+      // Report screen flow
       openReportArtifact: () => this.openReportArtifact(),
-      submitReportArtifact: () => this.submitReportArtifact(),
-      sheetReportArtifact: st.sheet === 'report_artifact',
-      closeReportArtifact: () => this.setState({sheet: null}),
-      reportReason: st._reportReason || 'wrong_info',
+      submitReportScreen: () => this.submitReportScreen(),
+      isReportScreen: st.screen === 'report_screen',
       reportText: st._reportText || '',
-      reportReasonWrongInfo: () => this.setState({_reportReason: 'wrong_info'}),
-      reportReasonWrongModel: () => this.setState({_reportReason: 'wrong_model'}),
-      reportReasonTypo: () => this.setState({_reportReason: 'typo'}),
+      reportImage: st._reportImage,
+      hasReportImage: !!st._reportImage,
+      hasNoReportImage: !st._reportImage,
+      reportType: (st._reportTypes || []).join(','),
+      selectReportTypeInfo: () => this.selectReportType('info'),
+      selectReportTypeModel: () => this.selectReportType('model'),
+      selectReportTypeTypo: () => this.selectReportType('typo'),
+      selectReportTypeOther: () => this.selectReportType('other'),
+      simulateUploadImage: () => this.simulateUploadImage(),
+      removeReportImage: () => this.removeReportImage(),
+
+      // Option styles tính sẵn (tránh logic trong template)
+      reportIconInfo: (st._reportTypes || []).includes('info') ? 'ti-checkbox' : 'ti-square',
+      reportColorInfo: (st._reportTypes || []).includes('info') ? 'var(--cta)' : 'var(--text-tertiary)',
+      reportBorderInfo: (st._reportTypes || []).includes('info') ? '1px solid var(--cta)' : '1px solid var(--border)',
+      reportBgInfo: (st._reportTypes || []).includes('info') ? 'var(--bg-tertiary)' : 'var(--bg-card)',
+
+      reportIconModel: (st._reportTypes || []).includes('model') ? 'ti-checkbox' : 'ti-square',
+      reportColorModel: (st._reportTypes || []).includes('model') ? 'var(--cta)' : 'var(--text-tertiary)',
+      reportBorderModel: (st._reportTypes || []).includes('model') ? '1px solid var(--cta)' : '1px solid var(--border)',
+      reportBgModel: (st._reportTypes || []).includes('model') ? 'var(--bg-tertiary)' : 'var(--bg-card)',
+
+      reportIconTypo: (st._reportTypes || []).includes('typo') ? 'ti-checkbox' : 'ti-square',
+      reportColorTypo: (st._reportTypes || []).includes('typo') ? 'var(--cta)' : 'var(--text-tertiary)',
+      reportBorderTypo: (st._reportTypes || []).includes('typo') ? '1px solid var(--cta)' : '1px solid var(--border)',
+      reportBgTypo: (st._reportTypes || []).includes('typo') ? 'var(--bg-tertiary)' : 'var(--bg-card)',
+
+      reportIconOther: (st._reportTypes || []).includes('other') ? 'ti-checkbox' : 'ti-square',
+      reportColorOther: (st._reportTypes || []).includes('other') ? 'var(--cta)' : 'var(--text-tertiary)',
+      reportBorderOther: (st._reportTypes || []).includes('other') ? '1px solid var(--cta)' : '1px solid var(--border)',
+      reportBgOther: (st._reportTypes || []).includes('other') ? 'var(--bg-tertiary)' : 'var(--bg-card)',
+
+      // Nút Gửi báo cáo state
+      reportSubmitBg: (st._reportTypes && st._reportTypes.length > 0) ? 'var(--cta)' : 'var(--disabled-bg)',
+      reportSubmitFg: (st._reportTypes && st._reportTypes.length > 0) ? '#fff' : 'var(--disabled-fg)',
+      reportSubmitCursor: (st._reportTypes && st._reportTypes.length > 0) ? 'pointer' : 'not-allowed',
+      reportSubmitShadow: (st._reportTypes && st._reportTypes.length > 0) ? '0 4px 12px rgba(237,137,39,.2)' : 'none',
+      reportSubmitPointerEvents: (st._reportTypes && st._reportTypes.length > 0) ? 'auto' : 'none',
+
       setReportText: (e) => this.setState({_reportText: e.target.value}),
-      // Props tính sẵn cho từng lý do báo cáo (tránh gọi hàm trong template)
-      reportIconWrongInfo: (st._reportReason || 'wrong_info') === 'wrong_info' ? 'ti-checkbox' : 'ti-square',
-      reportIconWrongModel: (st._reportReason || 'wrong_info') === 'wrong_model' ? 'ti-checkbox' : 'ti-square',
-      reportIconTypo: (st._reportReason || 'wrong_info') === 'typo' ? 'ti-checkbox' : 'ti-square',
-      reportColorWrongInfo: (st._reportReason || 'wrong_info') === 'wrong_info' ? 'var(--cta)' : 'var(--text-tertiary)',
-      reportColorWrongModel: (st._reportReason || 'wrong_info') === 'wrong_model' ? 'var(--cta)' : 'var(--text-tertiary)',
-      reportColorTypo: (st._reportReason || 'wrong_info') === 'typo' ? 'var(--cta)' : 'var(--text-tertiary)',
 
       exit3D: () => {
         this.stop3D();

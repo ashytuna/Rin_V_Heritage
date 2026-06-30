@@ -285,7 +285,7 @@
                     </button>
                   </div>
                   <button data-ripple="1" onClick="{{ doLogin }}" disabled="{{ loginDisabled }}"
-                          style="position:relative;overflow:hidden;width:100%;border:none;background:{{ loginBtnBg }};color:#fff;font-size:16px;font-weight:600;padding:16px;border-radius:8px;cursor:pointer;margin-top:8px;opacity:{{ loginBtnOpacity }};">
+                          style="position:relative;overflow:hidden;width:100%;border:none;background:{{ loginBtnBg }};color:{{ loginBtnFg }};font-size:16px;font-weight:600;padding:16px;border-radius:12px;cursor:{{ loginBtnCursor }};margin-top:8px;pointer-events:{{ loginBtnPointerEvents }};transition:all 0.2s;box-shadow:none;">
                     {{ loginBtnLabel }}
                   </button>
                   <div style="font-size:11px;color:var(--text-tertiary);text-align:center;margin-top:10px;">
@@ -1878,15 +1878,23 @@
                    style="position:absolute;inset:0;background:radial-gradient(circle at 50% 38%,#2a3550,#0d1220);overflow:hidden;">
                 <!-- header -->
                 <div
-                    style="position:absolute;top:46px;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:0 18px;z-index:10;">
+                    style="position:absolute;top:46px;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:0 18px;z-index:30;">
                   <button data-ripple="1" onClick="{{ exit3D }}"
                           style="position:relative;overflow:hidden;width:44px;height:44px;border-radius:99px;border:none;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;">
                     <i class="ti ti-x" style="font-size:22px;"></i></button>
-                  <div style="color:#fff;font-size:15px;font-weight:600;">Mô hình 3D</div>
-                  <button data-ripple="1" onClick="{{ openReportArtifact }}"
-                          style="position:relative;overflow:hidden;width:44px;height:44px;border-radius:99px;border:none;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);color:var(--error);cursor:pointer;display:flex;align-items:center;justify-content:center;"
-                          title="Báo cáo sai sót di sản">
-                    <i class="ti ti-flag" style="font-size:22px;"></i></button>
+                  <!-- Tên màn + badge chế độ -->
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+                    <div style="color:#fff;font-size:15px;font-weight:600;">Mô hình 3D</div>
+                    <sc-if value="{{ isARGbMode }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size:10px;font-weight:700;color:var(--cta);letter-spacing:.04em;">💬 AR GUESTBOOK</div>
+                    </sc-if>
+                  </div>
+                  <!-- Switch Mode: toggle trực tiếp, label thay đổi theo chế độ đang hoạt động -->
+                  <button data-ripple="1" onClick="{{ switchARMode }}"
+                          style="position:relative;overflow:hidden;height:36px;padding:0 14px;border-radius:99px;border:{{ switchModeBorder }};background:{{ switchModeBg }};backdrop-filter:blur(8px);color:#fff;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;transition:background .25s,border .25s;"
+                          title="Chuyển chế độ AR">
+                    <i class="ti ti-switch-3" style="font-size:15px;"></i>{{ switchModeLabel }}
+                  </button>
                 </div>
                 
                 <!-- vertical control bar on the right -->
@@ -1933,6 +1941,69 @@
                     style="position:absolute;bottom:188px;left:0;right:0;text-align:center;color:rgba(255,255,255,.5);font-size:12px;">
                   <i class="ti ti-rotate-360" style="font-size:15px;vertical-align:-2px;"></i> Kéo để xoay mô hình · Chạm điểm sáng khám phá
                 </div>
+
+                <!-- OVERLAY AR GUESTBOOK BUBBLES (in-place, z-index dưới info panel) -->
+                <sc-if value="{{ hasARBubbles }}" hint-placeholder-val="{{ false }}">
+                  <!-- Vùng tap đóng bubble: chỉ khi có bubble đang chọn -->
+                  <sc-if value="{{ hasSelectedBubble }}" hint-placeholder-val="{{ false }}">
+                    <div onClick="{{ closeARBubble }}" style="position:absolute;inset:0;z-index:14;"></div>
+                  </sc-if>
+                  <sc-for list="{{ arBubbles }}" as="b" hint-placeholder-count="3">
+                    <div class="{{ b.bubbleClass }}" style="{{ b.bubbleStyle }}z-index:15;" onClick="{{ b.tap }}">
+                      <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;">
+                        <div style="width:18px;height:18px;border-radius:99px;background:var(--cta);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex:none;">{{ b.initial }}</div>
+                        <span style="font-size:10px;font-weight:600;color:#1A2540;">{{ b.author }}</span>
+                      </div>
+                      <div style="font-size:11px;color:#1A2540;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:152px;">{{ b.preview }}</div>
+                      <div style="position:absolute;bottom:-6px;left:12px;width:0;height:0;border-left:7px solid transparent;border-top:7px solid rgba(255,255,255,.92);"></div>
+                    </div>
+                  </sc-for>
+                  <!-- Card chi tiết khi chạm bubble -->
+                  <sc-if value="{{ hasSelectedBubble }}" hint-placeholder-val="{{ false }}">
+                    <div style="position:absolute;left:16px;right:16px;top:38%;transform:translateY(-50%);z-index:16;background:rgba(255,255,255,.97);border-radius:20px;padding:18px 18px 14px;box-shadow:0 8px 32px rgba(0,0,0,.35);animation:vhBubbleIn .28s cubic-bezier(.32,.72,0,1);">
+                      <button data-ripple="1" onClick="{{ closeARBubble }}"
+                              style="position:absolute;top:12px;right:12px;width:26px;height:26px;border-radius:99px;border:none;background:rgba(0,0,0,.08);cursor:pointer;display:flex;align-items:center;justify-content:center;color:#1A2540;">
+                        <i class="ti ti-x" style="font-size:13px;"></i></button>
+                      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                        <div style="width:32px;height:32px;border-radius:99px;background:var(--cta);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex:none;">{{ selectedBubbleInitial }}</div>
+                        <div>
+                          <div style="font-size:13px;font-weight:700;color:#1A2540;">{{ selectedBubbleAuthor }}</div>
+                          <div style="font-size:11px;color:#8E98A8;">{{ selectedBubbleTime }}</div>
+                        </div>
+                      </div>
+                      <div style="font-size:13px;color:#1A2540;line-height:1.65;padding-bottom:10px;border-bottom:1px solid rgba(0,0,0,.08);">{{ selectedBubbleText }}</div>
+                      <button data-ripple="1" onClick="{{ selectedBubbleToggleLike }}"
+                              style="position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:4px;margin-top:8px;font-size:12px;color:{{ selectedBubbleHeartColor }};background:transparent;border:none;cursor:pointer;padding:2px 0;">
+                        <i class="ti {{ selectedBubbleHeartIcon }}" style="font-size:16px;"></i>{{ selectedBubbleLikeCount }}
+                      </button>
+                    </div>
+                  </sc-if>
+                </sc-if>
+
+                <!-- Thanh viết lời nhắn AR (chỉ hiện ở chế độ Guestbook) -->
+                <sc-if value="{{ isARGbMode }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;bottom:200px;left:0;right:0;z-index:18;padding:0 16px;animation:vhFade .3s ease;">
+                    <sc-if value="{{ arGbIsPremium }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;gap:8px;align-items:center;">
+                        <div style="flex:1;position:relative;">
+                          <input value="{{ arGbText }}" onInput="{{ onARGbText }}" maxlength="200"
+                                 placeholder="Để lại dấu ấn AR của bạn..."
+                                 style="width:100%;min-width:0;background:rgba(10,13,20,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2);border-radius:99px;padding:10px 44px 10px 16px;font-size:13px;color:#fff;outline:none;box-sizing:border-box;">
+                          <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:9px;color:rgba(255,255,255,.4);">{{ arGbCharCount }}/200</span>
+                        </div>
+                        <button data-ripple="1" onClick="{{ postARMessage }}"
+                                style="position:relative;overflow:hidden;width:44px;height:44px;border:none;border-radius:99px;cursor:{{ arGbPostCursor }};pointer-events:{{ arGbPostPointerEvents }};background:{{ arGbPostBg }};color:{{ arGbPostFg }};display:flex;align-items:center;justify-content:center;flex:none;">
+                          <i class="ti ti-send" style="font-size:18px;"></i></button>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ arGbIsPremium }}" hint-placeholder-val="{{ true }}">
+                      <button data-ripple="1" onClick="{{ gbUnlock }}"
+                              style="position:relative;overflow:hidden;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;border:1px dashed rgba(237,137,39,.6);background:rgba(10,13,20,.6);backdrop-filter:blur(8px);color:var(--cta);border-radius:99px;padding:11px 20px;cursor:pointer;font-size:13px;font-weight:600;">
+                        <i class="ti ti-crown" style="font-size:16px;"></i>Premium để viết lời nhắn AR
+                      </button>
+                    </sc-if>
+                  </div>
+                </sc-if>
 
                 <!-- info panel + CTA -->
                 <div
@@ -1982,61 +2053,101 @@
                   </button>
                 </div>
 
-                <!-- BOTTOM SHEET BÁO CÁO SAI SÓT -->
-                <sc-if value="{{ sheetReportArtifact }}" hint-placeholder-val="{{ false }}">
-                  <div style="position:absolute;inset:0;background:rgba(0,0,0,.6);z-index:99;display:flex;align-items:flex-end;">
-                    <!-- Click overlay to close -->
-                    <div onClick="{{ closeReportArtifact }}" style="position:absolute;inset:0;z-index:1;"></div>
-                    <!-- Content panel -->
-                    <div style="position:relative;z-index:2;width:100%;background:var(--bg-card);border-radius:24px 24px 0 0;padding:24px 20px 28px;box-shadow:0 -10px 40px rgba(0,0,0,.3);display:flex;flex-direction:column;gap:18px;">
-                      <!-- Drag indicator -->
-                      <div style="width:40px;height:4px;border-radius:99px;background:var(--border-2);margin:0 auto -6px;"></div>
-                      
-                      <div>
-                        <div class="vh-serif" style="font-size:19px;font-weight:600;color:var(--text-primary);">Báo cáo sai sót di sản</div>
-                        <div style="font-size:12px;color:var(--text-tertiary);margin-top:4px;">Giúp chúng tôi hoàn thiện thông tin chính xác nhất</div>
-                      </div>
+              </div>
+            </sc-if>
 
-                      <!-- Reason options -->
-                      <div style="display:flex;flex-direction:column;gap:10px;">
-                        <div style="font-size:11px;color:var(--text-tertiary);font-weight:600;text-transform:uppercase;">Lý do báo cáo</div>
-                        
-                        <button data-ripple="1" onClick="{{ reportReasonWrongInfo }}"
-                                style="border:1px solid var(--border);background:var(--bg-secondary);border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px;width:100%;text-align:left;cursor:pointer;color:var(--text-primary);">
-                          <i class="ti {{ reportIconWrongInfo }}" style="font-size:18px;color:{{ reportColorWrongInfo }};"></i>
-                          <span style="font-size:13.5px;font-weight:500;">Sai thông tin lịch sử / văn hóa</span>
-                        </button>
-                        
-                        <button data-ripple="1" onClick="{{ reportReasonWrongModel }}"
-                                style="border:1px solid var(--border);background:var(--bg-secondary);border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px;width:100%;text-align:left;cursor:pointer;color:var(--text-primary);">
-                          <i class="ti {{ reportIconWrongModel }}" style="font-size:18px;color:{{ reportColorWrongModel }};"></i>
-                          <span style="font-size:13.5px;font-weight:500;">Mô hình hiển thị lỗi / không tải được</span>
-                        </button>
-                        
-                        <button data-ripple="1" onClick="{{ reportReasonTypo }}"
-                                style="border:1px solid var(--border);background:var(--bg-secondary);border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px;width:100%;text-align:left;cursor:pointer;color:var(--text-primary);">
-                          <i class="ti {{ reportIconTypo }}" style="font-size:18px;color:{{ reportColorTypo }};"></i>
-                          <span style="font-size:13.5px;font-weight:500;">Lỗi chính tả / dịch thuật sai</span>
-                        </button>
-                      </div>
 
-                      <!-- Textarea description -->
-                      <div style="display:flex;flex-direction:column;gap:8px;">
-                        <div style="font-size:11px;color:var(--text-tertiary);font-weight:600;text-transform:uppercase;">Mô tả chi tiết sai sót</div>
-                        <textarea onInput="{{ setReportText }}" value="{{ reportText }}" placeholder="Vui lòng cung cấp chi tiết sai sót để Ban Nghiên cứu đối chiếu..."
-                                  style="width:100%;height:80px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:10px;padding:10px;font-size:13px;color:var(--text-primary);resize:none;outline:none;font-family:inherit;line-height:1.4;"></textarea>
-                      </div>
+            <!-- BÁO CÁO SAI SÓT SCREEN (Màn hình mới thay thế cho Bottom Sheet theo yêu cầu sơ đồ) -->
+            <sc-if value="{{ isReportScreen }}" hint-placeholder-val="{{ false }}">
+              <div data-screen-label="ReportScreen" class="vh-content"
+                   style="position:absolute;inset:0;background:var(--bg-primary);display:flex;flex-direction:column;padding:48px 18px 24px;box-sizing:border-box;animation:vhPushIn .25s ease-out;">
+                
+                <!-- Header phẳng đồng bộ design system -->
+                <div style="display:flex;align-items:center;gap:12px;flex:none;margin-bottom:18px;">
+                  <button data-ripple="1" onClick="{{ back }}"
+                          style="position:relative;overflow:hidden;width:42px;height:42px;border-radius:99px;border:none;background:transparent;cursor:pointer;color:var(--text-primary);display:flex;align-items:center;justify-content:center;">
+                    <i class="ti ti-arrow-left" style="font-size:22px;"></i>
+                  </button>
+                  <div class="vh-serif" style="font-size:20px;font-weight:600;flex:1;color:var(--text-primary);">Báo cáo sai sót</div>
+                </div>
 
-                      <!-- Action CTA -->
-                      <div style="display:flex;gap:10px;margin-top:4px;">
-                        <button data-ripple="1" onClick="{{ closeReportArtifact }}"
-                                style="flex:1;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text-secondary);font-size:14.5px;font-weight:600;padding:12px;border-radius:10px;cursor:pointer;">Để sau</button>
-                        <button data-ripple="1" onClick="{{ submitReportArtifact }}"
-                                style="flex:1;border:none;background:var(--cta);color:#fff;font-size:14.5px;font-weight:600;padding:12px;border-radius:10px;cursor:pointer;box-shadow:0 4px 12px rgba(237,137,39,.2);">Gửi báo cáo</button>
-                      </div>
+                <!-- Scroll Body sử dụng class vh-scroll ẩn scrollbar -->
+                <div class="vh-scroll" style="flex:1;overflow-y:auto;min-height:0;display:flex;flex-direction:column;box-sizing:border-box;">
+                  
+                  <!-- Section: Chọn loại báo cáo -->
+                  <div style="display:flex;flex-direction:column;margin-bottom:24px;">
+                    <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">Chọn loại báo cáo</div>
+                    
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                      <!-- Option 1: Thông tin không chính xác -->
+                      <button data-ripple="1" onClick="{{ selectReportTypeInfo }}"
+                              style="border:{{ reportBorderInfo }};background:{{ reportBgInfo }};border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;color:var(--text-primary);box-sizing:border-box;transition:all 0.2s;">
+                        <i class="ti {{ reportIconInfo }}" style="font-size:20px;color:{{ reportColorInfo }};"></i>
+                        <span style="font-size:14px;font-weight:600;line-height:1.2;">Thông tin không chính xác</span>
+                      </button>
+
+                      <!-- Option 2: Hình ảnh/mô hình bị lỗi -->
+                      <button data-ripple="1" onClick="{{ selectReportTypeModel }}"
+                              style="border:{{ reportBorderModel }};background:{{ reportBgModel }};border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;color:var(--text-primary);box-sizing:border-box;transition:all 0.2s;">
+                        <i class="ti {{ reportIconModel }}" style="font-size:20px;color:{{ reportColorModel }};"></i>
+                        <span style="font-size:14px;font-weight:600;line-height:1.2;">Hình ảnh/mô hình bị lỗi</span>
+                      </button>
+
+                      <!-- Option 3: Dịch thuật chưa đúng -->
+                      <button data-ripple="1" onClick="{{ selectReportTypeTypo }}"
+                              style="border:{{ reportBorderTypo }};background:{{ reportBgTypo }};border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;color:var(--text-primary);box-sizing:border-box;transition:all 0.2s;">
+                        <i class="ti {{ reportIconTypo }}" style="font-size:20px;color:{{ reportColorTypo }};"></i>
+                        <span style="font-size:14px;font-weight:600;line-height:1.2;">Dịch thuật chưa đúng</span>
+                      </button>
+
+                      <!-- Option 4: Khác -->
+                      <button data-ripple="1" onClick="{{ selectReportTypeOther }}"
+                              style="border:{{ reportBorderOther }};background:{{ reportBgOther }};border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;color:var(--text-primary);box-sizing:border-box;transition:all 0.2s;">
+                        <i class="ti {{ reportIconOther }}" style="font-size:20px;color:{{ reportColorOther }};"></i>
+                        <span style="font-size:14px;font-weight:600;line-height:1.2;">Khác</span>
+                      </button>
                     </div>
                   </div>
-                </sc-if>
+
+                  <!-- Section: Mô tả chi tiết -->
+                  <div style="display:flex;flex-direction:column;margin-bottom:24px;">
+                    <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">Mô tả chi tiết</div>
+                    <textarea class="vh-report-textarea" onInput="{{ setReportText }}" value="{{ reportText }}" placeholder="Vui lòng cung cấp chi tiết sai sót để Ban Nghiên cứu đối chiếu..."
+                              style="width:100%;height:120px;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;font-size:14px;color:var(--text-primary);resize:none;outline:none;font-family:inherit;line-height:1.5;box-sizing:border-box;"></textarea>
+                  </div>
+
+                  <!-- Section: Tải ảnh minh chứng -->
+                  <div style="display:flex;flex-direction:column;margin-bottom:24px;">
+                    <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">Tải ảnh minh chứng (nếu có)</div>
+                    
+                    <!-- Khi chưa tải ảnh -->
+                    <sc-if value="{{ hasNoReportImage }}" hint-placeholder-val="{{ true }}">
+                      <button data-ripple="1" onClick="{{ simulateUploadImage }}"
+                              style="border:1px dashed var(--border-2);background:var(--bg-card);border-radius:14px;padding:24px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;width:100%;cursor:pointer;color:var(--text-secondary);transition:all 0.2s;box-sizing:border-box;">
+                        <i class="ti ti-camera" style="font-size:22px;color:var(--cta);"></i>
+                        <span style="font-size:13px;font-weight:600;text-align:center;">Bấm để tải ảnh minh họa lên</span>
+                      </button>
+                    </sc-if>
+
+                    <!-- Khi đã tải ảnh -->
+                    <sc-if value="{{ hasReportImage }}" hint-placeholder-val="{{ false }}">
+                      <div style="position:relative;width:120px;height:80px;border-radius:14px;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);">
+                        <img src="{{ reportImage }}" alt="Minh chứng" style="width:100%;height:100%;object-fit:cover;">
+                        <button onClick="{{ removeReportImage }}"
+                                style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.5);border:none;border-radius:99px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;backdrop-filter:blur(4px);">
+                          <i class="ti ti-x" style="font-size:14px;"></i>
+                        </button>
+                      </div>
+                    </sc-if>
+                  </div>
+
+                  <!-- Action Submit -->
+                  <button data-ripple="1" onClick="{{ submitReportScreen }}"
+                          style="position:relative;overflow:hidden;width:100%;border:none;background:{{ reportSubmitBg }};color:{{ reportSubmitFg }};font-size:16px;font-weight:600;padding:16px;border-radius:12px;cursor:{{ reportSubmitCursor }};margin-top:auto;flex-shrink:0;box-shadow:{{ reportSubmitShadow }};pointer-events:{{ reportSubmitPointerEvents }};display:flex;align-items:center;justify-content:center;transition:all 0.2s;">
+                    Gửi báo cáo
+                  </button>
+
+                </div>
               </div>
             </sc-if>
 
@@ -5083,6 +5194,7 @@
           </div>
         </sc-if>
 
+
         <!-- CONTEXT MENU -->
         <sc-if value="{{ sheetContext }}" hint-placeholder-val="{{ false }}">
           <div
@@ -5254,6 +5366,7 @@ class Component extends DCLogic {
     libTab: 'art', searchQuery: '', searchFilter: 'all', _exploreH: 18, _camAskChecked: false, _camSnoozeDay: '',
     wheelchair: false, voiceDesc: false, _venueDownloadLoading: false, _venueDownloadProgress: 0, _venueDownloadError: null,
     threeDRot: 0, threeDZoom: 1, threeDPlaying: true, timeIdx: 1, threeDPanelY: 130, _draggingPanel: false,
+    _arMode: 'camera', _arGbBubble: null, _arGbText: '',
     paymentMethod: null, paymentTier: 'premium', notifList: null, twoFA: false, failedPayment: 0,
     _cpOld: '', _cpNew: '', _cpConfirm: '', _ceNew: '', _daConfirm: false, _daPass: '', _revoked: [],
     _helpQuery: '', _csName: '', _csEmail: '', _csIssue: null, _csDesc: '', _csAttached: false,

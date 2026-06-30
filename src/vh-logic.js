@@ -476,6 +476,7 @@ window.VH_LOGIC = {
   doLogin() {
     if (Date.now() < this.state.lockedUntil) return;
     const {liEmail, liPass} = this.state;
+    if (!liEmail || !liPass) return;
     const err = {email: null, pass: null};
     if (this.state.isOffline) {
       this.showToast('Không có kết nối mạng. Vui lòng kiểm tra và thử lại.', 'error');
@@ -752,6 +753,40 @@ window.VH_LOGIC = {
       this.replace('photo');
       this.showToast('Đã lưu ảnh AR vào Bộ sưu tập ✦', 'success');
     }, 180);
+  },
+  // ---- Switch Mode AR (toggle in-place, không nav) ----
+  switchARMode() {
+    const next = this.state._arMode === 'camera' ? 'guestbook' : 'camera';
+    this.setState({_arMode: next, _arGbBubble: null, _arGbText: ''});
+  },
+  selectARBubble(id) {
+    this.setState({_arGbBubble: this.state._arGbBubble === id ? null : id});
+  },
+  closeARBubble() {
+    this.setState({_arGbBubble: null});
+  },
+  postARMessage() {
+    const text = (this.state._arGbText || '').trim();
+    if (!text) return;
+    const isPremium = !!(this.state.tiers && this.state.tiers.premium);
+    if (!isPremium) {
+      this.premiumGate();
+      return;
+    }
+    if (this.state.guestbookPosted >= 3) {
+      this.gbLimitReached();
+      return;
+    }
+    this.guestbook = [{
+      id: Date.now(),
+      text,
+      author: this.state.user.name || 'Bạn',
+      likes: 0,
+      time: 'vừa xong',
+      premium: true
+    }, ...this.guestbook];
+    this.setState({_arGbText: '', guestbookPosted: this.state.guestbookPosted + 1, _arGbBubble: null});
+    this.showToast('Đã gửi lời nhắn AR ✦', 'success');
   },
   downloadNearby() {
     const packs = this.state.packs || [];
@@ -1424,10 +1459,35 @@ window.VH_LOGIC = {
     }
   },
   openReportArtifact() {
-    this.setState({sheet: 'report_artifact', _reportReason: 'wrong_info', _reportText: ''});
+    this.nav('report_screen');
+    this.setState({
+      _reportTypes: [],
+      _reportText: '',
+      _reportImage: null
+    });
   },
-  submitReportArtifact() {
-    this.setState({sheet: null});
+  selectReportType(type) {
+    let list = this.state._reportTypes || [];
+    if (list.includes(type)) {
+      list = list.filter(x => x !== type);
+    } else {
+      list = [...list, type];
+    }
+    this.setState({_reportTypes: list});
+  },
+  simulateUploadImage() {
+    this.setState({_reportImage: 'https://picsum.photos/seed/reportimg/300/200'});
+    this.showToast('Đã tải lên ảnh minh chứng thành công!', 'success');
+  },
+  removeReportImage() {
+    this.setState({_reportImage: null});
+  },
+  submitReportScreen() {
+    if (!this.state._reportTypes || this.state._reportTypes.length === 0) {
+      this.showToast('Vui lòng chọn loại báo cáo sai sót!', 'error');
+      return;
+    }
+    this.back();
     this.showToast('Đã gửi báo cáo! Ban Nghiên cứu di sản sẽ xác minh trong 24h tới ✦', 'success');
   },
   // ---- 3D viewer ----
