@@ -2085,6 +2085,7 @@ window.VH_RENDER = {
       threeDPlayIcon: st.threeDPlaying ? 'ti-player-pause' : 'ti-player-play',
       toggle3DPlay: () => this.toggle3DPlay(),
       drag3DStart: (e) => this.drag3DStart(e),
+      clearHotspot: (e) => { this.setState({activeHotspot: null}); },
       threeDPanelY: st.threeDPanelY !== undefined ? st.threeDPanelY : 130,
       panelTransition: this._draggingPanel ? 'none' : 'transform 0.3s ease',
       dragPanelStart: (e) => this.dragPanelStart(e),
@@ -2141,7 +2142,7 @@ window.VH_RENDER = {
         ][h.id - 1] || 'position:absolute;top:50%;left:50%;',
         activeScale: st.activeHotspot === h.id ? 'scale(1.4)' : 'scale(1)',
         activeColor: st.activeHotspot === h.id ? 'var(--cta)' : 'var(--info)',
-        tap: () => this.selectHotspot(h.id)
+        tap: (e) => { e.stopPropagation(); this.selectHotspot(h.id); }
       })),
       showDetailBtn: (st.threeDPanelY !== undefined ? st.threeDPanelY : 130) <= 170,
 

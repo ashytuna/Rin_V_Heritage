@@ -1915,7 +1915,7 @@
                 </div>
 
                 <!-- model and interactive hotspots -->
-                <div onMouseDown="{{ drag3DStart }}" onTouchStart="{{ drag3DStart }}"
+                <div onMouseDown="{{ drag3DStart }}" onTouchStart="{{ drag3DStart }}" onClick="{{ clearHotspot }}"
                      style="position:absolute;top:44%;left:50%;transform:translate(-50%,-50%);width:236px;height:236px;perspective:900px;cursor:grab;touch-action:none;">
                   <img src="{{ threeDImg }}" alt="" draggable="false"
                        style="width:100%;height:100%;object-fit:cover;border-radius:16px;box-shadow:0 30px 60px rgba(0,0,0,.5);transform:{{ threeDRot }};transition:transform .1s linear;pointer-events:none;">
@@ -1958,17 +1958,6 @@
                       </div>
                     </div>
 
-                    <!-- basic summary description (always visible) -->
-                    <div style="display:flex;gap:12px;align-items:flex-start;flex:none;">
-                      <sc-if value="{{ curHotspotImg }}" hint-placeholder-val="{{ false }}">
-                        <img src="{{ curHotspotImg }}" alt=""
-                             style="width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid var(--border);flex:none;margin-top:2px;">
-                      </sc-if>
-                      <div style="flex:1;min-width:0;">
-                        <div style="font-size:11px;color:var(--text-tertiary);font-weight:600;text-transform:uppercase;line-height:1.2;">Mô tả cơ bản</div>
-                        <div style="font-size:13.5px;line-height:1.6;color:var(--text-secondary);margin-top:4px;">{{ curArtSummary }}</div>
-                      </div>
-                    </div>
 
                     <!-- full description (only visible when expanded) -->
                     <sc-if value="{{ showDetailBtn }}" hint-placeholder-val="{{ false }}">
