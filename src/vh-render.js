@@ -832,12 +832,25 @@ window.VH_RENDER = {
     }, []);
     return {
       placesMain, grpHanoi, grpHcm, grpMuseum, grpNature, homeFeed,
-      homeFeatVenues: placesMain.slice(0, 3).map((v, idx) => {
-        const dots = [0, 1, 2].map(i => ({
-          width: i === idx ? '12px' : '6px',
-          opacity: i === idx ? '1' : '0.4'
-        }));
-        return Object.assign({}, v, { dots });
+      heroIndex: st.heroIndex || 0,
+      homeFeatVenue: Object.assign({}, placesMain[st.heroIndex || 0] || placesMain[0], {
+        dots: [0, 1, 2].map(i => ({
+          width: i === (st.heroIndex || 0) ? '12px' : '6px',
+          opacity: i === (st.heroIndex || 0) ? '1' : '0.4',
+          go: () => {
+            // Khi người dùng click chọn dot thủ công, reset/clear timer slideshow cũ để tránh bị trôi nhanh
+            if (this._heroTimer) {
+              clearInterval(this._heroTimer);
+              this._heroTimer = setInterval(() => {
+                if (this.state.screen === 'home') {
+                  const cur = this.state.heroIndex || 0;
+                  this.setState({heroIndex: (cur + 1) % 3});
+                }
+              }, 5000);
+            }
+            this.setState({heroIndex: i});
+          }
+        }))
       }),
       homeFeatArticle: articlesView[0],
       showContinueCard: showContinue,

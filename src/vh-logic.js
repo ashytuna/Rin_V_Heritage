@@ -1,4 +1,19 @@
 window.VH_LOGIC = {
+  handleHeroTouchStart(e) {
+    this._heroTouchX = e.touches ? e.touches[0].clientX : e.clientX;
+  },
+  handleHeroTouchEnd(e) {
+    const endX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+    const dx = endX - (this._heroTouchX || 0);
+    if (Math.abs(dx) > 40) {
+      const cur = this.state.heroIndex || 0;
+      if (dx < 0) {
+        this.setState({heroIndex: (cur + 1) % 3});
+      } else {
+        this.setState({heroIndex: (cur - 1 + 3) % 3});
+      }
+    }
+  },
   // ---- notif ----
   markRead(id) {
     const l = (this.state.notifList || this.NOTIF_SEED).map(n => n.id === id ? {...n, read: true} : n);
@@ -103,6 +118,13 @@ window.VH_LOGIC = {
     };
     document.addEventListener('mousedown', this._rgDown, true);
     document.addEventListener('mouseup', this._rgUp, true);
+    // Slideshow Hero Card: tự động chuyển slide sau mỗi 5 giây
+    this._heroTimer = setInterval(() => {
+      if (this.state.screen === 'home') {
+        const cur = this.state.heroIndex || 0;
+        this.setState({heroIndex: (cur + 1) % 3});
+      }
+    }, 5000);
   },
   componentDidUpdate() {
     // pre-permission Thông báo: lần đầu vào Home sau khi tạo tài khoản (chỉ 1 lần)
@@ -129,6 +151,7 @@ window.VH_LOGIC = {
     }
   },
   componentWillUnmount() {
+    clearInterval(this._heroTimer);
     clearTimeout(this._splashT);
     clearTimeout(this._notifPromptT);
     clearTimeout(this._scanT);
