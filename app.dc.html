@@ -1959,9 +1959,15 @@
                     </div>
 
                     <!-- basic summary description (always visible) -->
-                    <div style="flex:none;">
-                      <div style="font-size:11px;color:var(--text-tertiary);font-weight:600;text-transform:uppercase;line-height:1.2;">Mô tả cơ bản</div>
-                      <div style="font-size:13.5px;line-height:1.6;color:var(--text-secondary);margin-top:4px;">{{ curArtSummary }}</div>
+                    <div style="display:flex;gap:12px;align-items:flex-start;flex:none;">
+                      <sc-if value="{{ curHotspotImg }}" hint-placeholder-val="{{ false }}">
+                        <img src="{{ curHotspotImg }}" alt=""
+                             style="width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid var(--border);flex:none;margin-top:2px;">
+                      </sc-if>
+                      <div style="flex:1;min-width:0;">
+                        <div style="font-size:11px;color:var(--text-tertiary);font-weight:600;text-transform:uppercase;line-height:1.2;">Mô tả cơ bản</div>
+                        <div style="font-size:13.5px;line-height:1.6;color:var(--text-secondary);margin-top:4px;">{{ curArtSummary }}</div>
+                      </div>
                     </div>
 
                     <!-- full description (only visible when expanded) -->

@@ -1416,7 +1416,11 @@ window.VH_LOGIC = {
     if (this.state.activeHotspot === id) {
       this.setState({activeHotspot: null});
     } else {
-      this.setState({activeHotspot: id});
+      const nextState = {activeHotspot: id};
+      if ((this.state.threeDPanelY !== undefined ? this.state.threeDPanelY : 130) > 150) {
+        nextState.threeDPanelY = 120; // Trượt nhẹ panel lên để hiển thị thông tin hotspot
+      }
+      this.setState(nextState);
       this.showToast('Đang khám phá chi tiết điểm chạm ✦');
     }
   },
@@ -1428,11 +1432,14 @@ window.VH_LOGIC = {
     this.showToast('Đã gửi báo cáo! Ban Nghiên cứu di sản sẽ xác minh trong 24h tới ✦', 'success');
   },
   // ---- 3D viewer ----
+  record3DInteraction() {
+    this._last3DInteract = Date.now();
+  },
   start3D() {
     clearInterval(this._threeDT);
     this._threeDT = setInterval(() => {
-      if (!this.state.threeDPlaying || this._dragging3D) return;
-      this.setState(s => ({threeDRot: (s.threeDRot + 2) % 360}));
+      if (!this.state.threeDPlaying || this._dragging3D || (this._last3DInteract && Date.now() - this._last3DInteract < 4000)) return;
+      this.setState(s => ({threeDRot: (s.threeDRot + 0.6) % 360}));
     }, 40);
   },
   stop3D() {
@@ -1440,13 +1447,28 @@ window.VH_LOGIC = {
     this._threeDT = null;
   },
   toggle3DPlay() {
+    this.record3DInteraction();
     this.setState(s => ({threeDPlaying: !s.threeDPlaying}));
+  },
+  zoom3DIn() {
+    this.record3DInteraction();
+    this.setState(s => ({threeDZoom: Math.min(1.8, s.threeDZoom + 0.2)}));
+  },
+  zoom3DOut() {
+    this.record3DInteraction();
+    this.setState(s => ({threeDZoom: Math.max(0.6, s.threeDZoom - 0.2)}));
+  },
+  reset3D() {
+    this.record3DInteraction();
+    this.setState({threeDRot: 0, threeDZoom: 1});
   },
   drag3DStart(e) {
     this._dragging3D = true;
+    this.record3DInteraction();
     const startX = e.touches ? e.touches[0].clientX : e.clientX;
     const startRot = this.state.threeDRot;
     const move = (ev) => {
+      this.record3DInteraction();
       const x = ev.touches ? ev.touches[0].clientX : ev.clientX;
       this.setState({threeDRot: ((startRot + (x - startX) * 0.8) % 360 + 360) % 360});
     };

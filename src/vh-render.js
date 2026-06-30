@@ -2077,9 +2077,9 @@ window.VH_RENDER = {
       threeDImg: this.vimg(cur.seed, 500, 500),
       rot3DLeft: () => this.setState({threeDRot: (st.threeDRot - 30 + 360) % 360}),
       rot3DRight: () => this.setState({threeDRot: (st.threeDRot + 30) % 360}),
-      zoom3DIn: () => this.setState({threeDZoom: Math.min(1.8, st.threeDZoom + 0.2)}),
-      zoom3DOut: () => this.setState({threeDZoom: Math.max(0.6, st.threeDZoom - 0.2)}),
-      reset3D: () => this.setState({threeDRot: 0, threeDZoom: 1}),
+      zoom3DIn: () => this.zoom3DIn(),
+      zoom3DOut: () => this.zoom3DOut(),
+      reset3D: () => this.reset3D(),
       show3DHint: () => this.showToast('Kéo để xoay · chạm điểm sáng để xem chi tiết'),
       threeDPlaying: st.threeDPlaying,
       threeDPlayIcon: st.threeDPlaying ? 'ti-player-pause' : 'ti-player-play',
@@ -2098,6 +2098,15 @@ window.VH_RENDER = {
         ];
         const activeH = curHotspots.find(h => h.id === st.activeHotspot);
         return activeH ? activeH.title : cur.name;
+      })(),
+      curHotspotImg: (() => {
+        const curHotspots = cur.hotspots || [
+          { id: 1, title: 'Đỉnh hiện vật', summary: 'Phần phía trên của hiện vật chứa nhiều chi tiết trang trí tinh xảo.', desc: 'Đặc trưng hoa văn trang trí ở phần trên thể hiện tính thẩm mỹ cao và tài năng của các nghệ nhân chế tác cổ đại.' },
+          { id: 2, title: 'Thân hiện vật', summary: 'Phần thân chính nâng đỡ cấu trúc hiện vật với chất liệu bền bỉ.', desc: 'Cấu trúc thân chính làm bằng chất liệu đặc trưng giúp hiện vật trường tồn qua hàng ngàn năm lịch sử.' },
+          { id: 3, title: 'Chân đế hiện vật', summary: 'Đế vững chãi nâng đỡ toàn bộ hiện vật.', desc: 'Chân đế được gia cố vững chắc, có kết cấu đặc trưng để giữ thăng bằng cho hiện vật trong suốt thời kỳ trưng bày.' }
+        ];
+        const activeH = curHotspots.find(h => h.id === st.activeHotspot);
+        return activeH ? this.vimg(cur.seed + '_part' + activeH.id, 120, 120) : null;
       })(),
       curArtSummary: (() => {
         const curHotspots = cur.hotspots || [
