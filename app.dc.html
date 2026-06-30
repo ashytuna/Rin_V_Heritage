@@ -116,12 +116,10 @@
                    onTouchStart="{{ onWalkTouchStart }}" onTouchEnd="{{ onWalkTouchEnd }}"
                    onMouseDown="{{ onWalkMouseDown }}" onMouseUp="{{ onWalkMouseUp }}"
                    style="position:absolute;inset:0;background:var(--bg-primary);display:flex;flex-direction:column;">
-                <!-- nút back ở slide đầu: quay lại đổi ngôn ngữ -->
-                <sc-if value="{{ isFirstWalk }}" hint-placeholder-val="{{ true }}">
-                  <button data-ripple="1" onClick="{{ back }}"
-                          style="position:absolute;top:46px;left:24px;z-index:5;overflow:hidden;width:42px;height:42px;border-radius:99px;border:1px solid var(--border);background:var(--bg-card);cursor:pointer;color:var(--text-primary);display:flex;align-items:center;justify-content:center;">
-                    <i class="ti ti-arrow-left" style="font-size:20px;"></i></button>
-                </sc-if>
+                <button data-ripple="1" onClick="{{ walkBack }}"
+                        aria-label="Quay lại chọn ngôn ngữ"
+                        style="position:absolute;top:46px;left:24px;z-index:5;overflow:hidden;width:42px;height:42px;border-radius:99px;border:1px solid {{ walkBackBtnBorder }};background:{{ walkBackBtnBg }};cursor:pointer;color:{{ walkBackBtnColor }};display:flex;align-items:center;justify-content:center;">
+                  <i class="ti ti-arrow-left" style="font-size:20px;"></i></button>
                 <div key="walkstep-{{ walkStep }}"
                      style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 38px;text-align:center;animation:vhUp .4s ease;">
                   <div

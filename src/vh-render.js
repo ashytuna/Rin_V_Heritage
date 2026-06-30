@@ -347,6 +347,10 @@ window.VH_RENDER = {
       isLastWalk,
       isFirstWalk: st.walkStep === 0,
       t_walkStart: this.t('walkStart'),
+      walkBack: () => this.exitWalkToLanguage(),
+      walkBackBtnBg: 'transparent',
+      walkBackBtnBorder: 'var(--cta)',
+      walkBackBtnColor: 'var(--cta)',
       showPrevArrow: st.walkStep > 0,
       showNextArrow: !isLastWalk,
       showPrevWalk: st.walkStep > 0,
@@ -665,6 +669,7 @@ window.VH_RENDER = {
       langContinue: () => {
         // lưu cấu hình ngôn ngữ vào localStorage rồi sang Tutorial
         try { localStorage.setItem('vh_lang', this.state.language); } catch (e) {}
+        this.setState({walkStep: 0});
         this.nav('walkthrough', 'fwd');
       },
       // NEARBY (gợi ý tải gói AR gần đây sau đăng nhập, khi đã bật vị trí)

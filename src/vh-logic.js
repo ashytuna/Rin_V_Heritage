@@ -307,6 +307,18 @@ window.VH_LOGIC = {
   skipWalk() {
     this.nav('authchoice', 'fwd');
   },
+  exitWalkToLanguage() {
+    this.setState({
+      screen: 'language',
+      history: [],
+      navDir: 'back',
+      sheet: null,
+      modal: null,
+      walkStep: 0
+    });
+    this.clearAuthToast('language');
+    this.stop3D();
+  },
 
   // ---- auth helpers ----
   validEmail(e) {
