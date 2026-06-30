@@ -2085,6 +2085,10 @@ window.VH_RENDER = {
       threeDPlayIcon: st.threeDPlaying ? 'ti-player-pause' : 'ti-player-play',
       toggle3DPlay: () => this.toggle3DPlay(),
       drag3DStart: (e) => this.drag3DStart(e),
+      threeDPanelY: st.threeDPanelY !== undefined ? st.threeDPanelY : 130,
+      panelTransition: this._draggingPanel ? 'none' : 'transform 0.3s ease',
+      dragPanelStart: (e) => this.dragPanelStart(e),
+      curArtSummary: cur.summary || (cur.desc ? (cur.desc.substring(0, 85) + '...') : 'Chưa có mô tả cơ bản'),
       exit3D: () => {
         this.stop3D();
         this.back();

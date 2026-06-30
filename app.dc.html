@@ -1883,9 +1883,16 @@
                           style="position:relative;overflow:hidden;width:44px;height:44px;border-radius:99px;border:none;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;">
                     <i class="ti ti-x" style="font-size:22px;"></i></button>
                   <div style="color:#fff;font-size:15px;font-weight:600;">Mô hình 3D</div>
-                  <button data-ripple="1" onClick="{{ show3DHint }}"
-                          style="position:relative;overflow:hidden;width:44px;height:44px;border-radius:99px;border:none;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;">
-                    <i class="ti ti-info-circle" style="font-size:22px;"></i></button>
+                  <div style="display:flex;gap:8px;">
+                    <button data-ripple="1" onClick="{{ openSaveSheet }}"
+                            style="position:relative;overflow:hidden;width:44px;height:44px;border-radius:99px;border:none;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);color:{{ saveHeroColor }};cursor:pointer;display:flex;align-items:center;justify-content:center;"
+                            title="{{ saveLabel }}">
+                      <i class="ti {{ saveIcon }}" style="font-size:20px;"></i>
+                    </button>
+                    <button data-ripple="1" onClick="{{ show3DHint }}"
+                            style="position:relative;overflow:hidden;width:44px;height:44px;border-radius:99px;border:none;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+                      <i class="ti ti-info-circle" style="font-size:22px;"></i></button>
+                  </div>
                 </div>
                 <!-- controls (đẩy lên trên) -->
                 <div
@@ -1921,38 +1928,65 @@
                 </div>
                 <!-- info panel + CTA -->
                 <div
-                    style="position:absolute;left:0;right:0;bottom:0;background:var(--bg-card);border-radius:24px 24px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.4);padding:20px 20px 26px;">
-                  <div class="vh-serif" style="font-size:20px;font-weight:600;color:var(--text-primary);">{{ curArt.name
-                    }}
+                    style="position:absolute;left:0;right:0;bottom:0;background:var(--bg-card);border-radius:24px 24px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.4);padding:10px 20px 24px;transform:translateY({{ threeDPanelY }}px);transition:{{ panelTransition }};height:380px;z-index:20;display:flex;flex-direction:column;">
+                  <!-- Drag Handle -->
+                  <div onMouseDown="{{ dragPanelStart }}" onTouchStart="{{ dragPanelStart }}"
+                       style="width:100%;height:22px;display:flex;align-items:center;justify-content:center;cursor:ns-resize;flex:none;margin-bottom:2px;">
+                    <div style="width:44px;height:5px;border-radius:99px;background:var(--border-2);"></div>
                   </div>
-                  <div style="display:flex;gap:8px;margin-top:12px;">
-                    <div style="flex:1;background:var(--bg-tertiary);border-radius:8px;padding:8px 10px;">
-                      <div style="font-size:10px;color:var(--text-tertiary);">Niên đại</div>
-                      <div class="vh-serif" style="font-size:13px;font-weight:500;color:var(--text-primary);">{{
-                        curArt.era }}
+                  
+                  <div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding-right:2px;">
+                    <div class="vh-serif" style="font-size:20px;font-weight:600;color:var(--text-primary);line-height:1.2;">{{ curArt.name }}</div>
+                    
+                    <div style="display:flex;gap:8px;flex:none;">
+                      <div style="flex:1;background:var(--bg-tertiary);border-radius:8px;padding:6px 10px;border:1px solid var(--border);">
+                        <div style="font-size:9px;color:var(--text-tertiary);text-transform:uppercase;">Niên đại</div>
+                        <div class="vh-serif" style="font-size:13px;font-weight:600;color:var(--text-primary);margin-top:2px;">{{ curArt.era }}</div>
+                      </div>
+                      <div style="flex:1;background:var(--bg-tertiary);border-radius:8px;padding:6px 10px;border:1px solid var(--border);">
+                        <div style="font-size:9px;color:var(--text-tertiary);text-transform:uppercase;">Chất liệu</div>
+                        <div class="vh-serif" style="font-size:13px;font-weight:600;color:var(--text-primary);margin-top:2px;">{{ curArt.material }}</div>
+                      </div>
+                      <div style="flex:1;background:var(--bg-tertiary);border-radius:8px;padding:6px 10px;border:1px solid var(--border);">
+                        <div style="font-size:9px;color:var(--text-tertiary);text-transform:uppercase;">Lượt xem</div>
+                        <div class="vh-serif" style="font-size:13px;font-weight:600;color:var(--text-primary);margin-top:2px;">{{ curArt.views }}</div>
                       </div>
                     </div>
-                    <div style="flex:1;background:var(--bg-tertiary);border-radius:8px;padding:8px 10px;">
-                      <div style="font-size:10px;color:var(--text-tertiary);">Chất liệu</div>
-                      <div class="vh-serif" style="font-size:13px;font-weight:500;color:var(--text-primary);">{{
-                        curArt.material }}
-                      </div>
+
+                    <!-- basic summary description -->
+                    <div style="flex:none;">
+                      <div style="font-size:11px;color:var(--text-tertiary);font-weight:600;text-transform:uppercase;line-height:1.2;">Mô tả cơ bản</div>
+                      <div style="font-size:13.5px;line-height:1.55;color:var(--text-secondary);margin-top:4px;">{{ curArtSummary }}</div>
                     </div>
-                    <div style="flex:1;background:var(--bg-tertiary);border-radius:8px;padding:8px 10px;">
-                      <div style="font-size:10px;color:var(--text-tertiary);">Lượt khám phá</div>
-                      <div class="vh-serif" style="font-size:13px;font-weight:500;color:var(--text-primary);">{{
-                        curArt.views }}
+
+                    <!-- mini audio guide player -->
+                    <div style="display:flex;align-items:center;gap:12px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:10px;padding:8px 12px;flex:none;box-shadow:var(--shadow);">
+                      <button data-ripple="1" onClick="{{ toggleAudio }}"
+                              style="position:relative;overflow:hidden;width:34px;height:34px;border-radius:99px;border:none;background:var(--cta);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;">
+                        <i class="ti {{ audioIcon }}" style="font-size:16px;"></i>
+                      </button>
+                      <div style="flex:1;min-width:0;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--text-tertiary);">
+                          <span style="font-weight:600;color:var(--text-primary);">Thuyết minh di sản</span>
+                          <span>{{ audioTime }} / {{ audioTotal }}</span>
+                        </div>
+                        <div onMouseDown="{{ audioScrub }}" onTouchStart="{{ audioScrub }}"
+                             style="height:5px;border-radius:99px;background:var(--bg-tertiary);margin-top:6px;overflow:hidden;cursor:pointer;touch-action:none;">
+                          <div style="height:100%;width:{{ audioPct }};background:var(--cta);border-radius:99px;transition:width .1s linear;"></div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div style="display:flex;gap:10px;margin-top:16px;">
+
+                  <!-- CTA buttons -->
+                  <div style="display:flex;gap:10px;margin-top:12px;flex:none;">
                     <button data-ripple="1" onClick="{{ toDetail }}"
-                            style="position:relative;overflow:hidden;flex:1;border:none;background:var(--cta);color:#fff;font-size:15px;font-weight:600;padding:15px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
-                      Xem chi tiết hiện vật<i class="ti ti-arrow-right" style="font-size:19px;"></i>
+                            style="position:relative;overflow:hidden;flex:1;border:none;background:var(--cta);color:#fff;font-size:14.5px;font-weight:600;padding:13px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 12px rgba(237,137,39,.25);">
+                      Xem chi tiết hiện vật<i class="ti ti-arrow-right" style="font-size:18px;"></i>
                     </button>
                     <button data-ripple="1" onClick="{{ openPhoto }}"
-                            style="position:relative;overflow:hidden;flex:none;width:56px;border:1px solid var(--border);background:var(--bg-secondary);color:var(--cta);border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
-                      <i class="ti ti-camera" style="font-size:23px;"></i></button>
+                            style="position:relative;overflow:hidden;flex:none;width:52px;height:48px;border:1px solid var(--border);background:var(--bg-secondary);color:var(--cta);border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+                      <i class="ti ti-camera" style="font-size:22px;"></i></button>
                   </div>
                 </div>
               </div>
@@ -5171,7 +5205,7 @@ class Component extends DCLogic {
     scanState: 'idle', scanFailReason: null, qrState: 'idle', isPlaying: false, audioProgress: 0, audioHD: false, audioSpeed: 1, audioVoice: 'Tiêu chuẩn',
     libTab: 'art', searchQuery: '', searchFilter: 'all', _exploreH: 18, _camAskChecked: false, _camSnoozeDay: '',
     wheelchair: false, voiceDesc: false, _venueDownloadLoading: false, _venueDownloadProgress: 0, _venueDownloadError: null,
-    threeDRot: 0, threeDZoom: 1, threeDPlaying: true, timeIdx: 1,
+    threeDRot: 0, threeDZoom: 1, threeDPlaying: true, timeIdx: 1, threeDPanelY: 130, _draggingPanel: false,
     paymentMethod: null, paymentTier: 'premium', notifList: null, twoFA: false, failedPayment: 0,
     _cpOld: '', _cpNew: '', _cpConfirm: '', _ceNew: '', _daConfirm: false, _daPass: '', _revoked: [],
     _helpQuery: '', _csName: '', _csEmail: '', _csIssue: null, _csDesc: '', _csAttached: false,

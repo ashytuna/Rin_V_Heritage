@@ -1447,7 +1447,30 @@ window.VH_LOGIC = {
     document.addEventListener('touchmove', move, {passive: true});
     document.addEventListener('touchend', up);
   },
-
+  dragPanelStart(e) {
+    this._draggingPanel = true;
+    const startY = e.touches ? e.touches[0].clientY : e.clientY;
+    const startPanelY = this.state.threeDPanelY !== undefined ? this.state.threeDPanelY : 130;
+    const move = (ev) => {
+      const y = ev.touches ? ev.touches[0].clientY : ev.clientY;
+      const deltaY = y - startY;
+      let newY = startPanelY + deltaY;
+      if (newY < 0) newY = 0;
+      if (newY > 240) newY = 240;
+      this.setState({threeDPanelY: newY});
+    };
+    const up = () => {
+      this._draggingPanel = false;
+      document.removeEventListener('mousemove', move);
+      document.removeEventListener('mouseup', up);
+      document.removeEventListener('touchmove', move);
+      document.removeEventListener('touchend', up);
+    };
+    document.addEventListener('mousemove', move);
+    document.addEventListener('mouseup', up);
+    document.addEventListener('touchmove', move, {passive: true});
+    document.addEventListener('touchend', up);
+  },
   // ---- time travel ----
   pickTimeStage(idx) {
     if (idx === 2 && !(this.state.tiers && this.state.tiers.premium)) {
