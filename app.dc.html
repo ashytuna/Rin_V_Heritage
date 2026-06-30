@@ -1345,12 +1345,13 @@
             </sc-if>
 
             <!-- LOCATION ASK (hỏi bật vị trí trước khi vào Khám phá) -->
-            <sc-if value="{{ isLocationAsk }}" hint-placeholder-val="{{ false }}">
-              <div data-screen-label="LocationAsk"
+            <!-- PERMISSION ASK (Hỏi quyền dùng chung: Vị trí / Camera) -->
+            <sc-if value="{{ isPermissionAsk }}" hint-placeholder-val="{{ false }}">
+              <div data-screen-label="PermissionAsk"
                    class="vh-location-ask-screen"
                    style="position:absolute;inset:0;background:var(--bg-primary);display:flex;flex-direction:column;padding:0 24px;">
                 <div style="padding:46px 0 0;flex:none;">
-                  <button data-ripple="1" onClick="{{ locAskBack }}"
+                  <button data-ripple="1" onClick="{{ permBack }}"
                           style="position:relative;overflow:hidden;width:42px;height:42px;border-radius:99px;border:1px solid var(--border);background:var(--bg-card);cursor:pointer;color:var(--text-primary);display:flex;align-items:center;justify-content:center;">
                     <i class="ti ti-arrow-left" style="font-size:20px;"></i></button>
                 </div>
@@ -1358,28 +1359,25 @@
                   <div class="vh-location-ask-stack">
                     <div
                         style="width:96px;height:96px;border-radius:99px;background:rgba(237,137,39,.14);display:flex;align-items:center;justify-content:center;">
-                      <i class="ti ti-map-pin" style="font-size:46px;color:var(--cta);"></i>
+                      <i class="ti {{ permIcon }}" style="font-size:46px;color:var(--cta);"></i>
                     </div>
-                    <div class="vh-serif" style="font-size:26px;font-weight:600;margin-top:24px;">Bật vị trí của bạn?</div>
-                    <div class="vh-location-ask-copy">
-                      Cho phép truy cập vị trí để xem bản đồ di tích quanh bạn và gợi ý điểm đến gần nhất. Nếu bỏ qua, bản đồ
-                      sẽ mặc định ở Hà Nội.
-                    </div>
+                    <div class="vh-serif" style="font-size:26px;font-weight:600;margin-top:24px;">{{ permTitle }}</div>
+                    <div class="vh-location-ask-copy">{{ permDesc }}</div>
                   </div>
                 </div>
                 <div class="vh-location-ask-actions">
-                  <button data-ripple="1" onClick="{{ locAskGrant }}"
+                  <button data-ripple="1" onClick="{{ permGrant }}"
                           style="position:relative;overflow:hidden;width:100%;border:none;background:var(--cta);color:#fff;font-size:16px;font-weight:600;padding:16px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
-                    <i class="ti ti-map-pin" style="font-size:19px;"></i>Bật vị trí
+                    <i class="ti {{ permIcon }}" style="font-size:19px;"></i>{{ permCta }}
                   </button>
-                  <button data-ripple="1" onClick="{{ locAskSkip }}" class="vh-location-ask-secondary"
+                  <button data-ripple="1" onClick="{{ permSkip }}" class="vh-location-ask-secondary"
                           style="position:relative;overflow:hidden;border:none;background:transparent;color:var(--text-secondary);font-size:14px;font-weight:600;padding:12px 16px;border-radius:12px;cursor:pointer;">
-                    Dùng không có vị trí
+                    Để sau
                   </button>
-                  <button data-ripple="1" onClick="{{ toggleLocAsk }}" class="vh-location-ask-preference">
+                  <button data-ripple="1" onClick="{{ togglePermAsk }}" class="vh-location-ask-preference">
                     <div
-                        style="width:20px;height:20px;border-radius:6px;border:2px solid {{ locAskBoxBorder }};background:{{ locAskBoxBg }};display:flex;align-items:center;justify-content:center;flex:none;">
-                      <i class="ti ti-check" style="font-size:13px;color:#fff;display:{{ locAskCheckDisp }};"></i>
+                        style="width:20px;height:20px;border-radius:6px;border:2px solid {{ permBoxBorder }};background:{{ permBoxBg }};display:flex;align-items:center;justify-content:center;flex:none;">
+                      <i class="ti ti-check" style="font-size:13px;color:#fff;display:{{ permCheckDisp }};"></i>
                     </div>
                     <span class="vh-location-ask-pref-label">Đừng hỏi lại hôm nay</span>
                   </button>
@@ -1908,47 +1906,7 @@
               </div>
             </sc-if>
 
-            <!-- CAMERA ASK (Hỏi quyền camera trước khi vào Chụp ảnh AR) -->
-            <sc-if value="{{ isCameraAsk }}" hint-placeholder-val="{{ false }}">
-              <div data-screen-label="CameraAsk"
-                   class="vh-location-ask-screen"
-                   style="position:absolute;inset:0;background:var(--bg-primary);display:flex;flex-direction:column;padding:0 24px;">
-                <div style="padding:46px 0 0;flex:none;">
-                  <button data-ripple="1" onClick="{{ camAskBack }}"
-                          style="position:relative;overflow:hidden;width:42px;height:42px;border-radius:99px;border:1px solid var(--border);background:var(--bg-card);cursor:pointer;color:var(--text-primary);display:flex;align-items:center;justify-content:center;">
-                    <i class="ti ti-arrow-left" style="font-size:20px;"></i></button>
-                </div>
-                <div class="vh-location-ask-main">
-                  <div class="vh-location-ask-stack">
-                    <div
-                        style="width:96px;height:96px;border-radius:99px;background:rgba(237,137,39,.14);display:flex;align-items:center;justify-content:center;">
-                      <i class="ti ti-camera" style="font-size:46px;color:var(--cta);"></i>
-                    </div>
-                    <div class="vh-serif" style="font-size:26px;font-weight:600;margin-top:24px;">Cấp quyền Camera?</div>
-                    <div class="vh-location-ask-copy">
-                      V-Heritage cần quyền truy cập camera để đưa mô hình hiện vật 3D hiển thị ngay trong không gian thực và cho phép bạn chụp hình lưu niệm.
-                    </div>
-                  </div>
-                </div>
-                <div class="vh-location-ask-actions">
-                  <button data-ripple="1" onClick="{{ camAskGrant }}"
-                          style="position:relative;overflow:hidden;width:100%;border:none;background:var(--cta);color:#fff;font-size:16px;font-weight:600;padding:16px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
-                    <i class="ti ti-camera" style="font-size:19px;"></i>Cấp quyền Camera
-                  </button>
-                  <button data-ripple="1" onClick="{{ camAskSkip }}" class="vh-location-ask-secondary"
-                          style="position:relative;overflow:hidden;border:none;background:transparent;color:var(--text-secondary);font-size:14px;font-weight:600;padding:12px 16px;border-radius:12px;cursor:pointer;">
-                    Để sau
-                  </button>
-                  <button data-ripple="1" onClick="{{ toggleCamAsk }}" class="vh-location-ask-preference">
-                    <div
-                        style="width:20px;height:20px;border-radius:6px;border:2px solid {{ camAskBoxBorder }};background:{{ camAskBoxBg }};display:flex;align-items:center;justify-content:center;flex:none;">
-                      <i class="ti ti-check" style="font-size:13px;color:#fff;display:{{ camAskCheckDisp }};"></i>
-                    </div>
-                    <span class="vh-location-ask-pref-label">Đừng hỏi lại hôm nay</span>
-                  </button>
-                </div>
-              </div>
-            </sc-if>
+
 
             <!-- CAMERA SHOT (Màn chụp ảnh AR hiện vật) -->
             <sc-if value="{{ isCameraShot }}" hint-placeholder-val="{{ false }}">

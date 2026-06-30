@@ -85,15 +85,26 @@ window.VH_RENDER = {
       isParental: st.screen === 'parental',
       isLangScreen: st.screen === 'language',
       isSpecial: st.screen === 'special',
-      isLocationAsk: st.screen === 'locationask',
-      locAskChecked: !!st._locAskChecked,
-      locAskBoxBorder: st._locAskChecked ? 'var(--cta)' : 'var(--border-2)',
-      locAskBoxBg: st._locAskChecked ? 'var(--cta)' : 'transparent',
-      locAskCheckDisp: st._locAskChecked ? 'block' : 'none',
-      toggleLocAsk: () => this.toggleLocAsk(),
-      locAskGrant: () => this.locAskGrant(),
-      locAskSkip: () => this.locAskSkip(),
-      locAskBack: () => this.back(),
+      isPermissionAsk: st.screen === 'locationask' || st.screen === 'cameraask',
+      permIcon: st.screen === 'cameraask' ? 'ti-camera' : 'ti-map-pin',
+      permTitle: st.screen === 'cameraask' ? 'Cấp quyền Camera?' : 'Bật vị trí của bạn?',
+      permDesc: st.screen === 'cameraask' 
+        ? 'V-Heritage cần quyền truy cập camera để đưa mô hình hiện vật 3D hiển thị ngay trong không gian thực và cho phép bạn chụp hình lưu niệm.'
+        : 'Cho phép truy cập vị trí để xem bản đồ di tích quanh bạn và gợi ý điểm đến gần nhất. Nếu bỏ qua, bản đồ sẽ mặc định ở Hà Nội.',
+      permCta: st.screen === 'cameraask' ? 'Cấp quyền Camera' : 'Bật vị trí',
+      permBoxBorder: st.screen === 'cameraask' 
+        ? (st._camAskChecked ? 'var(--cta)' : 'var(--border)') 
+        : (st._locAskChecked ? 'var(--cta)' : 'var(--border-2)'),
+      permBoxBg: st.screen === 'cameraask' 
+        ? (st._camAskChecked ? 'var(--cta)' : 'transparent') 
+        : (st._locAskChecked ? 'var(--cta)' : 'transparent'),
+      permCheckDisp: st.screen === 'cameraask' 
+        ? (st._camAskChecked ? 'block' : 'none') 
+        : (st._locAskChecked ? 'block' : 'none'),
+      permBack: () => st.screen === 'cameraask' ? this.camAskBack() : this.back(),
+      permGrant: () => st.screen === 'cameraask' ? this.camAskGrant() : this.locAskGrant(),
+      permSkip: () => st.screen === 'cameraask' ? this.camAskSkip() : this.locAskSkip(),
+      togglePermAsk: () => st.screen === 'cameraask' ? this.toggleCamAsk() : this.toggleLocAsk(),
       offlineBanner: st.isOffline && st.hasPacks && mainTabsSet,
       t_offlineBanner: this.t('offlineBanner'),
       toggleOffline: () => {
@@ -2029,16 +2040,8 @@ window.VH_RENDER = {
       openPhoto: () => this.openPhotoCapture(),
       showVoiceDesc: st.a11y.visualBlind,
       openAudioDesc: () => this.nav('audiodesc', 'fwd'),
-      // CAMERA ASK & SHOT
-      isCameraAsk: st.screen === 'cameraask',
+      // CAMERA SHOT
       isCameraShot: st.screen === 'camerashot',
-      camAskGrant: () => this.camAskGrant(),
-      camAskSkip: () => this.camAskSkip(),
-      camAskBack: () => this.camAskBack(),
-      toggleCamAsk: () => this.toggleCamAsk(),
-      camAskBoxBorder: st._camAskChecked ? 'var(--cta)' : 'var(--border)',
-      camAskBoxBg: st._camAskChecked ? 'var(--cta)' : 'transparent',
-      camAskCheckDisp: st._camAskChecked ? 'block' : 'none',
       takePhoto: () => this.takePhoto(),
       cameraShotImg: this.vimg(cur.seed, 500, 500),
       shutterFlash: st._shutterFlash ? 'block' : 'none',
