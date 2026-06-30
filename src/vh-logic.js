@@ -549,12 +549,17 @@ window.VH_LOGIC = {
   },
   finishPreDownload() {
     clearInterval(this._preDlTimer);
+    const success = (this.state._preDlProgress || 0) === 100;
     this.setState({
       sheet: null,
       _preDlLoading: false,
       _preDlProgress: 0
     });
-    this.showToast('Chào mừng bạn đến với V-Heritage ✦', 'success');
+    if (success) {
+      this.openVenue(2); // Bảo tàng Mỹ thuật Việt Nam
+    } else {
+      this.showToast('Chào mừng bạn đến với V-Heritage ✦', 'success');
+    }
   },
   // ---- pre-permission Thông báo: chỉ hiện 1 lần đầu khi user mới vào Home ----
   showNotifPrompt() {
