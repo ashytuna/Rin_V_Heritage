@@ -784,10 +784,20 @@ window.VH_RENDER = {
     const VTYPE = {1: 'Bảo tàng', 2: 'Bảo tàng', 3: 'Di tích', 4: 'Khu di tích', 5: 'Khu di tích', 6: 'Phố cổ', 11: 'Di sản', 12: 'Di sản', 13: 'Thánh địa', 14: 'Thắng cảnh', 15: 'Di sản', 16: 'Di tích', 17: 'Khu di tích', 18: 'Di sản'};
     const posterCard = (id) => {
       const v = this.findVenue(id) || {};
+      const name = v.name || '';
+      let displayName = name;
+      if (name === 'Hoàng thành Thăng Long' && window.React) {
+        displayName = window.React.createElement('span', null,
+          'Hoàng thành',
+          window.React.createElement('br', {key: 'br'}),
+          'Thăng Long'
+        );
+      }
       return {
-        id, name: v.name || '', city: v.city || '',
+        id, name, displayName, city: v.city || '',
         badge: 'Địa điểm nổi bật',
-        locationBadge: '📍 ' + (v.city || ''),
+        locationBadge: v.city || '',
+        contextLabel: 'Khám phá di sản tại ' + (v.city || ''),
         badgeBg: 'var(--chip-badge-bg)', badgeColor: 'var(--chip-badge-fg)',
         subtitle: v.city || '',
         type: VTYPE[id] || 'Di tích',
