@@ -194,7 +194,6 @@ window.VH_RENDER = {
       socialColor: md.color,
       socialContinue: () => {
         this.setState({modal: null, user: {name: 'Minh Anh', email: 'minhanh@gmail.com', isLoggedIn: true, age: 31}});
-        this.showToast('Chào mừng trở lại ✦');
         this.enterApp();
       },
       socialCancel: () => {
