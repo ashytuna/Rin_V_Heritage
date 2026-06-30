@@ -2038,7 +2038,7 @@ window.VH_RENDER = {
       takePhoto: () => this.takePhoto(),
       cameraShotImg: this.vimg(cur.seed, 500, 500),
       shutterFlash: st._shutterFlash ? 'block' : 'none',
-      camerashotBack: () => this.nav('threed', 'back'),
+      camerashotBack: () => this.back(),
       // 3D VIEWER
       isThreeD: st.screen === 'threed',
       threeDRot: 'rotateY(' + st.threeDRot + 'deg) scale(' + st.threeDZoom + ')',

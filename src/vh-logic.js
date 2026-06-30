@@ -711,9 +711,9 @@ window.VH_LOGIC = {
   openPhotoCapture() {
     const camOn = this.state.permissions && this.state.permissions.camera === 1;
     if (!camOn) {
-      this.setState({screen: 'cameraask', history: this.state.history.concat(this.state.screen), navDir: 'fwd'});
+      this.nav('cameraask', 'fwd');
     } else {
-      this.setState({screen: 'camerashot', history: this.state.history.concat(this.state.screen), navDir: 'fwd'});
+      this.nav('camerashot', 'fwd');
     }
   },
   camAskGrant() {
@@ -722,7 +722,7 @@ window.VH_LOGIC = {
       if (ok) {
         this._setPermFlag('camera', 1);
         this.showToast('Đã cấp quyền camera ✦', 'success');
-        this.setState({screen: 'camerashot'});
+        this.replace('camerashot');
       } else {
         this.showSystemSettingsDialog('camera');
       }
@@ -730,10 +730,10 @@ window.VH_LOGIC = {
   },
   camAskSkip() {
     this.showToast('Bạn cần cấp quyền camera để chụp hình AR.');
-    this.setState({screen: 'threed', navDir: 'back'});
+    this.back();
   },
   camAskBack() {
-    this.setState({screen: 'threed', navDir: 'back'});
+    this.back();
   },
   takePhoto() {
     if (this.state._shutterFlash) return;
@@ -741,7 +741,7 @@ window.VH_LOGIC = {
     if (navigator.vibrate) navigator.vibrate(40);
     setTimeout(() => {
       this.setState({_shutterFlash: false});
-      this.setState({screen: 'photo'});
+      this.replace('photo');
       this.showToast('Đã lưu ảnh AR vào Bộ sưu tập ✦', 'success');
     }, 180);
   },
