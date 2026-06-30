@@ -1023,10 +1023,7 @@
                 </sc-if>
                 <!-- card địa điểm nổi bật (slideshow chuyển nội dung) -->
                 <div data-ripple="1"
-                     onTouchStart="{{ handleHeroTouchStart }}"
-                     onTouchEnd="{{ handleHeroTouchEnd }}"
-                     onMouseDown="{{ handleHeroTouchStart }}"
-                     onMouseUp="{{ handleHeroTouchEnd }}"
+                     class="vh-hero-card-container"
                      style="position:relative;overflow:hidden;border-radius:16px;height:var(--home-hero-height);cursor:pointer;box-shadow:var(--shadow-lg);display:flex;flex-direction:column;margin:14px 18px 0;">
                     <img key="hero-bg-{{ heroIndex }}" src="{{ homeFeatVenue.img }}" alt=""
                          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:heroBgFadeZoom 0.45s cubic-bezier(0.215, 0.610, 0.355, 1) forwards;"
@@ -1034,9 +1031,9 @@
                     <div
                         style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.45) 0%,rgba(0,0,0,.1) 40%,rgba(26,37,64,.88) 100%);pointer-events:none;"></div>
                     <div
-                        style="position:relative;flex:1;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;text-align:left;padding:0 22px 22px;pointer-events:none;">
+                        style="position:relative;flex:1;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;text-align:left;padding:0 22px 22px;">
                       <!-- container chữ có key để trigger animation vhUp -->
-                      <div key="hero-content-{{ heroIndex }}" style="animation:vhUp 0.4s cubic-bezier(0.215, 0.610, 0.355, 1) forwards;width:100%;">
+                      <div key="hero-content-{{ heroIndex }}" style="animation:vhUp 0.4s cubic-bezier(0.215, 0.610, 0.355, 1) forwards;width:100%;pointer-events:none;">
                         <div class="vh-serif"
                              style="font-size:32px;font-weight:600;color:#fff;line-height:1.18;text-shadow:0 2px 12px rgba(0,0,0,.4);">
                           {{ homeFeatVenue.displayName }}
@@ -1047,7 +1044,7 @@
                         </div>
                       </div>
                       <div
-                          style="margin-top:20px;display:flex;align-items:center;justify-content:space-between;width:100%;pointer-events:auto;">
+                          style="margin-top:20px;display:flex;align-items:center;justify-content:space-between;width:100%;">
                         <!-- CTA căn trái -->
                         <div onClick="{{ homeFeatVenue.open }}"
                             style="display:inline-flex;align-items:center;gap:8px;border:1.5px solid rgba(255,255,255,.55);color:#fff;font-size:14px;font-weight:600;padding:10px 22px;border-radius:99px;background:rgba(255,255,255,.18);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);cursor:pointer;">

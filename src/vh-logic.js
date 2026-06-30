@@ -14,6 +14,16 @@ window.VH_LOGIC = {
       }
     }
   },
+  setupHeroSwipe() {
+    const el = document.querySelector('.vh-hero-card-container');
+    if (el && !el._vhSwipeBound) {
+      el._vhSwipeBound = true;
+      el.addEventListener('touchstart', (e) => this.handleHeroTouchStart(e), { passive: true });
+      el.addEventListener('touchend', (e) => this.handleHeroTouchEnd(e), { passive: true });
+      el.addEventListener('mousedown', (e) => this.handleHeroTouchStart(e));
+      el.addEventListener('mouseup', (e) => this.handleHeroTouchEnd(e));
+    }
+  },
   // ---- notif ----
   markRead(id) {
     const l = (this.state.notifList || this.NOTIF_SEED).map(n => n.id === id ? {...n, read: true} : n);
@@ -125,6 +135,7 @@ window.VH_LOGIC = {
         this.setState({heroIndex: (cur + 1) % 3});
       }
     }, 5000);
+    this.setupHeroSwipe();
   },
   componentDidUpdate() {
     // pre-permission Thông báo: lần đầu vào Home sau khi tạo tài khoản (chỉ 1 lần)
@@ -149,6 +160,7 @@ window.VH_LOGIC = {
         c.scrollTo({top: Math.max(0, target), behavior: 'smooth'});
       }
     }
+    this.setupHeroSwipe();
   },
   componentWillUnmount() {
     clearInterval(this._heroTimer);
