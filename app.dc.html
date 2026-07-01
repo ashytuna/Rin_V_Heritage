@@ -2012,7 +2012,7 @@
                       </sc-if>
 
                       <!-- Panel content area with transitions on hotspot changes -->
-                      <div key="hotspot-content-{{ activeHotspot }}" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:16px;padding-right:2px;animation:vhFadeIn .25s ease-out;">
+                      <div key="hotspot-content-{{ activeHotspot }}" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:16px;padding-right:2px;animation:vhFadeIn .25s ease-out;padding-bottom:60px;">
 
                         <div class="vh-serif" style="font-size:21px;font-weight:600;color:var(--text-primary);line-height:1.28;text-align:left;">{{ curArtName }}</div>
 
@@ -2034,10 +2034,13 @@
                         </sc-if>
                       </div>
 
-                      <!-- CTA — luôn hiển thị dưới cùng panel -->
-                      <button data-ripple="1" onClick="{{ toDetail }}" style="position:relative;overflow:hidden;flex:none;width:100%;border:none;background:var(--cta);color:#fff;font-size:14px;font-weight:600;padding:12px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 12px rgba(237,137,39,.3);">
-                        Xem chi tiết hiện vật<i class="ti ti-arrow-right" style="font-size:17px;"></i>
-                      </button>
+                      <!-- CTA — luôn hiển thị sticky ở đáy màn hình khi showDetailBtn = true -->
+                      <sc-if value="{{ showDetailBtn }}" hint-placeholder-val="{{ true }}">
+                        <button data-ripple="1" onClick="{{ toDetail }}"
+                                style="position:absolute;bottom:{{ threeDPanelY }}px;left:20px;right:20px;z-index:21;overflow:hidden;height:46px;border:none;background:var(--cta);color:#fff;font-size:14px;font-weight:600;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 12px rgba(237,137,39,.3);transition:{{ panelTransition }};">
+                          Xem chi tiết hiện vật<i class="ti ti-arrow-right" style="font-size:17px;"></i>
+                        </button>
+                      </sc-if>
                     </div>
                   </sc-if>
 
