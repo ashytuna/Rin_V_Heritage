@@ -824,6 +824,7 @@ window.VH_RENDER = {
       arGbText: st._arGbText || '',
       arGbCharCount: (st._arGbText || '').length,
       onARGbText: (e) => this.setState({_arGbText: e.target.value.slice(0, 200)}),
+      onARGbSelectTemplate: (e) => this.setState({_arGbSelectedTemplateText: e.target.value}),
       arGbIsPremium: !!(st.tiers && st.tiers.premium),
       arGbNotPremium: !(st.tiers && st.tiers.premium),
       arGbList,
