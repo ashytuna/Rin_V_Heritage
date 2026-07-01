@@ -773,45 +773,39 @@ window.VH_LOGIC = {
   closeARBubble() {
     this.setState({_arGbBubble: null});
   },
-  postARMessage() {
-    const text = (this.state._arGbText || '').trim();
-    if (!text) return;
+  handleSendGbAR() {
     const isPremium = !!(this.state.tiers && this.state.tiers.premium);
-    if (!isPremium) {
-      this.premiumGate();
-      return;
+    let text = '';
+    if (isPremium) {
+      text = (this.state._arGbText || '').trim().slice(0, 200);
+    } else {
+      text = this.state._arGbSelectedTemplateText || '';
     }
-    if (this.state.guestbookPosted >= 3) {
-      this.gbLimitReached();
-      return;
-    }
-    this.guestbook = [{
-      id: Date.now(),
-      text,
-      author: this.state.user.name || 'Bạn',
-      likes: 0,
-      time: 'vừa xong',
-      premium: true
-    }, ...this.guestbook];
-    this.setState({_arGbText: '', guestbookPosted: this.state.guestbookPosted + 1, _arGbBubble: null});
-    this.showToast('Đã gửi lời nhắn AR ✦', 'success');
-  },
-  postCustomMessage(text) {
+    
     if (!text) return;
+    
     if (this.state.guestbookPosted >= 3) {
       this.gbLimitReached();
       return;
     }
+    
     this.guestbook = [{
       id: Date.now(),
-      text,
+      text: text,
       author: this.state.user.name || 'Bạn',
       likes: 0,
       time: 'vừa xong',
-      premium: false
+      premium: isPremium
     }, ...this.guestbook];
-    this.setState({guestbookPosted: this.state.guestbookPosted + 1});
-    this.showToast('Đã gửi lời nhắn AR ✦', 'success');
+    
+    this.setState({
+      _arGbText: '',
+      _arGbSelectedTemplateText: '',
+      guestbookPosted: this.state.guestbookPosted + 1,
+      _arGbBubble: null
+    });
+    
+    this.showToast('Đã gửi lời nhắn.');
   },
   downloadNearby() {
     const packs = this.state.packs || [];

@@ -744,16 +744,23 @@ window.VH_RENDER = {
     const selectedBubble = isARGbMode ? (arBubbles.find(b => b.id === st._arGbBubble) || null) : null;
     const hasSelectedBubble = !!selectedBubble;
 
-    const arGbList = this.guestbook.map(g => {
-      return {
-        ...g,
-        initial: (g.author || 'B')[0],
-        heartIcon: (st.liked && st.liked[g.id]) ? 'ti-heart-filled' : 'ti-heart',
-        heartColor: (st.liked && st.liked[g.id]) ? 'var(--error)' : 'var(--text-tertiary)',
-        likeCount: (g.likes || 0) + ((st.liked && st.liked[g.id]) ? 1 : 0),
-        toggleLike: () => this.toggleGbLike(g.id),
-      };
-    });
+    const arGbList = this.guestbook
+      .filter(g => {
+        if (g.id > 1000000000000) {
+          return g.id >= (Date.now() - 60 * 24 * 60 * 60 * 1000);
+        }
+        return true;
+      })
+      .map(g => {
+        return {
+          ...g,
+          initial: (g.author || 'B')[0],
+          heartIcon: (st.liked && st.liked[g.id]) ? 'ti-heart-filled' : 'ti-heart',
+          heartColor: (st.liked && st.liked[g.id]) ? 'var(--error)' : 'var(--text-tertiary)',
+          likeCount: (g.likes || 0) + ((st.liked && st.liked[g.id]) ? 1 : 0),
+          toggleLike: () => this.toggleGbLike(g.id),
+        };
+      });
 
     return {
       isScan: st.screen === 'scan',
@@ -817,19 +824,54 @@ window.VH_RENDER = {
       arGbText: st._arGbText || '',
       arGbCharCount: (st._arGbText || '').length,
       onARGbText: (e) => this.setState({_arGbText: e.target.value.slice(0, 200)}),
-      postARMessage: () => this.postARMessage(),
       arGbIsPremium: !!(st.tiers && st.tiers.premium),
-      arGbPostBg: (st._arGbText || '').trim() ? 'var(--cta)' : 'var(--disabled-bg)',
-      arGbPostFg: (st._arGbText || '').trim() ? '#fff' : 'var(--disabled-fg)',
-      arGbPostCursor: (st._arGbText || '').trim() ? 'pointer' : 'not-allowed',
-      arGbPostPointerEvents: (st._arGbText || '').trim() ? 'auto' : 'none',
+      arGbNotPremium: !(st.tiers && st.tiers.premium),
       arGbList,
       gbCount: this.guestbook.length,
-      postCustomMsg1: () => this.postCustomMessage("Tuyệt vời quá! 🇻🇳"),
-      postCustomMsg2: () => this.postCustomMessage("Rất tự hào về lịch sử Việt Nam!"),
-      postCustomMsg3: () => this.postCustomMessage("Mô hình 3D AR rất trực quan"),
-      postCustomMsg4: () => this.postCustomMessage("Trải nghiệm học tập thú vị 👍"),
       gbUnlock: () => this.premiumGate(),
+      handleSendGbAR: () => this.handleSendGbAR(),
+      arGbSelectedTemplateText: st._arGbSelectedTemplateText || '',
+      arGbTemplatesV3: [
+        '❤️ Thật tuyệt vời!',
+        '👏 Di sản rất đẹp.',
+        '📖 Hôm nay học được nhiều điều.',
+        '✨ Trải nghiệm đáng nhớ.',
+        '🏛 Sẽ quay lại lần sau.'
+      ].map(t => ({
+        text: t,
+        borderColor: st._arGbSelectedTemplateText === t ? 'var(--cta)' : 'var(--border)',
+        bgColor: st._arGbSelectedTemplateText === t ? 'rgba(237, 137, 39, 0.08)' : 'var(--bg-secondary)',
+        textColor: st._arGbSelectedTemplateText === t ? 'var(--cta)' : 'var(--text-primary)',
+        select: () => this.setState({_arGbSelectedTemplateText: t})
+      })),
+      arGbSendDisabled: (() => {
+        const isPremium = !!(st.tiers && st.tiers.premium);
+        if (isPremium) {
+          return !(st._arGbText && st._arGbText.trim().length > 0);
+        } else {
+          return !st._arGbSelectedTemplateText;
+        }
+      })(),
+      arGbSendBtnBg: (() => {
+        const isPremium = !!(st.tiers && st.tiers.premium);
+        const disabled = isPremium ? !(st._arGbText && st._arGbText.trim().length > 0) : !st._arGbSelectedTemplateText;
+        return disabled ? 'var(--bg-tertiary)' : 'var(--cta)';
+      })(),
+      arGbSendBtnFg: (() => {
+        const isPremium = !!(st.tiers && st.tiers.premium);
+        const disabled = isPremium ? !(st._arGbText && st._arGbText.trim().length > 0) : !st._arGbSelectedTemplateText;
+        return disabled ? 'var(--text-tertiary)' : '#fff';
+      })(),
+      arGbSendBtnOpacity: (() => {
+        const isPremium = !!(st.tiers && st.tiers.premium);
+        const disabled = isPremium ? !(st._arGbText && st._arGbText.trim().length > 0) : !st._arGbSelectedTemplateText;
+        return disabled ? '0.6' : '1';
+      })(),
+      arGbSendBtnCursor: (() => {
+        const isPremium = !!(st.tiers && st.tiers.premium);
+        const disabled = isPremium ? !(st._arGbText && st._arGbText.trim().length > 0) : !st._arGbSelectedTemplateText;
+        return disabled ? 'not-allowed' : 'pointer';
+      })(),
     };
   },
 
