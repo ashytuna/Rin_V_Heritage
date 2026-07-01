@@ -2275,17 +2275,16 @@
                 </div>
 
                 <!-- Floating Glassmorphism Controller Panel (Z-index: 10) -->
-                <div style="position:absolute;left:20px;right:20px;bottom:34px;z-index:10;background:rgba(13, 20, 35, 0.78);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.12);border-radius:24px;padding:22px 20px 18px;box-shadow:0 12px 40px rgba(0,0,0,0.5);display:flex;flex-direction:column;gap:16px;box-sizing:border-box;">
+                <div style="position:absolute;left:20px;right:20px;bottom:34px;z-index:10;background:rgba(13, 20, 35, 0.78);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.12);border-radius:24px;padding:20px;box-shadow:0 12px 40px rgba(0,0,0,0.5);display:flex;flex-direction:column;gap:14px;box-sizing:border-box;">
                   
-                  <!-- Header của panel (Badge thông tin mốc hiện tại) -->
-                  <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
-                    <div style="display:flex;align-items:center;gap:6px;background:rgba(237,137,39,0.16);border:1px solid rgba(237,137,39,0.25);color:var(--cta);font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;text-transform:uppercase;letter-spacing:0.05em;">
+                  <!-- Dòng 1: Badge tự co giãn, không wrap text, white-space: nowrap -->
+                  <div style="display:flex;align-items:center;justify-content:flex-start;width:100%;">
+                    <div style="display:flex;align-items:center;gap:6px;background:rgba(237,137,39,0.16);border:1px solid rgba(237,137,39,0.25);color:var(--cta);font-size:11px;font-weight:700;padding:4px 12px;border-radius:8px;text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap;width:fit-content;">
                       <i class="ti {{ timeBadgeIcon }}" style="font-size:13px;"></i>{{ timeBadge }}
                     </div>
-                    <span style="font-size:11px;color:rgba(255,255,255,0.45);font-weight:500;">Vuốt ảnh hoặc kéo slider</span>
                   </div>
 
-                  <!-- Text mô tả mốc -->
+                  <!-- Dòng 2: Tiêu đề và mô tả mốc -->
                   <div style="display:flex;flex-direction:column;gap:6px;text-align:left;animation:vhFadeIn .3s ease-out;">
                     <div class="vh-serif" style="font-size:20px;font-weight:700;color:#fff;line-height:1.2;">{{ timeLabel }}</div>
                     <div style="font-size:12px;color:rgba(255,255,255,0.65);line-height:1.5;height:36px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;text-align:left;">{{ timeBigSub }}</div>
@@ -2311,11 +2310,11 @@
                       <div style="position:absolute;top:50%;transform:translate(-50%, -50%);left:calc(10px + (100% - 20px) * {{ timeSliderPct }} / 100);width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid var(--primary);box-shadow:0 3px 8px rgba(0,0,0,0.4);cursor:grab;pointer-events:none;transition:{{ timeThumbTransition }};"></div>
                     </div>
 
-                    <!-- Nhãn mốc nằm dưới Slider (Căn chỉnh tuyệt đối trùng khớp tâm dot) -->
-                    <div style="position:relative;width:100%;height:24px;margin-top:6px;box-sizing:border-box;">
+                    <!-- Nhãn mốc nằm dưới Slider (Chia đều bằng Expanded và căn chỉnh trùng khớp tâm dot) -->
+                    <div style="display:flex;width:100%;margin-top:6px;padding:0 10px;box-sizing:border-box;">
                       <sc-for list="{{ timeStages }}" as="s" hint-placeholder-count="3">
                         <button onClick="{{ s.pick }}"
-                                style="background:transparent;border:none;padding:0;margin:0;cursor:pointer;outline:none;position:absolute;top:0;transform:translateX(-50%);left:calc(10px + (100% - 20px) * {{ s.idx }} * 50 / 100);display:flex;justify-content:center;width:80px;text-align:center;">
+                                style="background:transparent;border:none;padding:4px 0;margin:0;cursor:pointer;outline:none;flex:1;display:flex;justify-content:{{ s.idx === 0 ? 'flex-start' : (s.idx === 2 ? 'flex-end' : 'center') }};">
                           <span style="font-size:11px;font-weight:700;color:{{ s.labelColor }};white-space:nowrap;transition:color 0.25s;">
                             {{ s.label }}
                           </span>
@@ -2324,7 +2323,7 @@
                     </div>
                   </div>
 
-                  <!-- Footer Caption (Bỏ premium, đổi nội dung) -->
+                  <!-- Footer Caption -->
                   <div style="font-size:11.5px;color:rgba(255,255,255,0.5);text-align:center;border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;margin-top:2px;font-weight:500;">
                     Kéo thanh thời gian để khám phá sự thay đổi của di tích.
                   </div>
