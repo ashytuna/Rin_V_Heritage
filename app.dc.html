@@ -2255,17 +2255,13 @@
                 <!-- Vùng ảnh nền chính (Full screen) -->
                 <div onMouseDown="{{ timeSwipe }}" onTouchStart="{{ timeSwipe }}"
                      style="position:absolute;inset:0;touch-action:pan-y;z-index:1;">
-                  <!-- Ảnh Nguyên bản (TimeIdx = 0) -->
+                  <!-- Ảnh Hiện trạng (TimeIdx = 0) -->
                   <img src="{{ timeImg0 }}" alt=""
-                       style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:sepia(.55) contrast(1.05) brightness(.92) saturate(.85);transition:opacity 0.25s ease-in-out;opacity:{{ timeImg0Opacity }};z-index:2;">
+                       style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:none;transition:opacity 0.25s ease-in-out;opacity:{{ timeImg0Opacity }};z-index:2;">
                   
-                  <!-- Ảnh Hiện trạng (TimeIdx = 1) -->
+                  <!-- Ảnh Phục dựng 3D (TimeIdx = 1) -->
                   <img src="{{ timeImg1 }}" alt=""
-                       style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:none;transition:opacity 0.25s ease-in-out;opacity:{{ timeImg1Opacity }};z-index:3;">
-                  
-                  <!-- Ảnh Phục dựng 3D (TimeIdx = 2) -->
-                  <img src="{{ timeImg2 }}" alt=""
-                       style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(1.25) contrast(1.12) hue-rotate(-6deg);transition:opacity 0.25s ease-in-out;opacity:{{ timeImg2Opacity }};z-index:4;">
+                       style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(1.25) contrast(1.12) hue-rotate(-6deg);transition:opacity 0.25s ease-in-out;opacity:{{ timeImg1Opacity }};z-index:3;">
                   
                   <!-- Lớp lưới phục dựng công nghệ 3D (Chỉ hiện khi timeIdx === 2) -->
                   <div style="position:absolute;inset:0;display:{{ time3DDisp }};background-image:linear-gradient(rgba(95,138,236,.15) 1px,transparent 1px),linear-gradient(90deg,rgba(95,138,236,.15) 1px,transparent 1px);background-size:24px 24px;mix-blend-mode:screen;pointer-events:none;opacity:0.8;z-index:5;"></div>
@@ -2301,9 +2297,8 @@
                       <!-- Line màu Primary chạy theo phần trăm (Tránh chiều rộng âm) -->
                       <div style="position:absolute;left:16.666%;height:4px;border-radius:99px;background:var(--primary);pointer-events:none;transition:{{ timeTrackTransition }};width:calc(66.666% * ({{ timeSliderPct }} / 100));"></div>
                       
-                      <!-- 3 Dot mốc định vị nhỏ (16.67%, 50%, 83.33%) -->
+                      <!-- 2 Dot mốc ở hai đầu track (16.67% và 83.33%) -->
                       <div style="position:absolute;left:16.666%;width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.4);transform:translate(-50%, -50%);top:50%;pointer-events:none;"></div>
-                      <div style="position:absolute;left:50%;width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.4);transform:translate(-50%, -50%);top:50%;pointer-events:none;"></div>
                       <div style="position:absolute;left:83.333%;width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.4);transform:translate(-50%, -50%);top:50%;pointer-events:none;"></div>
 
                       <!-- Thumb kéo 20px (bám theo timeSliderPct) -->
@@ -2312,7 +2307,7 @@
 
                     <!-- Nhãn mốc nằm dưới Slider (Chia đều bằng Expanded/Flex và căn giữa) -->
                     <div style="display:flex;width:100%;margin-top:12px;box-sizing:border-box;">
-                      <sc-for list="{{ timeStages }}" as="s" hint-placeholder-count="3">
+                      <sc-for list="{{ timeStages }}" as="s" hint-placeholder-count="2">
                         <button onClick="{{ s.pick }}"
                                 style="background:transparent;border:none;padding:4px 0;margin:0;cursor:pointer;outline:none;flex:1;display:flex;justify-content:center;align-items:center;text-align:center;">
                           <span style="font-size:12px;font-weight:500;color:{{ s.labelColor }};white-space:nowrap;transition:color 0.25s;">
@@ -5405,7 +5400,7 @@ class Component extends DCLogic {
     scanState: 'idle', scanFailReason: null, qrState: 'idle', isPlaying: false, audioProgress: 0, audioHD: false, audioSpeed: 1, audioVoice: 'Tiêu chuẩn',
     libTab: 'art', searchQuery: '', searchFilter: 'all', _exploreH: 18, _camAskChecked: false, _camSnoozeDay: '',
     wheelchair: false, voiceDesc: false, _venueDownloadLoading: false, _venueDownloadProgress: 0, _venueDownloadError: null,
-    threeDRot: 0, threeDZoom: 1, threeDPlaying: true, timeIdx: 1, threeDPanelY: 80, _draggingPanel: false,
+    threeDRot: 0, threeDZoom: 1, threeDPlaying: true, timeIdx: 0, threeDPanelY: 80, _draggingPanel: false,
     _arMode: 'camera', _arGbBubble: null, _arGbText: '',
     paymentMethod: null, paymentTier: 'premium', notifList: null, twoFA: false, failedPayment: 0,
     _cpOld: '', _cpNew: '', _cpConfirm: '', _ceNew: '', _daConfirm: false, _daPass: '', _revoked: [],

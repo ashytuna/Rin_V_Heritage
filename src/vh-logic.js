@@ -1638,15 +1638,15 @@ window.VH_LOGIC = {
     document.addEventListener('touchmove', move, {passive: true});
     document.addEventListener('touchend', up);
   },
-  // ---- time travel ----
+  // ---- time travel (2 mốc) ----
   pickTimeStage(idx) {
     this.setState({
       timeIdx: idx,
-      _timeTravelPct: idx === 0 ? 0 : (idx === 1 ? 50 : 100)
+      _timeTravelPct: idx === 0 ? 0 : 100
     });
   },
   changeTimeStage(dir) {
-    const next = Math.min(2, Math.max(0, this.state.timeIdx + dir));
+    const next = Math.min(1, Math.max(0, this.state.timeIdx + dir));
     if (next === this.state.timeIdx) return;
     this.pickTimeStage(next);
   },
@@ -1668,9 +1668,8 @@ window.VH_LOGIC = {
       let pct = ((relativeX - pixel16) / usableWidth) * 100;
       pct = Math.max(0, Math.min(100, pct));
       
-      let nextIdx = 1;
-      if (pct < 25) nextIdx = 0;
-      else if (pct >= 75) nextIdx = 2;
+      // 2 mốc: ngưỡng snap tại 50%
+      const nextIdx = pct < 50 ? 0 : 1;
       
       const nextState = {_timeTravelPct: pct};
       if (nextIdx !== this.state.timeIdx) {
@@ -1694,15 +1693,14 @@ window.VH_LOGIC = {
       document.removeEventListener('touchmove', move);
       document.removeEventListener('touchend', up);
       
-      // Snap về mốc gần nhất
-      const pct = this.state._timeTravelPct !== undefined ? this.state._timeTravelPct : 50;
-      let snappedIdx = 1;
-      let snappedPct = 50;
-      if (pct < 25) {
+      // Snap về mốc gần nhất (2 mốc: ngưỡng 50%)
+      const pct = this.state._timeTravelPct !== undefined ? this.state._timeTravelPct : 0;
+      let snappedIdx, snappedPct;
+      if (pct < 50) {
         snappedIdx = 0;
         snappedPct = 0;
-      } else if (pct >= 75) {
-        snappedIdx = 2;
+      } else {
+        snappedIdx = 1;
         snappedPct = 100;
       }
       

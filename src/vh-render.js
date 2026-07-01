@@ -2333,35 +2333,31 @@ window.VH_RENDER = {
         this.stop3D();
         this.back();
       },
-      // TIME TRAVEL
+      // TIME TRAVEL (2 mốc: Hiện trạng / Phục dựng 3D)
       isTimeTravel: st.screen === 'timetravel',
       timeIdx: st.timeIdx,
-      timeLabel: ['Nguyên bản (thế kỷ XI)', 'Hiện trạng ngày nay', 'Phục dựng 3D đầy đủ'][st.timeIdx],
+      timeLabel: ['Hiện trạng ngày nay', 'Phục dựng 3D đầy đủ'][st.timeIdx],
       timeBigSub: [
-        'Tái hiện hiện vật như khi mới được tạo tác, dựa trên tư liệu khảo cổ.',
-        'Hình ảnh hiện vật theo hiện trạng đang được lưu giữ, trưng bày.',
+        'Hình ảnh hiện vật theo hiện trạng đang được lưu giữ và trưng bày.',
         'Mô hình phục dựng 3D đầy đủ — chi tiết, màu sắc và hoa văn nguyên gốc.'
       ][st.timeIdx],
       timeSwipe: (e) => this.timeSwipeStart(e),
       timeImg0: this.vimg(cur.seed, 600, 760),
       timeImg1: this.vimg(cur.seed, 600, 760),
-      timeImg2: this.vimg(cur.seed, 600, 760),
       timeImg0Opacity: st.timeIdx === 0 ? 1 : 0,
       timeImg1Opacity: st.timeIdx === 1 ? 1 : 0,
-      timeImg2Opacity: st.timeIdx === 2 ? 1 : 0,
-      time3DDisp: st.timeIdx === 2 ? 'block' : 'none',
-      timeBadge: ['Tư liệu phục chế', 'Hiện trạng trưng bày', 'Mô hình phục dựng 3D'][st.timeIdx],
-      timeBadgeIcon: ['ti-photo-scan', 'ti-building-museum', 'ti-cube-3d-sphere'][st.timeIdx],
+      time3DDisp: st.timeIdx === 1 ? 'block' : 'none',
+      timeBadge: ['Hiện trạng trưng bày', 'Mô hình phục dựng 3D'][st.timeIdx],
+      timeBadgeIcon: ['ti-building-museum', 'ti-cube-3d-sphere'][st.timeIdx],
       
-      timeSliderPct: st._timeTravelPct !== undefined ? st._timeTravelPct : (st.timeIdx * 50),
+      timeSliderPct: st._timeTravelPct !== undefined ? st._timeTravelPct : (st.timeIdx * 100),
       timeThumbTransition: this._draggingTimeSlider ? 'none' : 'left 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
       timeTrackTransition: this._draggingTimeSlider ? 'none' : 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
       onTimeSliderStart: (e) => this.timeSliderStart(e),
       
       timeStages: [
-        {idx: 0, label: 'Nguyên bản', position: '0%'},
-        {idx: 1, label: 'Hiện tại', position: '50%'},
-        {idx: 2, label: 'Phục dựng', position: '100%'},
+        {idx: 0, label: 'Hiện trạng'},
+        {idx: 1, label: 'Phục dựng 3D'},
       ].map(s => {
         const active = st.timeIdx === s.idx;
         return {
