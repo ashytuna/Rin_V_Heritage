@@ -1831,6 +1831,7 @@ window.VH_RENDER = {
     const ven = this.findVenue(st.curVenueId) || this.venues[0];
     const venArtifacts = this.venueArtifacts(ven.id);
     const isPremium = !!(st.tiers && st.tiers.premium);
+    const hasAcademic = !!(st.tiers && st.tiers.academic);
     const inAnyCollection = (st.collections || []).some(c => (c.items || []).includes(cur.id));
     const isSaved = st.saved.includes(cur.id) || inAnyCollection;
     const a3 = (this.deepArticles && this.deepArticles[cur.id]) || this.deepArticles[1];
