@@ -1662,7 +1662,9 @@ window.VH_LOGIC = {
     const startX = rect.left;
     
     const update = (clientX) => {
-      let pct = ((clientX - startX) / width) * 100;
+      const relativeX = clientX - startX - 20; // Trừ đi 20px padding trái của track
+      const usableWidth = width - 40;          // Chiều rộng khả dụng thực tế
+      let pct = (relativeX / usableWidth) * 100;
       pct = Math.max(0, Math.min(100, pct));
       
       let nextIdx = 1;
