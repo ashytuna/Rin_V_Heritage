@@ -163,17 +163,24 @@ window.VH_RENDER = {
         document.addEventListener('touchmove', move, {passive: true});
         document.addEventListener('touchend', up);
       },
-      guestbookList: this.guestbook.map(g => {
-        const liked = !!(st.liked && st.liked[g.id]);
-        return {
-          ...g,
-          initial: (g.author || 'B')[0],
-          likeCount: (g.likes || 0) + (liked ? 1 : 0),
-          heartIcon: liked ? 'ti-heart-filled' : 'ti-heart',
-          heartColor: liked ? 'var(--error)' : 'var(--text-tertiary)',
-          toggleLike: () => this.toggleGbLike(g.id),
-        };
-      }),
+      guestbookListFiltered: this.guestbook
+        .filter(g => {
+          if (g.id > 1000000000000) {
+            return g.id >= (Date.now() - 60 * 24 * 60 * 60 * 1000);
+          }
+          return true;
+        })
+        .map(g => {
+          const liked = !!(st.liked && st.liked[g.id]);
+          return {
+            ...g,
+            initial: (g.author || 'B')[0],
+            likeCount: (g.likes || 0) + (liked ? 1 : 0),
+            heartIcon: liked ? 'ti-heart-filled' : 'ti-heart',
+            heartColor: liked ? 'var(--error)' : 'var(--text-tertiary)',
+            toggleLike: () => this.toggleGbLike(g.id),
+          };
+        }),
       gbCount: this.guestbook.length,
       gbIsPremium: !!(st.tiers && st.tiers.premium),
       gbNotPremium: !(st.tiers && st.tiers.premium),
@@ -186,10 +193,49 @@ window.VH_RENDER = {
       gbCharCount: (st._gbText || '').length,
       onGbText: (e) => this.setState({_gbText: e.target.value.slice(0, 200)}),
       postGuestbook: () => this.postGuestbook(),
-      gbTemplates: ['Tự hào về di sản Việt Nam 🇻🇳', 'Cảm ơn vì đã gìn giữ lịch sử', 'Một trải nghiệm khó quên!', 'Đẹp và ý nghĩa quá!'].map(t => ({
-        t,
-        use: () => this.postGuestbookTemplate(t)
+      handleSendGb: () => this.handleSendGb(),
+      gbSelectedTemplateText: st._gbSelectedTemplateText || '',
+      gbTemplatesV3: [
+        '❤️ Thật tuyệt vời!',
+        '👏 Di sản rất đẹp.',
+        '📖 Hôm nay học được nhiều điều.',
+        '✨ Trải nghiệm đáng nhớ.',
+        '🏛 Sẽ quay lại lần sau.'
+      ].map(t => ({
+        text: t,
+        borderColor: st._gbSelectedTemplateText === t ? 'var(--cta)' : 'var(--border)',
+        bgColor: st._gbSelectedTemplateText === t ? 'rgba(237, 137, 39, 0.08)' : 'var(--bg-secondary)',
+        textColor: st._gbSelectedTemplateText === t ? 'var(--cta)' : 'var(--text-primary)',
+        select: () => this.setState({_gbSelectedTemplateText: t})
       })),
+      gbSendDisabled: (() => {
+        const isPremium = !!(st.tiers && st.tiers.premium);
+        if (isPremium) {
+          return !(st._gbText && st._gbText.trim().length > 0);
+        } else {
+          return !st._gbSelectedTemplateText;
+        }
+      })(),
+      gbSendBtnBg: (() => {
+        const isPremium = !!(st.tiers && st.tiers.premium);
+        const disabled = isPremium ? !(st._gbText && st._gbText.trim().length > 0) : !st._gbSelectedTemplateText;
+        return disabled ? 'var(--bg-tertiary)' : 'var(--cta)';
+      })(),
+      gbSendBtnFg: (() => {
+        const isPremium = !!(st.tiers && st.tiers.premium);
+        const disabled = isPremium ? !(st._gbText && st._gbText.trim().length > 0) : !st._gbSelectedTemplateText;
+        return disabled ? 'var(--text-tertiary)' : '#fff';
+      })(),
+      gbSendBtnOpacity: (() => {
+        const isPremium = !!(st.tiers && st.tiers.premium);
+        const disabled = isPremium ? !(st._gbText && st._gbText.trim().length > 0) : !st._gbSelectedTemplateText;
+        return disabled ? '0.6' : '1';
+      })(),
+      gbSendBtnCursor: (() => {
+        const isPremium = !!(st.tiers && st.tiers.premium);
+        const disabled = isPremium ? !(st._gbText && st._gbText.trim().length > 0) : !st._gbSelectedTemplateText;
+        return disabled ? 'not-allowed' : 'pointer';
+      })(),
       shareTargets,
       shareSubtitle: cur.name,
       ctxSave: () => {

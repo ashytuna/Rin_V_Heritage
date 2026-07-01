@@ -1256,6 +1256,39 @@ window.VH_LOGIC = {
     this.setState({_gbText: '', guestbookPosted: this.state.guestbookPosted + 1});
     this.showToast('Đã gửi — hiển thị sau khi kiểm duyệt ✦');
   },
+  handleSendGb() {
+    const isPremium = !!(this.state.tiers && this.state.tiers.premium);
+    let text = '';
+    if (isPremium) {
+      text = (this.state._gbText || '').trim().slice(0, 200);
+    } else {
+      text = this.state._gbSelectedTemplateText || '';
+    }
+    
+    if (!text) return;
+    
+    if (this.state.guestbookPosted >= 3) {
+      this.gbLimitReached();
+      return;
+    }
+    
+    this.guestbook = [{
+      id: Date.now(),
+      text: text,
+      author: this.state.user.name || 'Bạn',
+      likes: 0,
+      time: 'vừa xong',
+      premium: isPremium
+    }, ...this.guestbook];
+    
+    this.setState({
+      _gbText: '',
+      _gbSelectedTemplateText: '',
+      guestbookPosted: this.state.guestbookPosted + 1
+    });
+    
+    this.showToast('Đã gửi lời nhắn.');
+  },
 
   // ---- artifact / venue ----
   // tra cứu venue ở cả danh sách chính lẫn điểm đến Top 10
