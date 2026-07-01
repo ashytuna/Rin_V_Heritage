@@ -1755,20 +1755,15 @@
                        style="font-size:26px;font-weight:600;line-height:1.2;margin-top:10px;">{{
                     curArt.name }}
                   </div>
-                  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;">
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;">
                     <div style="background:var(--bg-tertiary);border-radius:8px;padding:8px 12px;">
                       <div style="font-size:10px;color:var(--text-tertiary);">Niên đại</div>
-                      <div class="vh-serif" style="font-size:14px;font-weight:500;">{{ curArt.era
-                        }}
-                      </div>
+                      <div class="vh-serif" style="font-size:14px;font-weight:500;">{{ curArt.era }}</div>
                     </div>
                     <div style="background:var(--bg-tertiary);border-radius:8px;padding:8px 12px;">
                       <div style="font-size:10px;color:var(--text-tertiary);">Chất liệu</div>
-                      <div class="vh-serif" style="font-size:14px;font-weight:500;">{{
-                        curArt.material }}
-                      </div>
+                      <div class="vh-serif" style="font-size:14px;font-weight:500;">{{ curArt.material }}</div>
                     </div>
-
                   </div>
                   <!-- voice description (blind a11y) -->
                   <sc-if value="{{ showVoiceDesc }}" hint-placeholder-val="{{ false }}">
@@ -1993,7 +1988,7 @@
 
                         <div class="vh-serif" style="font-size:21px;font-weight:600;color:var(--text-primary);line-height:1.28;text-align:left;">{{ curArtName }}</div>
 
-                        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;flex:none;width:100%;">
+                        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;flex:none;width:100%;">
                           <sc-for list="{{ curArtMetaItems }}" as="meta" hint-placeholder-count="2">
                             <div style="min-width:0;background:var(--bg-tertiary);border-radius:8px;padding:7px 8px;border:1px solid var(--border);text-align:left;">
                               <div style="font-size:10px;color:var(--text-tertiary);font-weight:600;line-height:1.2;">{{ meta.label }}</div>
